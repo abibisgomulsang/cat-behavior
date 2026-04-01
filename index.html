@@ -44,13 +44,16 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 
 <script>
 /*
- * ============================================
- *   여기에 본인의 Anthropic API 키를 넣으세요
- *   (따옴표 안에 키를 붙여넣기)
- * ============================================
+ * ==============================================
+ *   아래 따옴표 안에 본인의 API 키를 붙여넣으세요
+ *   앞뒤 공백 자동 제거됩니다
+ * ==============================================
  */
 var API_KEY = "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";
-/* ============================================ */
+/* ============================================== */
+
+// 공백/줄바꿈 자동 제거
+API_KEY = API_KEY.trim();
 
 var html = htm.bind(React.createElement);
 var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef,useCallback=React.useCallback;
@@ -75,7 +78,7 @@ var S={
   appSub:{fontSize:12,color:"#8888aa",marginTop:4},
   tipBox:{background:"rgba(255,255,255,.06)",borderRadius:12,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,width:"100%",marginBottom:20,border:"1px solid rgba(255,255,255,.05)"},
   modeCard:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:"15px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"},
-  histBtn:{marginTop:16,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5},
+  histBtn:{marginTop:12,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5},
   topBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"#333",position:"sticky",top:0,zIndex:10,flexShrink:0},
   topTitle:{color:"#fff",fontSize:15,fontWeight:700},
   topBtn:{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5},
@@ -84,7 +87,7 @@ var S={
   video:{width:"100%",height:"100%",objectFit:"cover",display:"block"},
   camOverlay:{position:"absolute",inset:0,background:"rgba(0,0,0,.75)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)",zIndex:3},
   liveBar:{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",background:"rgba(255,255,255,.04)",borderBottom:"1px solid rgba(255,255,255,.06)"},
-  errBox:{margin:"14px 18px",padding:"14px 16px",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",borderRadius:12,color:"#ff7070",fontSize:13,display:"flex",flexDirection:"column",gap:10},
+  errBox:{margin:"14px 18px",padding:"14px 16px",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",borderRadius:12,color:"#ff7070",fontSize:12,display:"flex",flexDirection:"column",gap:10,wordBreak:"break-all"},
   retryBtn:{alignSelf:"flex-start",padding:"8px 20px",background:"rgba(255,255,255,.12)",borderRadius:8,color:"#fff",fontSize:12.5},
   resTxt:{padding:"12px 18px 16px",color:"#ccccdd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"},
   hItem:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:14,cursor:"pointer",textAlign:"left",display:"block",marginBottom:10}
@@ -93,6 +96,12 @@ var S={
 function ResultText(props){
   var lines=props.text.split("\n");
   return html`<div style=${S.resTxt}>${lines.map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`;})}</div>`;
+}
+
+/* ====== KEY INFO HELPER ====== */
+function keyPreview(){
+  if(!API_KEY||API_KEY.length<15) return "❌ 키 미설정";
+  return API_KEY.substring(0,12)+"..."+API_KEY.substring(API_KEY.length-4);
 }
 
 function App(){
@@ -110,6 +119,8 @@ function App(){
   var _live=useState(false),liveOn=_live[0],setLiveOn=_live[1];
   var _cnt=useState(0),analyzeCount=_cnt[0],setAnalyzeCount=_cnt[1];
   var _paused=useState(false),paused=_paused[0],setPaused=_paused[1];
+  var _testResult=useState(null),testResult=_testResult[0],setTestResult=_testResult[1];
+  var _testing=useState(false),testing=_testing[0],setTesting=_testing[1];
 
   var videoRef=useRef(null),canvasRef=useRef(null),streamRef=useRef(null);
   var modeRef=useRef(mode),analyzingRef=useRef(false),liveRef=useRef(false),timerRef=useRef(null),pausedRef=useRef(false);
@@ -123,6 +134,35 @@ function App(){
     return function(){clearInterval(iv);};
   },[]);
 
+  /* ---- API TEST ---- */
+  function testApiKey(){
+    setTesting(true);setTestResult(null);
+    fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":API_KEY,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",max_tokens:30,
+        messages:[{role:"user",content:"안녕 한마디만 해줘"}]
+      })
+    }).then(function(r){
+      return r.text().then(function(txt){return {status:r.status,body:txt};});
+    }).then(function(res){
+      if(res.status===200){
+        setTestResult({ok:true,msg:"✅ API 키 정상! 연결 성공 (HTTP "+res.status+")"});
+      } else {
+        setTestResult({ok:false,msg:"❌ 오류 (HTTP "+res.status+")\n\n"+res.body});
+      }
+    }).catch(function(err){
+      setTestResult({ok:false,msg:"❌ 네트워크 오류: "+err.message});
+    }).finally(function(){setTesting(false);});
+  }
+
+  /* --- CAMERA --- */
   var startCam=useCallback(function(face){
     setCamReady(false);setCamError(null);
     if(streamRef.current){streamRef.current.getTracks().forEach(function(t){t.stop();});streamRef.current=null;}
@@ -187,8 +227,11 @@ function App(){
           {type:"text",text:m.prompt}
         ]}]
       })
-    }).then(function(r){return r.json();})
-    .then(function(data){
+    }).then(function(r){
+      return r.text().then(function(txt){return {status:r.status,body:txt};});
+    }).then(function(res){
+      if(res.status!==200) throw new Error("HTTP "+res.status+": "+res.body.substring(0,200));
+      var data=JSON.parse(res.body);
       if(data.error) throw new Error(data.error.message);
       var txt=data.content?data.content.map(function(c){return c.text||"";}).join("\n"):"결과 없음";
       setResult(txt);
@@ -284,6 +327,30 @@ function App(){
           <p style=${S.appSub}>AI 고양이 행동교정 전문가</p>
           <p style=${{fontSize:11,color:"#4ECDC4",marginTop:6}}>✨ 실시간 자동 분석 (3초 간격)</p>
         </div>
+
+        <!-- API KEY STATUS -->
+        <div style=${{width:"100%",background:"rgba(255,255,255,.05)",borderRadius:12,padding:"12px 16px",marginBottom:16,border:"1px solid rgba(255,255,255,.07)"}}>
+          <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+            <span style=${{color:"#aaa",fontSize:12,fontWeight:700}}>🔑 API 키 상태</span>
+            <span style=${{color:API_KEY.length>20?"#4ECDC4":"#ff7070",fontSize:11,fontFamily:"monospace"}}>${keyPreview()}</span>
+          </div>
+          <div style=${{display:"flex",alignItems:"center",gap:4,marginBottom:8}}>
+            <span style=${{color:"#888",fontSize:11}}>키 길이: ${API_KEY.length}자</span>
+          </div>
+          <button
+            onClick=${testApiKey}
+            disabled=${testing}
+            style=${{width:"100%",padding:"10px",borderRadius:10,background:testing?"#333":"#4ECDC4",color:"#fff",fontSize:13,fontWeight:700,opacity:testing?.6:1}}
+          >
+            ${testing?"🔍 테스트 중...":"🧪 API 연결 테스트"}
+          </button>
+          ${testResult&&html`
+            <div style=${{marginTop:10,padding:"10px 12px",borderRadius:8,background:testResult.ok?"rgba(78,205,196,.1)":"rgba(255,80,80,.1)",border:testResult.ok?"1px solid rgba(78,205,196,.2)":"1px solid rgba(255,80,80,.2)",fontSize:11,color:testResult.ok?"#4ECDC4":"#ff7070",whiteSpace:"pre-wrap",wordBreak:"break-all",maxHeight:150,overflowY:"auto"}}>
+              ${testResult.msg}
+            </div>
+          `}
+        </div>
+
         <div style=${S.tipBox}>
           <span>💡</span>
           <span style=${{color:"#ccd",fontSize:12,lineHeight:1.5}}>${tip}</span>
