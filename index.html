@@ -12,6 +12,7 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif;-webkit-tap-highlight-color:transparent}
 html,body,#root{width:100%;min-height:100vh;min-height:100dvh;background:#111119;overflow-x:hidden}
 button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+input{font-family:'Noto Sans KR',sans-serif}
 .paw{position:absolute;opacity:.1;pointer-events:none}
 .p1{top:28px;left:18px;font-size:26px;animation:fl1 4s ease-in-out infinite}
 .p2{top:85px;right:28px;font-size:20px;animation:fl2 5s ease-in-out infinite .5s}
@@ -44,34 +45,20 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 
 <script>
 var html = htm.bind(React.createElement);
-var useState = React.useState, useEffect = React.useEffect, useRef = React.useRef, useCallback = React.useCallback;
+var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef,useCallback=React.useCallback;
 
-var MODES = [
-  {
-    id:"toy",icon:"\u{1F9F8}",label:"\uC7A5\uB09C\uAC10 \uBD84\uC11D",desc:"\uC7A5\uB09C\uAC10\uC744 \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uBD84\uC11D",color:"#FF6B6B",
-    prompt:"당신은 고양이 행동학 및 놀이 전문가입니다. 이 이미지에 보이는 장난감/물건을 분석하고 다음을 한국어로 상세히 답변하세요:\n1. 🧸 장난감 분석: 종류, 재질, 특징\n2. 😺 고양이 반응 예측\n3. ❌ 안 노는 이유 3가지\n4. 💡 놀아주는 방법 3가지\n5. ⭐ 추천 보완 장난감\n6. ⚠️ 안전 주의사항\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
-  },
-  {
-    id:"behavior",icon:"\u{1F431}",label:"\uD589\uB3D9 \uBD84\uC11D",desc:"\uACE0\uC591\uC774\uB97C \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uBD84\uC11D",color:"#4ECDC4",
-    prompt:"당신은 수의행동학 전문가입니다. 이 이미지에 보이는 고양이의 행동을 분석하고 다음을 한국어로 상세히 답변하세요:\n1. 🐱 현재 행동 분석: 자세, 표정, 꼬리, 귀\n2. 💭 감정 상태\n3. 🗣️ 고양이 통역 (의인화하여 재미있게)\n4. ❤️ 원하는 것\n5. 🎯 최적의 놀이 방법\n6. 📊 스트레스 지수: 1-10\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
-  },
-  {
-    id:"correction",icon:"\u{1FA7A}",label:"\uD589\uB3D9 \uAD50\uC815",desc:"\uBB38\uC81C\uD589\uB3D9\uC744 \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uAD50\uC815",color:"#FF8C42",
-    prompt:"당신은 고양이 행동교정 전문 수의행동학자입니다. 이 이미지에서 보이는 고양이의 행동을 분석하고 행동 교정 솔루션을 한국어로 제공하세요:\n1. 🔍 문제 행동 진단\n2. 🧠 원인 분석\n3. ⚡ 즉각 대응법\n4. 📋 단계별 교정 계획 (1주/2주/4주)\n5. 🏠 환경 개선\n6. 🍽️ 식이/건강 체크\n7. ⚠️ 병원 방문 필요성\n8. 💪 재발 방지 예방법\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
-  }
+var MODES=[
+  {id:"toy",icon:"\u{1F9F8}",label:"\uC7A5\uB09C\uAC10 \uBD84\uC11D",desc:"\uC7A5\uB09C\uAC10\uC744 \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uBD84\uC11D",color:"#FF6B6B",
+    prompt:"당신은 고양이 행동학 및 놀이 전문가입니다. 이 이미지에 보이는 장난감/물건을 분석하고 다음을 한국어로 상세히 답변하세요:\n1. 🧸 장난감 분석: 종류, 재질, 특징\n2. 😺 고양이 반응 예측\n3. ❌ 안 노는 이유 3가지\n4. 💡 놀아주는 방법 3가지\n5. ⭐ 추천 보완 장난감\n6. ⚠️ 안전 주의사항\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."},
+  {id:"behavior",icon:"\u{1F431}",label:"\uD589\uB3D9 \uBD84\uC11D",desc:"\uACE0\uC591\uC774\uB97C \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uBD84\uC11D",color:"#4ECDC4",
+    prompt:"당신은 수의행동학 전문가입니다. 이 이미지에 보이는 고양이의 행동을 분석하고 다음을 한국어로 상세히 답변하세요:\n1. 🐱 현재 행동 분석: 자세, 표정, 꼬리, 귀\n2. 💭 감정 상태\n3. 🗣️ 고양이 통역 (의인화하여 재미있게)\n4. ❤️ 원하는 것\n5. 🎯 최적의 놀이 방법\n6. 📊 스트레스 지수: 1-10\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."},
+  {id:"correction",icon:"\u{1FA7A}",label:"\uD589\uB3D9 \uAD50\uC815",desc:"\uBB38\uC81C\uD589\uB3D9\uC744 \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uAD50\uC815",color:"#FF8C42",
+    prompt:"당신은 고양이 행동교정 전문 수의행동학자입니다. 이 이미지에서 보이는 고양이의 행동을 분석하고 행동 교정 솔루션을 한국어로 제공하세요:\n1. 🔍 문제 행동 진단\n2. 🧠 원인 분석\n3. ⚡ 즉각 대응법\n4. 📋 단계별 교정 계획 (1주/2주/4주)\n5. 🏠 환경 개선\n6. 🍽️ 식이/건강 체크\n7. ⚠️ 병원 방문 필요성\n8. 💪 재발 방지 예방법\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."}
 ];
 
-var TIPS = [
-  "고양이는 하루 평균 15시간 수면을 취해요 😴",
-  "꼬리를 세우고 끝을 살짝 구부리면 반가운 인사예요 🐱",
-  "느린 눈 깜빡임은 '사랑해'라는 뜻이에요 😻",
-  "고양이는 사냥 본능이 있어 움직이는 장난감을 좋아해요 🎯",
-  "캣닢에 반응하는 고양이는 약 70%예요 🌿",
-  "골골송은 치유와 편안함의 신호예요 🎵",
-  "고양이는 높은 곳을 좋아해요 - 캣타워를 추천해요 🏔️"
-];
+var TIPS=["고양이는 하루 평균 15시간 수면을 취해요 😴","꼬리를 세우고 끝을 살짝 구부리면 반가운 인사예요 🐱","느린 눈 깜빡임은 '사랑해'라는 뜻이에요 😻","고양이는 사냥 본능이 있어 움직이는 장난감을 좋아해요 🎯","캣닢에 반응하는 고양이는 약 70%예요 🌿","골골송은 치유와 편안함의 신호예요 🎵","고양이는 높은 곳을 좋아해요 - 캣타워를 추천해요 🏔️"];
 
-var S = {
+var S={
   shell:{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",position:"relative",overflow:"hidden",display:"flex",flexDirection:"column"},
   home:{minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",padding:"0 20px 28px",display:"flex",flexDirection:"column",alignItems:"center",position:"relative"},
   logoWrap:{textAlign:"center",paddingTop:44,marginBottom:16,animation:"fadeUp .6s ease-out"},
@@ -97,12 +84,98 @@ var S = {
 
 function ResultText(props){
   var lines=props.text.split("\n");
-  return html`<div style=${S.resTxt}>
-    ${lines.map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`;})}
-  </div>`;
+  return html`<div style=${S.resTxt}>${lines.map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`;})}</div>`;
 }
 
+/* ====== API KEY SCREEN ====== */
+function ApiKeyScreen(props){
+  var _k=useState(""),keyVal=_k[0],setKeyVal=_k[1];
+  var _e=useState(""),keyErr=_e[0],setKeyErr=_e[1];
+  var _testing=useState(false),testing=_testing[0],setTesting=_testing[1];
+
+  function handleSave(){
+    var k=keyVal.trim();
+    if(!k){setKeyErr("API 키를 입력해주세요.");return;}
+    if(!k.startsWith("sk-ant-")){setKeyErr("올바른 Anthropic API 키 형식이 아닙니다. (sk-ant- 으로 시작)");return;}
+    setTesting(true);setKeyErr("");
+    // test the key with a tiny request
+    fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":k,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:10,messages:[{role:"user",content:"Hi"}]})
+    }).then(function(r){return r.json();})
+    .then(function(data){
+      if(data.error){
+        if(data.error.type==="authentication_error") setKeyErr("API 키가 유효하지 않습니다. 다시 확인해주세요.");
+        else setKeyErr("오류: "+data.error.message);
+      } else {
+        // key works!
+        try{sessionStorage.setItem("cat_api_key",k);}catch(e){}
+        props.onSave(k);
+      }
+    }).catch(function(err){
+      setKeyErr("연결 실패: "+err.message);
+    }).finally(function(){setTesting(false);});
+  }
+
+  return html`
+    <div style=${S.shell}>
+      <div style=${S.home}>
+        <div class="paw p1">🐾</div><div class="paw p2">🐾</div>
+        <div style=${{textAlign:"center",paddingTop:60,marginBottom:24,animation:"fadeUp .6s ease-out"}}>
+          <div style=${S.logoCircle}><span style=${{fontSize:50}}>🔑</span></div>
+          <h1 style=${{fontSize:22,fontWeight:900,color:"#f0f0f5",marginTop:4}}>API 키 설정</h1>
+          <p style=${{fontSize:12,color:"#8888aa",marginTop:6,lineHeight:1.5}}>AI 분석을 위해 Anthropic API 키가 필요합니다</p>
+        </div>
+
+        <div style=${{width:"100%",marginBottom:16}}>
+          <div style=${{background:"rgba(255,255,255,.05)",borderRadius:14,padding:18,border:"1px solid rgba(255,255,255,.07)"}}>
+            <div style=${{color:"#ccc",fontSize:13,fontWeight:700,marginBottom:10}}>Anthropic API Key</div>
+            <input
+              type="password"
+              value=${keyVal}
+              onInput=${function(e){setKeyVal(e.target.value);setKeyErr("");}}
+              placeholder="sk-ant-api03-..."
+              style=${{width:"100%",padding:"14px 16px",borderRadius:10,border:"1px solid rgba(255,255,255,.12)",background:"rgba(255,255,255,.06)",color:"#fff",fontSize:14,outline:"none"}}
+            />
+            ${keyErr&&html`<div style=${{color:"#ff7070",fontSize:12,marginTop:8}}>${keyErr}</div>`}
+          </div>
+        </div>
+
+        <button
+          onClick=${handleSave}
+          disabled=${testing}
+          style=${{width:"100%",padding:"16px",borderRadius:14,background:"linear-gradient(135deg,#4ECDC4,#44b8b0)",color:"#fff",fontSize:15,fontWeight:800,opacity:testing?.6:1}}
+        >
+          ${testing?"🔍 키 확인 중...":"✅ 저장하고 시작하기"}
+        </button>
+
+        <div style=${{marginTop:24,background:"rgba(255,255,255,.04)",borderRadius:12,padding:16,border:"1px solid rgba(255,255,255,.05)"}}>
+          <div style=${{color:"#aaa",fontSize:12,fontWeight:700,marginBottom:8}}>📌 API 키 발급 방법</div>
+          <div style=${{color:"#888",fontSize:11.5,lineHeight:1.7}}>
+            1. console.anthropic.com 접속${"\\n"}
+            2. 로그인 후 API Keys 메뉴${"\\n"}
+            3. Create Key 클릭${"\\n"}
+            4. 생성된 키를 위에 붙여넣기
+          </div>
+        </div>
+
+        <div style=${{marginTop:12,background:"rgba(78,205,196,.06)",borderRadius:12,padding:14,border:"1px solid rgba(78,205,196,.1)"}}>
+          <div style=${{color:"#4ECDC4",fontSize:11.5,lineHeight:1.6}}>
+            🔒 API 키는 이 기기의 세션에만 저장되며 외부로 전송되지 않습니다. 브라우저를 닫으면 자동 삭제됩니다.
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ====== MAIN APP ====== */
 function App(){
+  // API key state — check sessionStorage first
+  var savedKey="";
+  try{savedKey=sessionStorage.getItem("cat_api_key")||"";}catch(e){}
+  var _apiKey=useState(savedKey),apiKey=_apiKey[0],setApiKey=_apiKey[1];
+
   var _mode=useState(null),mode=_mode[0],setMode=_mode[1];
   var _scr=useState("home"),screen=_scr[0],setScreen=_scr[1];
   var _az=useState(false),analyzing=_az[0],setAnalyzing=_az[1];
@@ -118,24 +191,22 @@ function App(){
   var _cnt=useState(0),analyzeCount=_cnt[0],setAnalyzeCount=_cnt[1];
   var _paused=useState(false),paused=_paused[0],setPaused=_paused[1];
 
-  var videoRef=useRef(null);
-  var canvasRef=useRef(null);
-  var streamRef=useRef(null);
-  var modeRef=useRef(mode);
-  var analyzingRef=useRef(false);
-  var liveRef=useRef(false);
-  var timerRef=useRef(null);
-  var pausedRef=useRef(false);
+  var videoRef=useRef(null),canvasRef=useRef(null),streamRef=useRef(null);
+  var modeRef=useRef(mode),analyzingRef=useRef(false),liveRef=useRef(false),timerRef=useRef(null),pausedRef=useRef(false),apiKeyRef=useRef(apiKey);
 
   useEffect(function(){modeRef.current=mode;},[mode]);
   useEffect(function(){liveRef.current=liveOn;},[liveOn]);
   useEffect(function(){analyzingRef.current=analyzing;},[analyzing]);
   useEffect(function(){pausedRef.current=paused;},[paused]);
+  useEffect(function(){apiKeyRef.current=apiKey;},[apiKey]);
 
   useEffect(function(){
     var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);
     return function(){clearInterval(iv);};
   },[]);
+
+  // ===== IF NO API KEY => SHOW KEY SCREEN =====
+  if(!apiKey) return html`<${ApiKeyScreen} onSave=${function(k){setApiKey(k);}}/>`;
 
   /* --- CAMERA --- */
   var startCam=useCallback(function(face){
@@ -174,7 +245,6 @@ function App(){
     if(timerRef.current) clearInterval(timerRef.current);
   };},[]);
 
-  /* --- CAPTURE ONE FRAME --- */
   function captureFrame(){
     if(!videoRef.current||!canvasRef.current) return null;
     var v=videoRef.current,c=canvasRef.current;
@@ -183,7 +253,6 @@ function App(){
     return c.toDataURL("image/jpeg",0.8);
   }
 
-  /* --- ANALYZE ONE FRAME --- */
   function doAnalyze(imgUrl){
     var cur=modeRef.current;if(!cur) return;
     var b64=imgUrl.split(",")[1];
@@ -191,7 +260,12 @@ function App(){
     setAnalyzing(true);setError(null);
     fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":apiKeyRef.current,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
       body:JSON.stringify({
         model:"claude-sonnet-4-20250514",max_tokens:1500,
         messages:[{role:"user",content:[
@@ -201,29 +275,29 @@ function App(){
       })
     }).then(function(r){return r.json();})
     .then(function(data){
-      if(data.error) throw new Error(data.error.message);
-      var txt=data.content?data.content.map(function(c){return c.text||"";}).join("\n"):"결과 없음";
-      setResult(txt);
-      setAnalyzeCount(function(c){return c+1;});
-      setHistory(function(p){return [{id:Date.now(),mode:m.label,icon:m.icon,image:imgUrl,result:txt,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
+      if(data.error){
+        if(data.error.type==="authentication_error"){
+          setError("API 키가 만료되었거나 유효하지 않습니다.");
+          try{sessionStorage.removeItem("cat_api_key");}catch(e){}
+          setApiKey("");
+        } else throw new Error(data.error.message);
+      } else {
+        var txt=data.content?data.content.map(function(c){return c.text||"";}).join("\n"):"결과 없음";
+        setResult(txt);
+        setAnalyzeCount(function(c){return c+1;});
+        setHistory(function(p){return [{id:Date.now(),mode:m.label,icon:m.icon,image:imgUrl,result:txt,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
+      }
     }).catch(function(err){setError(err.message||"오류 발생");})
     .finally(function(){setAnalyzing(false);});
   }
 
-  /* --- LIVE AUTO-ANALYSIS LOOP --- */
   function startLive(){
     setLiveOn(true);setPaused(false);
-    // immediate first capture
-    var img=captureFrame();
-    if(img) doAnalyze(img);
-    // then every 3 seconds
-    if(timerRef.current) clearInterval(timerRef.current);
+    var img=captureFrame();if(img)doAnalyze(img);
+    if(timerRef.current)clearInterval(timerRef.current);
     timerRef.current=setInterval(function(){
-      if(!liveRef.current) return;
-      if(pausedRef.current) return;
-      if(analyzingRef.current) return; // skip if previous still running
-      var img2=captureFrame();
-      if(img2) doAnalyze(img2);
+      if(!liveRef.current||pausedRef.current||analyzingRef.current)return;
+      var img2=captureFrame();if(img2)doAnalyze(img2);
     },3000);
   }
 
@@ -232,9 +306,7 @@ function App(){
     if(timerRef.current){clearInterval(timerRef.current);timerRef.current=null;}
   }
 
-  function togglePause(){
-    setPaused(function(p){return !p;});
-  }
+  function togglePause(){setPaused(function(p){return !p;});}
 
   function goHome(){
     stopLive();stopCam();
@@ -244,6 +316,12 @@ function App(){
   function enterMode(id){
     setMode(id);setScreen("analyze");setResult(null);setError(null);setCamError(null);setAnalyzeCount(0);setLiveOn(false);
     setTimeout(function(){startCam(facing);},150);
+  }
+
+  function resetApiKey(){
+    try{sessionStorage.removeItem("cat_api_key");}catch(e){}
+    stopLive();stopCam();
+    setApiKey("");
   }
 
   var sm=MODES.find(function(x){return x.id===mode;});
@@ -324,7 +402,10 @@ function App(){
               <span style=${{fontSize:20,color:"#555"}}>›</span>
             </button>`;})}
         </div>
-        <button style=${S.histBtn} onClick=${function(){setScreen("history");}}>📋 분석 기록 (${history.length})</button>
+        <div style=${{display:"flex",gap:10,marginTop:16,width:"100%"}}>
+          <button style=${{...S.histBtn,flex:1}} onClick=${function(){setScreen("history");}}>📋 기록 (${history.length})</button>
+          <button style=${{...S.histBtn,flex:1,color:"#ff7070"}} onClick=${resetApiKey}>🔑 키 변경</button>
+        </div>
         <div style=${{marginTop:"auto",paddingTop:20,textAlign:"center"}}>
           <span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span>
         </div>
@@ -332,44 +413,27 @@ function App(){
     </div>`;
 
   /* ===== ANALYSIS (LIVE CAMERA) ===== */
-  var statusColor=sm?sm.color:"#4ECDC4";
-
+  var clr=sm?sm.color:"#4ECDC4";
   return html`
     <div style=${S.shell}>
-      <!-- HEADER -->
-      <div style=${{...S.topBar,background:sm?sm.color:"#333"}}>
+      <div style=${{...S.topBar,background:clr}}>
         <button style=${S.topBtn} onClick=${goHome}>← 홈</button>
         <span style=${S.topTitle}>${sm?sm.icon:""} ${sm?sm.label:""}</span>
         <button style=${S.topBtn} onClick=${flipCam}>🔄</button>
       </div>
-
       <div style=${S.scroll}>
         <!-- CAMERA -->
         <div style=${S.camWrap}>
           <video ref=${videoRef} autoPlay playsInline muted style=${S.video}/>
           <canvas ref=${canvasRef} style=${{display:"none"}}/>
-
-          ${!camReady&&!camError&&html`
-            <div style=${S.camOverlay}>
-              <div class="spinner"/>
-              <p style=${{color:"#fff",marginTop:12,fontSize:14}}>카메라 로딩 중...</p>
-            </div>`}
-
-          ${camError&&html`
-            <div style=${S.camOverlay}>
-              <span style=${{fontSize:40}}>📷</span>
-              <p style=${{color:"#ff7070",marginTop:12,fontSize:13,textAlign:"center",whiteSpace:"pre-line",lineHeight:1.6,padding:"0 24px"}}>${camError}</p>
-              <button style=${{...S.retryBtn,marginTop:16}} onClick=${function(){startCam(facing);}}>다시 시도</button>
-            </div>`}
-
+          ${!camReady&&!camError&&html`<div style=${S.camOverlay}><div class="spinner"/><p style=${{color:"#fff",marginTop:12,fontSize:14}}>카메라 로딩 중...</p></div>`}
+          ${camError&&html`<div style=${S.camOverlay}><span style=${{fontSize:40}}>📷</span><p style=${{color:"#ff7070",marginTop:12,fontSize:13,textAlign:"center",whiteSpace:"pre-line",lineHeight:1.6,padding:"0 24px"}}>${camError}</p><button style=${{...S.retryBtn,marginTop:16}} onClick=${function(){startCam(facing);}}>다시 시도</button></div>`}
           ${camReady&&liveOn&&html`<div class="scan-line"/>`}
-
-          <!-- START / CONTROLS overlay -->
           ${camReady&&html`
             <div style=${{position:"absolute",bottom:0,left:0,right:0,padding:"12px 16px 16px",background:"linear-gradient(transparent,rgba(0,0,0,.7))",zIndex:5,display:"flex",justifyContent:"center",gap:12}}>
               ${!liveOn?html`
-                <button style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 36px",borderRadius:50,color:"#fff",background:statusColor,boxShadow:"0 4px 24px "+statusColor+"66",fontSize:15,fontWeight:800}} onClick=${startLive}>
-                  <span style=${{fontSize:22}}>▶️</span> 실시간 분석 시작
+                <button style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 36px",borderRadius:50,color:"#fff",background:clr,boxShadow:"0 4px 24px "+clr+"66",fontSize:15,fontWeight:800}} onClick=${startLive}>
+                  ▶️ 실시간 분석 시작
                 </button>
               `:html`
                 <button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:paused?"#4ECDC4":"rgba(255,255,255,.25)",fontSize:13,fontWeight:700}} onClick=${togglePause}>
@@ -382,34 +446,23 @@ function App(){
             </div>`}
         </div>
 
-        <!-- LIVE STATUS BAR -->
         ${liveOn&&html`
           <div style=${S.liveBar}>
-            <div class="live-dot"/>
-            <span style=${{color:"#ff6666",fontSize:12,fontWeight:700}}>LIVE</span>
-            <span style=${{color:"#999",fontSize:11}}>3초마다 자동 분석</span>
+            <div class="live-dot"/><span style=${{color:"#ff6666",fontSize:12,fontWeight:700}}>LIVE</span>
+            <span style=${{color:"#999",fontSize:11}}>3초 자동</span>
             <span style=${{marginLeft:"auto",color:"#4ECDC4",fontSize:11,fontWeight:600}}>분석 ${analyzeCount}회</span>
             ${analyzing&&html`<div class="spinner-sm"/>`}
           </div>
-          <div class="progress-track">
-            <div class="progress-fill" style=${{background:statusColor}} key=${analyzeCount}/>
-          </div>
+          <div class="progress-track"><div class="progress-fill" style=${{background:clr}} key=${analyzeCount}/></div>
         `}
 
         ${paused&&liveOn&&html`
           <div style=${{padding:"10px 16px",background:"rgba(255,200,50,.08)",borderBottom:"1px solid rgba(255,200,50,.15)",display:"flex",alignItems:"center",gap:8}}>
-            <span style=${{fontSize:14}}>⏸️</span>
-            <span style=${{color:"#ffc832",fontSize:12}}>일시정지 중 - 재개 버튼을 누르세요</span>
-          </div>
-        `}
-
-        <!-- ERROR -->
-        ${error&&html`
-          <div style=${S.errBox}>
-            <span>⚠️ ${error}</span>
+            <span>⏸️</span><span style=${{color:"#ffc832",fontSize:12}}>일시정지 중</span>
           </div>`}
 
-        <!-- RESULT -->
+        ${error&&html`<div style=${S.errBox}><span>⚠️ ${error}</span></div>`}
+
         ${result&&html`
           <div class="fade-in" key=${analyzeCount}>
             <div style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 18px 4px"}}>
@@ -420,19 +473,13 @@ function App(){
             <${ResultText} text=${result}/>
           </div>`}
 
-        <!-- NO RESULT YET -->
         ${!result&&!error&&!analyzing&&liveOn&&html`
-          <div style=${{padding:"40px 20px",textAlign:"center"}}>
-            <div class="spinner"/>
-            <p style=${{color:"#888",marginTop:16,fontSize:13}}>첫 번째 분석을 기다리는 중...</p>
-          </div>
-        `}
+          <div style=${{padding:"40px 20px",textAlign:"center"}}><div class="spinner"/><p style=${{color:"#888",marginTop:16,fontSize:13}}>첫 분석 대기 중...</p></div>`}
 
         ${!result&&!liveOn&&camReady&&html`
           <div style=${{padding:"30px 20px",textAlign:"center"}}>
-            <p style=${{color:"#888",fontSize:13,lineHeight:1.6}}>위의 <b style=${{color:statusColor}}>실시간 분석 시작</b> 버튼을 누르면${"\\n"}3초마다 자동으로 분석합니다</p>
-          </div>
-        `}
+            <p style=${{color:"#888",fontSize:13,lineHeight:1.6}}>▶️ 버튼을 누르면 3초마다 자동 분석합니다</p>
+          </div>`}
       </div>
     </div>`;
 }
