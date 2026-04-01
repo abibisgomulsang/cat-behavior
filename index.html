@@ -44,18 +44,15 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 
 <script>
 /*
- * ==============================================
- *   아래 따옴표 안에 본인의 API 키를 붙여넣으세요
- *   앞뒤 공백 자동 제거됩니다
- * ==============================================
+ * ==========================================================
+ *   아래 URL을 본인의 Cloudflare Worker URL로 교체하세요
+ *   예: "https://cat-api.내아이디.workers.dev"
+ * ==========================================================
  */
-var API_KEY = "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";
-/* ============================================== */
+var WORKER_URL = "https://여기에-워커URL.workers.dev";
+/* ========================================================== */
 
-// 공백/줄바꿈 자동 제거
-API_KEY = API_KEY.trim();
-
-var html = htm.bind(React.createElement);
+var html=htm.bind(React.createElement);
 var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef,useCallback=React.useCallback;
 
 var MODES=[
@@ -74,11 +71,9 @@ var S={
   home:{minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",padding:"0 20px 28px",display:"flex",flexDirection:"column",alignItems:"center",position:"relative"},
   logoWrap:{textAlign:"center",paddingTop:44,marginBottom:16,animation:"fadeUp .6s ease-out"},
   logoCircle:{width:90,height:90,borderRadius:45,background:"linear-gradient(135deg,#FF6B6B,#FF8C42,#4ECDC4)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",boxShadow:"0 6px 28px rgba(255,107,107,.25)",animation:"pulse 3s ease-in-out infinite"},
-  appTitle:{fontSize:25,fontWeight:900,color:"#f0f0f5",letterSpacing:-.5},
-  appSub:{fontSize:12,color:"#8888aa",marginTop:4},
   tipBox:{background:"rgba(255,255,255,.06)",borderRadius:12,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,width:"100%",marginBottom:20,border:"1px solid rgba(255,255,255,.05)"},
   modeCard:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:"15px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"},
-  histBtn:{marginTop:12,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5},
+  histBtn:{marginTop:14,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5,width:"100%"},
   topBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"#333",position:"sticky",top:0,zIndex:10,flexShrink:0},
   topTitle:{color:"#fff",fontSize:15,fontWeight:700},
   topBtn:{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5},
@@ -98,12 +93,16 @@ function ResultText(props){
   return html`<div style=${S.resTxt}>${lines.map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`;})}</div>`;
 }
 
-/* ====== KEY INFO HELPER ====== */
-function keyPreview(){
-  if(!API_KEY||API_KEY.length<15) return "❌ 키 미설정";
-  return API_KEY.substring(0,12)+"..."+API_KEY.substring(API_KEY.length-4);
+/* ====== API CALL via Worker Proxy ====== */
+function callAPI(body){
+  return fetch(WORKER_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  }).then(function(r){return r.json();});
 }
 
+/* ====== MAIN APP ====== */
 function App(){
   var _mode=useState(null),mode=_mode[0],setMode=_mode[1];
   var _scr=useState("home"),screen=_scr[0],setScreen=_scr[1];
@@ -119,8 +118,6 @@ function App(){
   var _live=useState(false),liveOn=_live[0],setLiveOn=_live[1];
   var _cnt=useState(0),analyzeCount=_cnt[0],setAnalyzeCount=_cnt[1];
   var _paused=useState(false),paused=_paused[0],setPaused=_paused[1];
-  var _testResult=useState(null),testResult=_testResult[0],setTestResult=_testResult[1];
-  var _testing=useState(false),testing=_testing[0],setTesting=_testing[1];
 
   var videoRef=useRef(null),canvasRef=useRef(null),streamRef=useRef(null);
   var modeRef=useRef(mode),analyzingRef=useRef(false),liveRef=useRef(false),timerRef=useRef(null),pausedRef=useRef(false);
@@ -129,54 +126,15 @@ function App(){
   useEffect(function(){liveRef.current=liveOn;},[liveOn]);
   useEffect(function(){analyzingRef.current=analyzing;},[analyzing]);
   useEffect(function(){pausedRef.current=paused;},[paused]);
-  useEffect(function(){
-    var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);
-    return function(){clearInterval(iv);};
-  },[]);
+  useEffect(function(){var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);return function(){clearInterval(iv);};},[]);
 
-  /* ---- API TEST ---- */
-  function testApiKey(){
-    setTesting(true);setTestResult(null);
-    fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "x-api-key":API_KEY,
-        "anthropic-version":"2023-06-01",
-        "anthropic-dangerous-direct-browser-access":"true"
-      },
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",max_tokens:30,
-        messages:[{role:"user",content:"안녕 한마디만 해줘"}]
-      })
-    }).then(function(r){
-      return r.text().then(function(txt){return {status:r.status,body:txt};});
-    }).then(function(res){
-      if(res.status===200){
-        setTestResult({ok:true,msg:"✅ API 키 정상! 연결 성공 (HTTP "+res.status+")"});
-      } else {
-        setTestResult({ok:false,msg:"❌ 오류 (HTTP "+res.status+")\n\n"+res.body});
-      }
-    }).catch(function(err){
-      setTestResult({ok:false,msg:"❌ 네트워크 오류: "+err.message});
-    }).finally(function(){setTesting(false);});
-  }
-
-  /* --- CAMERA --- */
   var startCam=useCallback(function(face){
     setCamReady(false);setCamError(null);
     if(streamRef.current){streamRef.current.getTracks().forEach(function(t){t.stop();});streamRef.current=null;}
-    navigator.mediaDevices.getUserMedia({
-      video:{facingMode:face||facing,width:{ideal:1280},height:{ideal:960}},audio:false
+    navigator.mediaDevices.getUserMedia({video:{facingMode:face||facing,width:{ideal:1280},height:{ideal:960}},audio:false
     }).then(function(stream){
       streamRef.current=stream;
-      if(videoRef.current){
-        videoRef.current.srcObject=stream;
-        videoRef.current.onloadedmetadata=function(){
-          videoRef.current.play().catch(function(){});
-          setCamReady(true);
-        };
-      }
+      if(videoRef.current){videoRef.current.srcObject=stream;videoRef.current.onloadedmetadata=function(){videoRef.current.play().catch(function(){});setCamReady(true);};}
     }).catch(function(e){
       if(e.name==="NotAllowedError") setCamError("카메라 권한을 허용해주세요.\n설정 > 앱 > 브라우저 > 권한 > 카메라 허용");
       else if(e.name==="NotFoundError") setCamError("카메라를 찾을 수 없습니다.");
@@ -184,15 +142,8 @@ function App(){
     });
   },[facing]);
 
-  var stopCam=useCallback(function(){
-    if(streamRef.current){streamRef.current.getTracks().forEach(function(t){t.stop();});streamRef.current=null;}
-    setCamReady(false);
-  },[]);
-
-  var flipCam=useCallback(function(){
-    var next=facing==="environment"?"user":"environment";
-    setFacing(next);startCam(next);
-  },[facing,startCam]);
+  var stopCam=useCallback(function(){if(streamRef.current){streamRef.current.getTracks().forEach(function(t){t.stop();});streamRef.current=null;}setCamReady(false);},[]);
+  var flipCam=useCallback(function(){var next=facing==="environment"?"user":"environment";setFacing(next);startCam(next);},[facing,startCam]);
 
   useEffect(function(){return function(){
     if(streamRef.current) streamRef.current.getTracks().forEach(function(t){t.stop();});
@@ -212,27 +163,14 @@ function App(){
     var b64=imgUrl.split(",")[1];
     var m=MODES.find(function(x){return x.id===cur;});
     setAnalyzing(true);setError(null);
-    fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "x-api-key":API_KEY,
-        "anthropic-version":"2023-06-01",
-        "anthropic-dangerous-direct-browser-access":"true"
-      },
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",max_tokens:1500,
-        messages:[{role:"user",content:[
-          {type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},
-          {type:"text",text:m.prompt}
-        ]}]
-      })
-    }).then(function(r){
-      return r.text().then(function(txt){return {status:r.status,body:txt};});
-    }).then(function(res){
-      if(res.status!==200) throw new Error("HTTP "+res.status+": "+res.body.substring(0,200));
-      var data=JSON.parse(res.body);
-      if(data.error) throw new Error(data.error.message);
+    callAPI({
+      model:"claude-sonnet-4-20250514",max_tokens:1500,
+      messages:[{role:"user",content:[
+        {type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},
+        {type:"text",text:m.prompt}
+      ]}]
+    }).then(function(data){
+      if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
       var txt=data.content?data.content.map(function(c){return c.text||"";}).join("\n"):"결과 없음";
       setResult(txt);
       setAnalyzeCount(function(c){return c+1;});
@@ -250,142 +188,61 @@ function App(){
       var img2=captureFrame();if(img2)doAnalyze(img2);
     },3000);
   }
-
-  function stopLive(){
-    setLiveOn(false);
-    if(timerRef.current){clearInterval(timerRef.current);timerRef.current=null;}
-  }
-
+  function stopLive(){setLiveOn(false);if(timerRef.current){clearInterval(timerRef.current);timerRef.current=null;}}
   function togglePause(){setPaused(function(p){return !p;});}
-
-  function goHome(){
-    stopLive();stopCam();
-    setMode(null);setScreen("home");setResult(null);setError(null);setViewItem(null);setCamError(null);setAnalyzeCount(0);
-  }
-
-  function enterMode(id){
-    setMode(id);setScreen("analyze");setResult(null);setError(null);setCamError(null);setAnalyzeCount(0);setLiveOn(false);
-    setTimeout(function(){startCam(facing);},150);
-  }
+  function goHome(){stopLive();stopCam();setMode(null);setScreen("home");setResult(null);setError(null);setViewItem(null);setCamError(null);setAnalyzeCount(0);}
+  function enterMode(id){setMode(id);setScreen("analyze");setResult(null);setError(null);setCamError(null);setAnalyzeCount(0);setLiveOn(false);setTimeout(function(){startCam(facing);},150);}
 
   var sm=MODES.find(function(x){return x.id===mode;});
 
-  /* ===== HISTORY DETAIL ===== */
   if(viewItem) return html`
     <div style=${S.shell}>
-      <div style=${S.topBar}>
-        <button style=${S.topBtn} onClick=${function(){setViewItem(null);}}>← 뒤로</button>
-        <span style=${S.topTitle}>${viewItem.icon} ${viewItem.mode}</span>
-        <span style=${{width:56}}/>
-      </div>
-      <div style=${S.scroll}>
-        ${viewItem.image&&html`<img src=${viewItem.image} style=${{width:"100%",maxHeight:300,objectFit:"cover"}}/>`}
-        <div style=${{padding:"10px 20px 4px",color:"#777",fontSize:11}}>${viewItem.time}</div>
-        <${ResultText} text=${viewItem.result}/>
-      </div>
+      <div style=${S.topBar}><button style=${S.topBtn} onClick=${function(){setViewItem(null);}}>← 뒤로</button><span style=${S.topTitle}>${viewItem.icon} ${viewItem.mode}</span><span style=${{width:56}}/></div>
+      <div style=${S.scroll}>${viewItem.image&&html`<img src=${viewItem.image} style=${{width:"100%",maxHeight:300,objectFit:"cover"}}/>`}<div style=${{padding:"10px 20px 4px",color:"#777",fontSize:11}}>${viewItem.time}</div><${ResultText} text=${viewItem.result}/></div>
     </div>`;
 
-  /* ===== HISTORY LIST ===== */
   if(screen==="history") return html`
     <div style=${S.shell}>
-      <div style=${S.topBar}>
-        <button style=${S.topBtn} onClick=${goHome}>← 홈</button>
-        <span style=${S.topTitle}>📋 분석 기록</span>
-        <span style=${{width:56}}/>
-      </div>
-      <div style=${S.scroll}>
-        <div style=${{padding:16}}>
-          ${history.length===0?html`
-            <div style=${{textAlign:"center",paddingTop:60}}>
-              <div style=${{fontSize:52}}>📭</div>
-              <p style=${{color:"#888",marginTop:14}}>아직 분석 기록이 없어요</p>
-            </div>
-          `:history.map(function(h){return html`
-            <button key=${h.id} style=${S.hItem} onClick=${function(){setViewItem(h);}}>
-              <div style=${{display:"flex",alignItems:"center",gap:12}}>
-                ${h.image&&html`<img src=${h.image} style=${{width:52,height:52,borderRadius:10,objectFit:"cover"}}/>`}
-                <div style=${{flex:1,minWidth:0}}>
-                  <div style=${{color:"#eee",fontSize:13,fontWeight:700}}>${h.icon} ${h.mode}</div>
-                  <div style=${{color:"#777",fontSize:10,marginTop:2}}>${h.time}</div>
-                  <div style=${{color:"#999",fontSize:11,marginTop:3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>${h.result.slice(0,50)}</div>
-                </div>
-                <span style=${{color:"#555"}}>›</span>
-              </div>
-            </button>`;})}
-        </div>
-      </div>
+      <div style=${S.topBar}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>📋 분석 기록</span><span style=${{width:56}}/></div>
+      <div style=${S.scroll}><div style=${{padding:16}}>
+        ${history.length===0?html`<div style=${{textAlign:"center",paddingTop:60}}><div style=${{fontSize:52}}>📭</div><p style=${{color:"#888",marginTop:14}}>아직 분석 기록이 없어요</p></div>
+        `:history.map(function(h){return html`
+          <button key=${h.id} style=${S.hItem} onClick=${function(){setViewItem(h);}}>
+            <div style=${{display:"flex",alignItems:"center",gap:12}}>
+              ${h.image&&html`<img src=${h.image} style=${{width:52,height:52,borderRadius:10,objectFit:"cover"}}/>`}
+              <div style=${{flex:1,minWidth:0}}><div style=${{color:"#eee",fontSize:13,fontWeight:700}}>${h.icon} ${h.mode}</div><div style=${{color:"#777",fontSize:10,marginTop:2}}>${h.time}</div><div style=${{color:"#999",fontSize:11,marginTop:3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>${h.result.slice(0,50)}</div></div>
+              <span style=${{color:"#555"}}>›</span>
+            </div></button>`;})}
+      </div></div>
     </div>`;
 
-  /* ===== HOME ===== */
   if(screen==="home") return html`
     <div style=${S.shell}>
       <div style=${S.home}>
         <div class="paw p1">🐾</div><div class="paw p2">🐾</div><div class="paw p3">🐾</div>
         <div style=${S.logoWrap}>
           <div style=${S.logoCircle}><span style=${{fontSize:50}}>🐱</span></div>
-          <h1 style=${S.appTitle}>냥냥 행동분석</h1>
-          <p style=${S.appSub}>AI 고양이 행동교정 전문가</p>
+          <h1 style=${{fontSize:25,fontWeight:900,color:"#f0f0f5",letterSpacing:-.5}}>냥냥 행동분석</h1>
+          <p style=${{fontSize:12,color:"#8888aa",marginTop:4}}>AI 고양이 행동교정 전문가</p>
           <p style=${{fontSize:11,color:"#4ECDC4",marginTop:6}}>✨ 실시간 자동 분석 (3초 간격)</p>
         </div>
-
-        <!-- API KEY STATUS -->
-        <div style=${{width:"100%",background:"rgba(255,255,255,.05)",borderRadius:12,padding:"12px 16px",marginBottom:16,border:"1px solid rgba(255,255,255,.07)"}}>
-          <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-            <span style=${{color:"#aaa",fontSize:12,fontWeight:700}}>🔑 API 키 상태</span>
-            <span style=${{color:API_KEY.length>20?"#4ECDC4":"#ff7070",fontSize:11,fontFamily:"monospace"}}>${keyPreview()}</span>
-          </div>
-          <div style=${{display:"flex",alignItems:"center",gap:4,marginBottom:8}}>
-            <span style=${{color:"#888",fontSize:11}}>키 길이: ${API_KEY.length}자</span>
-          </div>
-          <button
-            onClick=${testApiKey}
-            disabled=${testing}
-            style=${{width:"100%",padding:"10px",borderRadius:10,background:testing?"#333":"#4ECDC4",color:"#fff",fontSize:13,fontWeight:700,opacity:testing?.6:1}}
-          >
-            ${testing?"🔍 테스트 중...":"🧪 API 연결 테스트"}
-          </button>
-          ${testResult&&html`
-            <div style=${{marginTop:10,padding:"10px 12px",borderRadius:8,background:testResult.ok?"rgba(78,205,196,.1)":"rgba(255,80,80,.1)",border:testResult.ok?"1px solid rgba(78,205,196,.2)":"1px solid rgba(255,80,80,.2)",fontSize:11,color:testResult.ok?"#4ECDC4":"#ff7070",whiteSpace:"pre-wrap",wordBreak:"break-all",maxHeight:150,overflowY:"auto"}}>
-              ${testResult.msg}
-            </div>
-          `}
-        </div>
-
-        <div style=${S.tipBox}>
-          <span>💡</span>
-          <span style=${{color:"#ccd",fontSize:12,lineHeight:1.5}}>${tip}</span>
-        </div>
+        <div style=${S.tipBox}><span>💡</span><span style=${{color:"#ccd",fontSize:12,lineHeight:1.5}}>${tip}</span></div>
         <div style=${{width:"100%",display:"flex",flexDirection:"column",gap:10}}>
           ${MODES.map(function(m,i){return html`
-            <button key=${m.id} class="card-anim"
-              style=${{...S.modeCard,borderLeft:"4px solid "+m.color,animationDelay:i*.08+"s"}}
-              onClick=${function(){enterMode(m.id);}}>
-              <div style=${{display:"flex",alignItems:"center",gap:14}}>
-                <span style=${{fontSize:34}}>${m.icon}</span>
-                <div>
-                  <div style=${{fontSize:15,fontWeight:700,color:m.color}}>${m.label}</div>
-                  <div style=${{fontSize:11,color:"#888",marginTop:2}}>${m.desc}</div>
-                </div>
-              </div>
+            <button key=${m.id} class="card-anim" style=${{...S.modeCard,borderLeft:"4px solid "+m.color,animationDelay:i*.08+"s"}} onClick=${function(){enterMode(m.id);}}>
+              <div style=${{display:"flex",alignItems:"center",gap:14}}><span style=${{fontSize:34}}>${m.icon}</span><div><div style=${{fontSize:15,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:11,color:"#888",marginTop:2}}>${m.desc}</div></div></div>
               <span style=${{fontSize:20,color:"#555"}}>›</span>
             </button>`;})}
         </div>
         <button style=${S.histBtn} onClick=${function(){setScreen("history");}}>📋 분석 기록 (${history.length})</button>
-        <div style=${{marginTop:"auto",paddingTop:20,textAlign:"center"}}>
-          <span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span>
-        </div>
+        <div style=${{marginTop:"auto",paddingTop:20,textAlign:"center"}}><span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span></div>
       </div>
     </div>`;
 
-  /* ===== ANALYSIS (LIVE CAMERA) ===== */
   var clr=sm?sm.color:"#4ECDC4";
   return html`
     <div style=${S.shell}>
-      <div style=${{...S.topBar,background:clr}}>
-        <button style=${S.topBtn} onClick=${goHome}>← 홈</button>
-        <span style=${S.topTitle}>${sm?sm.icon:""} ${sm?sm.label:""}</span>
-        <button style=${S.topBtn} onClick=${flipCam}>🔄</button>
-      </div>
+      <div style=${{...S.topBar,background:clr}}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>${sm?sm.icon:""} ${sm?sm.label:""}</span><button style=${S.topBtn} onClick=${flipCam}>🔄</button></div>
       <div style=${S.scroll}>
         <div style=${S.camWrap}>
           <video ref=${videoRef} autoPlay playsInline muted style=${S.video}/>
@@ -395,55 +252,24 @@ function App(){
           ${camReady&&liveOn&&html`<div class="scan-line"/>`}
           ${camReady&&html`
             <div style=${{position:"absolute",bottom:0,left:0,right:0,padding:"12px 16px 16px",background:"linear-gradient(transparent,rgba(0,0,0,.7))",zIndex:5,display:"flex",justifyContent:"center",gap:12}}>
-              ${!liveOn?html`
-                <button style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 36px",borderRadius:50,color:"#fff",background:clr,boxShadow:"0 4px 24px "+clr+"66",fontSize:15,fontWeight:800}} onClick=${startLive}>
-                  ▶️ 실시간 분석 시작
-                </button>
+              ${!liveOn?html`<button style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 36px",borderRadius:50,color:"#fff",background:clr,boxShadow:"0 4px 24px "+clr+"66",fontSize:15,fontWeight:800}} onClick=${startLive}>▶️ 실시간 분석 시작</button>
               `:html`
-                <button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:paused?"#4ECDC4":"rgba(255,255,255,.25)",fontSize:13,fontWeight:700}} onClick=${togglePause}>
-                  ${paused?"▶️ 재개":"⏸️ 일시정지"}
-                </button>
-                <button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:"#ff4444",fontSize:13,fontWeight:700}} onClick=${stopLive}>
-                  ⏹️ 중지
-                </button>
-              `}
+                <button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:paused?"#4ECDC4":"rgba(255,255,255,.25)",fontSize:13,fontWeight:700}} onClick=${togglePause}>${paused?"▶️ 재개":"⏸️ 일시정지"}</button>
+                <button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:"#ff4444",fontSize:13,fontWeight:700}} onClick=${stopLive}>⏹️ 중지</button>`}
             </div>`}
         </div>
-
         ${liveOn&&html`
-          <div style=${S.liveBar}>
-            <div class="live-dot"/><span style=${{color:"#ff6666",fontSize:12,fontWeight:700}}>LIVE</span>
-            <span style=${{color:"#999",fontSize:11}}>3초 자동</span>
-            <span style=${{marginLeft:"auto",color:"#4ECDC4",fontSize:11,fontWeight:600}}>분석 ${analyzeCount}회</span>
-            ${analyzing&&html`<div class="spinner-sm"/>`}
-          </div>
-          <div class="progress-track"><div class="progress-fill" style=${{background:clr}} key=${analyzeCount}/></div>
-        `}
-
-        ${paused&&liveOn&&html`
-          <div style=${{padding:"10px 16px",background:"rgba(255,200,50,.08)",borderBottom:"1px solid rgba(255,200,50,.15)",display:"flex",alignItems:"center",gap:8}}>
-            <span>⏸️</span><span style=${{color:"#ffc832",fontSize:12}}>일시정지 중</span>
-          </div>`}
-
+          <div style=${S.liveBar}><div class="live-dot"/><span style=${{color:"#ff6666",fontSize:12,fontWeight:700}}>LIVE</span><span style=${{color:"#999",fontSize:11}}>3초 자동</span><span style=${{marginLeft:"auto",color:"#4ECDC4",fontSize:11,fontWeight:600}}>분석 ${analyzeCount}회</span>${analyzing&&html`<div class="spinner-sm"/>`}</div>
+          <div class="progress-track"><div class="progress-fill" style=${{background:clr}} key=${analyzeCount}/></div>`}
+        ${paused&&liveOn&&html`<div style=${{padding:"10px 16px",background:"rgba(255,200,50,.08)",borderBottom:"1px solid rgba(255,200,50,.15)",display:"flex",alignItems:"center",gap:8}}><span>⏸️</span><span style=${{color:"#ffc832",fontSize:12}}>일시정지 중</span></div>`}
         ${error&&html`<div style=${S.errBox}><span>⚠️ ${error}</span></div>`}
-
         ${result&&html`
           <div class="fade-in" key=${analyzeCount}>
-            <div style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 18px 4px"}}>
-              <span style=${{fontSize:18}}>${sm?sm.icon:""}</span>
-              <span style=${{color:"#f0f0f5",fontSize:15,fontWeight:700}}>분석 결과</span>
-              ${analyzing&&html`<div class="spinner-sm" style=${{marginLeft:8}}/>`}
-            </div>
+            <div style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 18px 4px"}}><span style=${{fontSize:18}}>${sm?sm.icon:""}</span><span style=${{color:"#f0f0f5",fontSize:15,fontWeight:700}}>분석 결과</span>${analyzing&&html`<div class="spinner-sm" style=${{marginLeft:8}}/>`}</div>
             <${ResultText} text=${result}/>
           </div>`}
-
-        ${!result&&!error&&!analyzing&&liveOn&&html`
-          <div style=${{padding:"40px 20px",textAlign:"center"}}><div class="spinner"/><p style=${{color:"#888",marginTop:16,fontSize:13}}>첫 분석 대기 중...</p></div>`}
-
-        ${!result&&!liveOn&&camReady&&html`
-          <div style=${{padding:"30px 20px",textAlign:"center"}}>
-            <p style=${{color:"#888",fontSize:13,lineHeight:1.6}}>▶️ 버튼을 누르면 3초마다 자동 분석합니다</p>
-          </div>`}
+        ${!result&&!error&&!analyzing&&liveOn&&html`<div style=${{padding:"40px 20px",textAlign:"center"}}><div class="spinner"/><p style=${{color:"#888",marginTop:16,fontSize:13}}>첫 분석 대기 중...</p></div>`}
+        ${!result&&!liveOn&&camReady&&html`<div style=${{padding:"30px 20px",textAlign:"center"}}><p style=${{color:"#888",fontSize:13,lineHeight:1.6}}>▶️ 버튼을 누르면 3초마다 자동 분석합니다</p></div>`}
       </div>
     </div>`;
 }
