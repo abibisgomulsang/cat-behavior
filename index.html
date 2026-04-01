@@ -12,7 +12,6 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif;-webkit-tap-highlight-color:transparent}
 html,body,#root{width:100%;min-height:100vh;min-height:100dvh;background:#111119;overflow-x:hidden}
 button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
-input{font-family:'Noto Sans KR',sans-serif}
 .paw{position:absolute;opacity:.1;pointer-events:none}
 .p1{top:28px;left:18px;font-size:26px;animation:fl1 4s ease-in-out infinite}
 .p2{top:85px;right:28px;font-size:20px;animation:fl2 5s ease-in-out infinite .5s}
@@ -44,6 +43,15 @@ input{font-family:'Noto Sans KR',sans-serif}
 <script src="https://unpkg.com/htm@3.1.1/dist/htm.js"></script>
 
 <script>
+/*
+ * ============================================
+ *   여기에 본인의 Anthropic API 키를 넣으세요
+ *   (따옴표 안에 키를 붙여넣기)
+ * ============================================
+ */
+var API_KEY = "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";
+/* ============================================ */
+
 var html = htm.bind(React.createElement);
 var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef,useCallback=React.useCallback;
 
@@ -87,95 +95,7 @@ function ResultText(props){
   return html`<div style=${S.resTxt}>${lines.map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`;})}</div>`;
 }
 
-/* ====== API KEY SCREEN ====== */
-function ApiKeyScreen(props){
-  var _k=useState(""),keyVal=_k[0],setKeyVal=_k[1];
-  var _e=useState(""),keyErr=_e[0],setKeyErr=_e[1];
-  var _testing=useState(false),testing=_testing[0],setTesting=_testing[1];
-
-  function handleSave(){
-    var k=keyVal.trim();
-    if(!k){setKeyErr("API 키를 입력해주세요.");return;}
-    if(!k.startsWith("sk-ant-")){setKeyErr("올바른 Anthropic API 키 형식이 아닙니다. (sk-ant- 으로 시작)");return;}
-    setTesting(true);setKeyErr("");
-    // test the key with a tiny request
-    fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","x-api-key":k,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:10,messages:[{role:"user",content:"Hi"}]})
-    }).then(function(r){return r.json();})
-    .then(function(data){
-      if(data.error){
-        if(data.error.type==="authentication_error") setKeyErr("API 키가 유효하지 않습니다. 다시 확인해주세요.");
-        else setKeyErr("오류: "+data.error.message);
-      } else {
-        // key works!
-        try{sessionStorage.setItem("cat_api_key",k);}catch(e){}
-        props.onSave(k);
-      }
-    }).catch(function(err){
-      setKeyErr("연결 실패: "+err.message);
-    }).finally(function(){setTesting(false);});
-  }
-
-  return html`
-    <div style=${S.shell}>
-      <div style=${S.home}>
-        <div class="paw p1">🐾</div><div class="paw p2">🐾</div>
-        <div style=${{textAlign:"center",paddingTop:60,marginBottom:24,animation:"fadeUp .6s ease-out"}}>
-          <div style=${S.logoCircle}><span style=${{fontSize:50}}>🔑</span></div>
-          <h1 style=${{fontSize:22,fontWeight:900,color:"#f0f0f5",marginTop:4}}>API 키 설정</h1>
-          <p style=${{fontSize:12,color:"#8888aa",marginTop:6,lineHeight:1.5}}>AI 분석을 위해 Anthropic API 키가 필요합니다</p>
-        </div>
-
-        <div style=${{width:"100%",marginBottom:16}}>
-          <div style=${{background:"rgba(255,255,255,.05)",borderRadius:14,padding:18,border:"1px solid rgba(255,255,255,.07)"}}>
-            <div style=${{color:"#ccc",fontSize:13,fontWeight:700,marginBottom:10}}>Anthropic API Key</div>
-            <input
-              type="password"
-              value=${keyVal}
-              onInput=${function(e){setKeyVal(e.target.value);setKeyErr("");}}
-              placeholder="sk-ant-api03-..."
-              style=${{width:"100%",padding:"14px 16px",borderRadius:10,border:"1px solid rgba(255,255,255,.12)",background:"rgba(255,255,255,.06)",color:"#fff",fontSize:14,outline:"none"}}
-            />
-            ${keyErr&&html`<div style=${{color:"#ff7070",fontSize:12,marginTop:8}}>${keyErr}</div>`}
-          </div>
-        </div>
-
-        <button
-          onClick=${handleSave}
-          disabled=${testing}
-          style=${{width:"100%",padding:"16px",borderRadius:14,background:"linear-gradient(135deg,#4ECDC4,#44b8b0)",color:"#fff",fontSize:15,fontWeight:800,opacity:testing?.6:1}}
-        >
-          ${testing?"🔍 키 확인 중...":"✅ 저장하고 시작하기"}
-        </button>
-
-        <div style=${{marginTop:24,background:"rgba(255,255,255,.04)",borderRadius:12,padding:16,border:"1px solid rgba(255,255,255,.05)"}}>
-          <div style=${{color:"#aaa",fontSize:12,fontWeight:700,marginBottom:8}}>📌 API 키 발급 방법</div>
-          <div style=${{color:"#888",fontSize:11.5,lineHeight:1.7}}>
-            1. console.anthropic.com 접속${"\\n"}
-            2. 로그인 후 API Keys 메뉴${"\\n"}
-            3. Create Key 클릭${"\\n"}
-            4. 생성된 키를 위에 붙여넣기
-          </div>
-        </div>
-
-        <div style=${{marginTop:12,background:"rgba(78,205,196,.06)",borderRadius:12,padding:14,border:"1px solid rgba(78,205,196,.1)"}}>
-          <div style=${{color:"#4ECDC4",fontSize:11.5,lineHeight:1.6}}>
-            🔒 API 키는 이 기기의 세션에만 저장되며 외부로 전송되지 않습니다. 브라우저를 닫으면 자동 삭제됩니다.
-          </div>
-        </div>
-      </div>
-    </div>`;
-}
-
-/* ====== MAIN APP ====== */
 function App(){
-  // API key state — check sessionStorage first
-  var savedKey="";
-  try{savedKey=sessionStorage.getItem("cat_api_key")||"";}catch(e){}
-  var _apiKey=useState(savedKey),apiKey=_apiKey[0],setApiKey=_apiKey[1];
-
   var _mode=useState(null),mode=_mode[0],setMode=_mode[1];
   var _scr=useState("home"),screen=_scr[0],setScreen=_scr[1];
   var _az=useState(false),analyzing=_az[0],setAnalyzing=_az[1];
@@ -192,23 +112,17 @@ function App(){
   var _paused=useState(false),paused=_paused[0],setPaused=_paused[1];
 
   var videoRef=useRef(null),canvasRef=useRef(null),streamRef=useRef(null);
-  var modeRef=useRef(mode),analyzingRef=useRef(false),liveRef=useRef(false),timerRef=useRef(null),pausedRef=useRef(false),apiKeyRef=useRef(apiKey);
+  var modeRef=useRef(mode),analyzingRef=useRef(false),liveRef=useRef(false),timerRef=useRef(null),pausedRef=useRef(false);
 
   useEffect(function(){modeRef.current=mode;},[mode]);
   useEffect(function(){liveRef.current=liveOn;},[liveOn]);
   useEffect(function(){analyzingRef.current=analyzing;},[analyzing]);
   useEffect(function(){pausedRef.current=paused;},[paused]);
-  useEffect(function(){apiKeyRef.current=apiKey;},[apiKey]);
-
   useEffect(function(){
     var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);
     return function(){clearInterval(iv);};
   },[]);
 
-  // ===== IF NO API KEY => SHOW KEY SCREEN =====
-  if(!apiKey) return html`<${ApiKeyScreen} onSave=${function(k){setApiKey(k);}}/>`;
-
-  /* --- CAMERA --- */
   var startCam=useCallback(function(face){
     setCamReady(false);setCamError(null);
     if(streamRef.current){streamRef.current.getTracks().forEach(function(t){t.stop();});streamRef.current=null;}
@@ -262,7 +176,7 @@ function App(){
       method:"POST",
       headers:{
         "Content-Type":"application/json",
-        "x-api-key":apiKeyRef.current,
+        "x-api-key":API_KEY,
         "anthropic-version":"2023-06-01",
         "anthropic-dangerous-direct-browser-access":"true"
       },
@@ -275,18 +189,11 @@ function App(){
       })
     }).then(function(r){return r.json();})
     .then(function(data){
-      if(data.error){
-        if(data.error.type==="authentication_error"){
-          setError("API 키가 만료되었거나 유효하지 않습니다.");
-          try{sessionStorage.removeItem("cat_api_key");}catch(e){}
-          setApiKey("");
-        } else throw new Error(data.error.message);
-      } else {
-        var txt=data.content?data.content.map(function(c){return c.text||"";}).join("\n"):"결과 없음";
-        setResult(txt);
-        setAnalyzeCount(function(c){return c+1;});
-        setHistory(function(p){return [{id:Date.now(),mode:m.label,icon:m.icon,image:imgUrl,result:txt,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
-      }
+      if(data.error) throw new Error(data.error.message);
+      var txt=data.content?data.content.map(function(c){return c.text||"";}).join("\n"):"결과 없음";
+      setResult(txt);
+      setAnalyzeCount(function(c){return c+1;});
+      setHistory(function(p){return [{id:Date.now(),mode:m.label,icon:m.icon,image:imgUrl,result:txt,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
     }).catch(function(err){setError(err.message||"오류 발생");})
     .finally(function(){setAnalyzing(false);});
   }
@@ -316,12 +223,6 @@ function App(){
   function enterMode(id){
     setMode(id);setScreen("analyze");setResult(null);setError(null);setCamError(null);setAnalyzeCount(0);setLiveOn(false);
     setTimeout(function(){startCam(facing);},150);
-  }
-
-  function resetApiKey(){
-    try{sessionStorage.removeItem("cat_api_key");}catch(e){}
-    stopLive();stopCam();
-    setApiKey("");
   }
 
   var sm=MODES.find(function(x){return x.id===mode;});
@@ -402,10 +303,7 @@ function App(){
               <span style=${{fontSize:20,color:"#555"}}>›</span>
             </button>`;})}
         </div>
-        <div style=${{display:"flex",gap:10,marginTop:16,width:"100%"}}>
-          <button style=${{...S.histBtn,flex:1}} onClick=${function(){setScreen("history");}}>📋 기록 (${history.length})</button>
-          <button style=${{...S.histBtn,flex:1,color:"#ff7070"}} onClick=${resetApiKey}>🔑 키 변경</button>
-        </div>
+        <button style=${S.histBtn} onClick=${function(){setScreen("history");}}>📋 분석 기록 (${history.length})</button>
         <div style=${{marginTop:"auto",paddingTop:20,textAlign:"center"}}>
           <span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span>
         </div>
@@ -422,7 +320,6 @@ function App(){
         <button style=${S.topBtn} onClick=${flipCam}>🔄</button>
       </div>
       <div style=${S.scroll}>
-        <!-- CAMERA -->
         <div style=${S.camWrap}>
           <video ref=${videoRef} autoPlay playsInline muted style=${S.video}/>
           <canvas ref=${canvasRef} style=${{display:"none"}}/>
