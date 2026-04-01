@@ -48,36 +48,20 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 var WORKER_URL="https://abibisgomulsang--f439289c2d9c11f18dc942dde27851f2.web.val.run";
 var html=htm.bind(React.createElement);
 var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef,useCallback=React.useCallback;
-
 var MODES=[
-  {id:"toy",icon:"\u{1F9F8}",label:"\uC7A5\uB09C\uAC10 \uBD84\uC11D",desc:"\uC7A5\uB09C\uAC10\uC744 \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uBD84\uC11D",color:"#FF6B6B",
+  {id:"toy",icon:"\u{1F9F8}",label:"\uC7A5\uB09C\uAC10 \uBD84\uC11D",desc:"\uC7A5\uB09C\uAC10\uC744 \uBE44\uCD94\uBA74 \uBC14\uB85C \uBD84\uC11D",color:"#FF6B6B",
     prompt:"당신은 고양이 행동학 및 놀이 전문가입니다. 이 이미지에 보이는 장난감/물건을 분석하세요.\n\n반드시 첫 줄에 [자막] 태그로 고양이 입장에서 이 장난감에 대한 한마디를 적어주세요 (예: [자막] 음... 이 깃털은 좀 질렸다냥 🐱)\n두번째 줄에 [기분] 태그로 이 장난감을 본 고양이의 예상 감정을 적어주세요 (예: [기분] 흥미도: ★★★☆☆ | 사냥본능 자극: 높음)\n\n그 다음 줄부터 상세 분석:\n1. 🧸 장난감 분석: 종류, 재질, 특징\n2. 😺 고양이 반응 예측\n3. ❌ 안 노는 이유 3가지\n4. 💡 놀아주는 방법 3가지\n5. ⭐ 추천 보완 장난감\n6. ⚠️ 안전 주의사항\n마크다운 형식 없이 이모지와 줄바꿈으로 답변하세요."},
-  {id:"behavior",icon:"\u{1F431}",label:"\uD589\uB3D9 \uBD84\uC11D",desc:"\uACE0\uC591\uC774\uB97C \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uBD84\uC11D",color:"#4ECDC4",
+  {id:"behavior",icon:"\u{1F431}",label:"\uD589\uB3D9 \uBD84\uC11D",desc:"\uACE0\uC591\uC774\uB97C \uBE44\uCD94\uBA74 \uBC14\uB85C \uBD84\uC11D",color:"#4ECDC4",
     prompt:"당신은 수의행동학 전문가입니다. 이 이미지에 보이는 고양이를 분석하세요.\n\n반드시 첫 줄에 [자막] 태그로 이 고양이가 지금 하고 싶은 말을 적어주세요. 고양이 말투로 재미있게! (예: [자막] 집사야, 나 지금 배고프다냥... 밥 언제 주냥? 😾)\n두번째 줄에 [기분] 태그로 감정상태를 적어주세요 (예: [기분] 😊 편안함 80% | 스트레스 2/10 | 지금 원하는 것: 간식)\n\n그 다음 줄부터 상세 분석:\n1. 🐱 현재 행동 분석: 자세, 표정, 꼬리, 귀\n2. 💭 감정 상태\n3. 🗣️ 고양이 통역 상세\n4. ❤️ 원하는 것\n5. 🎯 최적의 놀이 방법\n6. 📊 스트레스 지수: 1-10\n마크다운 형식 없이 이모지와 줄바꿈으로 답변하세요."},
-  {id:"correction",icon:"\u{1FA7A}",label:"\uD589\uB3D9 \uAD50\uC815",desc:"\uBB38\uC81C\uD589\uB3D9\uC744 \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uAD50\uC815",color:"#FF8C42",
+  {id:"correction",icon:"\u{1FA7A}",label:"\uD589\uB3D9 \uAD50\uC815",desc:"\uBB38\uC81C\uD589\uB3D9\uC744 \uBE44\uCD94\uBA74 \uBC14\uB85C \uAD50\uC815",color:"#FF8C42",
     prompt:"당신은 고양이 행동교정 전문 수의행동학자입니다. 이 이미지를 분석하세요.\n\n반드시 첫 줄에 [자막] 태그로 이 고양이의 속마음을 적어주세요 (예: [자막] 나 스트레스 받아서 이러는 거라냥... 도와줘냥 😿)\n두번째 줄에 [기분] 태그로 문제 수준을 적어주세요 (예: [기분] ⚠️ 긴급도: 중간 | 문제유형: 스트레스성 | 교정 난이도: 쉬움)\n\n그 다음 줄부터 상세 분석:\n1. 🔍 문제 행동 진단\n2. 🧠 원인 분석\n3. ⚡ 즉각 대응법\n4. 📋 단계별 교정 계획 (1주/2주/4주)\n5. 🏠 환경 개선\n6. 🍽️ 식이/건강 체크\n7. ⚠️ 병원 방문 필요성\n8. 💪 재발 방지 예방법\n마크다운 형식 없이 이모지와 줄바꿈으로 답변하세요."}
 ];
-
 var TIPS=["고양이는 하루 평균 15시간 수면을 취해요 😴","꼬리를 세우고 끝을 살짝 구부리면 반가운 인사예요 🐱","느린 눈 깜빡임은 '사랑해'라는 뜻이에요 😻","고양이는 사냥 본능이 있어 움직이는 장난감을 좋아해요 🎯","캣닢에 반응하는 고양이는 약 70%예요 🌿","골골송은 치유와 편안함의 신호예요 🎵","고양이는 높은 곳을 좋아해요 - 캣타워를 추천해요 🏔️"];
-
 var S={shell:{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",position:"relative",overflow:"hidden",display:"flex",flexDirection:"column"},home:{minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",padding:"0 20px 28px",display:"flex",flexDirection:"column",alignItems:"center",position:"relative"},logoWrap:{textAlign:"center",paddingTop:44,marginBottom:16,animation:"fadeUp .6s ease-out"},logoCircle:{width:90,height:90,borderRadius:45,background:"linear-gradient(135deg,#FF6B6B,#FF8C42,#4ECDC4)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",boxShadow:"0 6px 28px rgba(255,107,107,.25)",animation:"pulse 3s ease-in-out infinite"},tipBox:{background:"rgba(255,255,255,.06)",borderRadius:12,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,width:"100%",marginBottom:20,border:"1px solid rgba(255,255,255,.05)"},modeCard:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:"15px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"},histBtn:{marginTop:14,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5,width:"100%"},topBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"#333",position:"sticky",top:0,zIndex:10,flexShrink:0},topTitle:{color:"#fff",fontSize:15,fontWeight:700},topBtn:{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5},scroll:{flex:1,overflowY:"auto",background:"linear-gradient(180deg,#13131f,#161630)",WebkitOverflowScrolling:"touch"},camWrap:{position:"relative",width:"100%",aspectRatio:"4/3",background:"#000",overflow:"hidden",flexShrink:0},video:{width:"100%",height:"100%",objectFit:"cover",display:"block"},camOverlay:{position:"absolute",inset:0,background:"rgba(0,0,0,.75)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)",zIndex:3},liveBar:{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",background:"rgba(255,255,255,.04)",borderBottom:"1px solid rgba(255,255,255,.06)"},errBox:{margin:"14px 18px",padding:"14px 16px",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",borderRadius:12,color:"#ff7070",fontSize:12,display:"flex",flexDirection:"column",gap:10,wordBreak:"break-all"},retryBtn:{alignSelf:"flex-start",padding:"8px 20px",background:"rgba(255,255,255,.12)",borderRadius:8,color:"#fff",fontSize:12.5},resTxt:{padding:"12px 18px 16px",color:"#ccccdd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"},hItem:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:14,cursor:"pointer",textAlign:"left",display:"block",marginBottom:10}};
 
 function ResultText(p){var lines=p.text.split("\n");return html`<div style=${S.resTxt}>${lines.map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`;})}</div>`;}
 function callAPI(body){return fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){return r.json();});}
-
-/* Parse [자막] and [기분] from result text */
-function parseResult(text){
-  var subtitle="";var mood="";var detail="";
-  var lines=text.split("\n");var detailLines=[];
-  for(var i=0;i<lines.length;i++){
-    var line=lines[i].trim();
-    if(line.startsWith("[자막]")){subtitle=line.replace("[자막]","").trim();}
-    else if(line.startsWith("[기분]")){mood=line.replace("[기분]","").trim();}
-    else{detailLines.push(lines[i]);}
-  }
-  detail=detailLines.join("\n").trim();
-  return {subtitle:subtitle,mood:mood,detail:detail};
-}
+function parseResult(text){var subtitle="";var mood="";var detail="";var lines=text.split("\n");var detailLines=[];for(var i=0;i<lines.length;i++){var line=lines[i].trim();if(line.startsWith("[자막]")){subtitle=line.replace("[자막]","").trim();}else if(line.startsWith("[기분]")){mood=line.replace("[기분]","").trim();}else{detailLines.push(lines[i]);}}detail=detailLines.join("\n").trim();return{subtitle:subtitle,mood:mood,detail:detail};}
 
 function App(){
   var _m=useState(null),mode=_m[0],setMode=_m[1];
@@ -99,15 +83,25 @@ function App(){
   var _detail=useState(""),detail=_detail[0],setDetail=_detail[1];
   var vRef=useRef(null),cRef=useRef(null),sRef=useRef(null);
   var mRef=useRef(mode),aRef=useRef(false),lRef=useRef(false),tRef=useRef(null),pRef=useRef(false);
+  var autoStarted=useRef(false);
+
   useEffect(function(){mRef.current=mode;},[mode]);
   useEffect(function(){lRef.current=liveOn;},[liveOn]);
   useEffect(function(){aRef.current=analyzing;},[analyzing]);
   useEffect(function(){pRef.current=paused;},[paused]);
   useEffect(function(){var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);return function(){clearInterval(iv);};},[]);
 
-  var startCam=useCallback(function(face){setCamReady(false);setCamError(null);if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}navigator.mediaDevices.getUserMedia({video:{facingMode:face||facing,width:{ideal:1280},height:{ideal:960}},audio:false}).then(function(st){sRef.current=st;if(vRef.current){vRef.current.srcObject=st;vRef.current.onloadedmetadata=function(){vRef.current.play().catch(function(){});setCamReady(true);};}}).catch(function(e){if(e.name==="NotAllowedError")setCamError("카메라 권한을 허용해주세요.\n설정 > 앱 > 브라우저 > 권한 > 카메라");else setCamError("카메라 오류: "+e.message);});},[facing]);
+  /* AUTO-START: 카메라 준비되면 바로 분석 시작 */
+  useEffect(function(){
+    if(camReady&&screen==="analyze"&&!autoStarted.current){
+      autoStarted.current=true;
+      goLive();
+    }
+  },[camReady,screen]);
+
+  var startCam=useCallback(function(face){setCamReady(false);setCamError(null);autoStarted.current=false;if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}navigator.mediaDevices.getUserMedia({video:{facingMode:face||facing,width:{ideal:1280},height:{ideal:960}},audio:false}).then(function(st){sRef.current=st;if(vRef.current){vRef.current.srcObject=st;vRef.current.onloadedmetadata=function(){vRef.current.play().catch(function(){});setCamReady(true);};}}).catch(function(e){if(e.name==="NotAllowedError")setCamError("카메라 권한을 허용해주세요.\n설정 > 앱 > 브라우저 > 권한 > 카메라");else setCamError("카메라 오류: "+e.message);});},[facing]);
   var stopCam=useCallback(function(){if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}setCamReady(false);},[]);
-  var flipCam=useCallback(function(){var n=facing==="environment"?"user":"environment";setFacing(n);startCam(n);},[facing,startCam]);
+  var flipCam=useCallback(function(){var n=facing==="environment"?"user":"environment";setFacing(n);stopLive();autoStarted.current=false;startCam(n);},[facing,startCam]);
   useEffect(function(){return function(){if(sRef.current)sRef.current.getTracks().forEach(function(t){t.stop();});if(tRef.current)clearInterval(tRef.current);};},[]);
 
   function cap(){if(!vRef.current||!cRef.current)return null;var v=vRef.current,c=cRef.current;c.width=v.videoWidth;c.height=v.videoHeight;c.getContext("2d").drawImage(v,0,0);return c.toDataURL("image/jpeg",0.8);}
@@ -116,36 +110,38 @@ function App(){
 
   function goLive(){setLiveOn(true);setPaused(false);var i=cap();if(i)analyze(i);if(tRef.current)clearInterval(tRef.current);tRef.current=setInterval(function(){if(!lRef.current||pRef.current||aRef.current)return;var i2=cap();if(i2)analyze(i2);},3000);}
   function stopLive(){setLiveOn(false);if(tRef.current){clearInterval(tRef.current);tRef.current=null;}}
-  function goHome(){stopLive();stopCam();setMode(null);setScreen("home");setResult(null);setError(null);setViewItem(null);setCamError(null);setCnt(0);setSubtitle("");setMood("");setDetail("");}
-  function enterMode(id){setMode(id);setScreen("analyze");setResult(null);setError(null);setCamError(null);setCnt(0);setLiveOn(false);setSubtitle("");setMood("");setDetail("");setTimeout(function(){startCam(facing);},150);}
+  function goHome(){stopLive();stopCam();setMode(null);setScreen("home");setResult(null);setError(null);setViewItem(null);setCamError(null);setCnt(0);setSubtitle("");setMood("");setDetail("");autoStarted.current=false;}
+  function enterMode(id){setMode(id);setScreen("analyze");setResult(null);setError(null);setCamError(null);setCnt(0);setLiveOn(false);setSubtitle("");setMood("");setDetail("");autoStarted.current=false;setTimeout(function(){startCam(facing);},150);}
   var sm=MODES.find(function(x){return x.id===mode;});
 
   if(viewItem)return html`<div style=${S.shell}><div style=${S.topBar}><button style=${S.topBtn} onClick=${function(){setViewItem(null);}}>← 뒤로</button><span style=${S.topTitle}>${viewItem.icon} ${viewItem.mode}</span><span style=${{width:56}}/></div><div style=${S.scroll}>${viewItem.image&&html`<img src=${viewItem.image} style=${{width:"100%",maxHeight:300,objectFit:"cover"}}/>`}${viewItem.subtitle&&html`<div class="subtitle-bar"><div class="subtitle-text">🐱 "${viewItem.subtitle}"</div></div>`}<div style=${{padding:"10px 20px 4px",color:"#777",fontSize:11}}>${viewItem.time}</div><${ResultText} text=${viewItem.result}/></div></div>`;
 
   if(screen==="history")return html`<div style=${S.shell}><div style=${S.topBar}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>📋 분석 기록</span><span style=${{width:56}}/></div><div style=${S.scroll}><div style=${{padding:16}}>${history.length===0?html`<div style=${{textAlign:"center",paddingTop:60}}><div style=${{fontSize:52}}>📭</div><p style=${{color:"#888",marginTop:14}}>아직 기록이 없어요</p></div>`:history.map(function(h){return html`<button key=${h.id} style=${S.hItem} onClick=${function(){setViewItem(h);}}><div style=${{display:"flex",alignItems:"center",gap:12}}>${h.image&&html`<img src=${h.image} style=${{width:52,height:52,borderRadius:10,objectFit:"cover"}}/>`}<div style=${{flex:1,minWidth:0}}><div style=${{color:"#eee",fontSize:13,fontWeight:700}}>${h.icon} ${h.mode}</div>${h.subtitle&&html`<div style=${{color:"#FFD700",fontSize:11,marginTop:2}}>"${h.subtitle.slice(0,30)}${h.subtitle.length>30?"...":""}"</div>`}<div style=${{color:"#777",fontSize:10,marginTop:2}}>${h.time}</div></div><span style=${{color:"#555"}}>›</span></div></button>`;})}</div></div></div>`;
 
-  if(screen==="home")return html`<div style=${S.shell}><div style=${S.home}><div class="paw p1">🐾</div><div class="paw p2">🐾</div><div class="paw p3">🐾</div><div style=${S.logoWrap}><div style=${S.logoCircle}><span style=${{fontSize:50}}>🐱</span></div><h1 style=${{fontSize:25,fontWeight:900,color:"#f0f0f5"}}>냥냥 행동분석</h1><p style=${{fontSize:12,color:"#8888aa",marginTop:4}}>AI 고양이 행동교정 전문가</p><p style=${{fontSize:11,color:"#4ECDC4",marginTop:6}}>✨ 실시간 자동 분석 + 고양이 통역</p></div><div style=${S.tipBox}><span>💡</span><span style=${{color:"#ccd",fontSize:12,lineHeight:1.5}}>${tip}</span></div><div style=${{width:"100%",display:"flex",flexDirection:"column",gap:10}}>${MODES.map(function(m,i){return html`<button key=${m.id} class="card-anim" style=${{...S.modeCard,borderLeft:"4px solid "+m.color,animationDelay:i*.08+"s"}} onClick=${function(){enterMode(m.id);}}><div style=${{display:"flex",alignItems:"center",gap:14}}><span style=${{fontSize:34}}>${m.icon}</span><div><div style=${{fontSize:15,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:11,color:"#888",marginTop:2}}>${m.desc}</div></div></div><span style=${{fontSize:20,color:"#555"}}>›</span></button>`;})}</div><button style=${S.histBtn} onClick=${function(){setScreen("history");}}>📋 분석 기록 (${history.length})</button><div style=${{marginTop:"auto",paddingTop:20,textAlign:"center"}}><span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span></div></div></div>`;
+  if(screen==="home")return html`<div style=${S.shell}><div style=${S.home}><div class="paw p1">🐾</div><div class="paw p2">🐾</div><div class="paw p3">🐾</div><div style=${S.logoWrap}><div style=${S.logoCircle}><span style=${{fontSize:50}}>🐱</span></div><h1 style=${{fontSize:25,fontWeight:900,color:"#f0f0f5"}}>냥냥 행동분석</h1><p style=${{fontSize:12,color:"#8888aa",marginTop:4}}>AI 고양이 행동교정 전문가</p><p style=${{fontSize:11,color:"#4ECDC4",marginTop:6}}>✨ 카메라만 켜면 바로 통역 시작!</p></div><div style=${S.tipBox}><span>💡</span><span style=${{color:"#ccd",fontSize:12,lineHeight:1.5}}>${tip}</span></div><div style=${{width:"100%",display:"flex",flexDirection:"column",gap:10}}>${MODES.map(function(m,i){return html`<button key=${m.id} class="card-anim" style=${{...S.modeCard,borderLeft:"4px solid "+m.color,animationDelay:i*.08+"s"}} onClick=${function(){enterMode(m.id);}}><div style=${{display:"flex",alignItems:"center",gap:14}}><span style=${{fontSize:34}}>${m.icon}</span><div><div style=${{fontSize:15,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:11,color:"#888",marginTop:2}}>${m.desc}</div></div></div><span style=${{fontSize:20,color:"#555"}}>›</span></button>`;})}</div><button style=${S.histBtn} onClick=${function(){setScreen("history");}}>📋 분석 기록 (${history.length})</button><div style=${{marginTop:"auto",paddingTop:20,textAlign:"center"}}><span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span></div></div></div>`;
 
   var clr=sm?sm.color:"#4ECDC4";
   return html`<div style=${S.shell}><div style=${{...S.topBar,background:clr}}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>${sm?sm.icon:""} ${sm?sm.label:""}</span><button style=${S.topBtn} onClick=${flipCam}>🔄</button></div><div style=${S.scroll}>
     <!-- CAMERA -->
-    <div style=${S.camWrap}><video ref=${vRef} autoPlay playsInline muted style=${S.video}/><canvas ref=${cRef} style=${{display:"none"}}/>${!camReady&&!camError&&html`<div style=${S.camOverlay}><div class="spinner"/><p style=${{color:"#fff",marginTop:12,fontSize:14}}>카메라 로딩 중...</p></div>`}${camError&&html`<div style=${S.camOverlay}><span style=${{fontSize:40}}>📷</span><p style=${{color:"#ff7070",marginTop:12,fontSize:13,textAlign:"center",whiteSpace:"pre-line",lineHeight:1.6,padding:"0 24px"}}>${camError}</p><button style=${{...S.retryBtn,marginTop:16}} onClick=${function(){startCam(facing);}}>다시 시도</button></div>`}${camReady&&liveOn&&html`<div class="scan-line"/>`}${camReady&&html`<div style=${{position:"absolute",bottom:0,left:0,right:0,padding:"12px 16px 16px",background:"linear-gradient(transparent,rgba(0,0,0,.7))",zIndex:5,display:"flex",justifyContent:"center",gap:12}}>${!liveOn?html`<button style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 36px",borderRadius:50,color:"#fff",background:clr,boxShadow:"0 4px 24px "+clr+"66",fontSize:15,fontWeight:800}} onClick=${goLive}>▶️ 실시간 분석 시작</button>`:html`<button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:paused?"#4ECDC4":"rgba(255,255,255,.25)",fontSize:13,fontWeight:700}} onClick=${function(){setPaused(function(p){return !p;});}}>${paused?"▶️ 재개":"⏸️ 일시정지"}</button><button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:"#ff4444",fontSize:13,fontWeight:700}} onClick=${stopLive}>⏹️ 중지</button>`}</div>`}</div>
+    <div style=${S.camWrap}><video ref=${vRef} autoPlay playsInline muted style=${S.video}/><canvas ref=${cRef} style=${{display:"none"}}/>${!camReady&&!camError&&html`<div style=${S.camOverlay}><div class="spinner"/><p style=${{color:"#fff",marginTop:12,fontSize:14}}>카메라 시작 중...</p><p style=${{color:"#4ECDC4",fontSize:11,marginTop:4}}>곧 자동으로 분석이 시작됩니다</p></div>`}${camError&&html`<div style=${S.camOverlay}><span style=${{fontSize:40}}>📷</span><p style=${{color:"#ff7070",marginTop:12,fontSize:13,textAlign:"center",whiteSpace:"pre-line",lineHeight:1.6,padding:"0 24px"}}>${camError}</p><button style=${{...S.retryBtn,marginTop:16}} onClick=${function(){startCam(facing);}}>다시 시도</button></div>`}${camReady&&liveOn&&html`<div class="scan-line"/>`}
+      <!-- 일시정지/중지 컨트롤 -->
+      ${camReady&&liveOn&&html`<div style=${{position:"absolute",bottom:0,left:0,right:0,padding:"10px 16px 14px",background:"linear-gradient(transparent,rgba(0,0,0,.6))",zIndex:5,display:"flex",justifyContent:"center",gap:12}}><button style=${{padding:"10px 22px",borderRadius:50,color:"#fff",background:paused?"#4ECDC4":"rgba(255,255,255,.2)",fontSize:13,fontWeight:700}} onClick=${function(){setPaused(function(p){return !p;});}}>${paused?"▶️ 재개":"⏸️ 일시정지"}</button><button style=${{padding:"10px 22px",borderRadius:50,color:"#fff",background:"rgba(255,70,70,.6)",fontSize:13,fontWeight:700}} onClick=${function(){stopLive();}}>⏹️ 중지</button></div>`}
+    </div>
 
-    <!-- SUBTITLE BAR (실시간 통역) -->
+    <!-- SUBTITLE BAR -->
     ${subtitle&&html`<div class="subtitle-bar" key=${cnt}><div class="subtitle-text">🐱 "${subtitle}"</div>${mood&&html`<div class="subtitle-mood">${mood}</div>`}</div>`}
     ${analyzing&&!subtitle&&html`<div class="subtitle-bar"><div style=${{display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><div class="spinner-sm"/><span style=${{color:"#aaa",fontSize:13}}>고양이 통역 중...</span></div></div>`}
 
     <!-- LIVE STATUS -->
     ${liveOn&&html`<div style=${S.liveBar}><div class="live-dot"/><span style=${{color:"#ff6666",fontSize:12,fontWeight:700}}>LIVE</span><span style=${{color:"#999",fontSize:11}}>3초 자동</span><span style=${{marginLeft:"auto",color:"#4ECDC4",fontSize:11,fontWeight:600}}>분석 ${cnt}회</span>${analyzing&&html`<div class="spinner-sm"/>`}</div><div class="progress-track"><div class="progress-fill" style=${{background:clr}} key=${cnt}/></div>`}
 
-    ${paused&&liveOn&&html`<div style=${{padding:"10px 16px",background:"rgba(255,200,50,.08)",display:"flex",alignItems:"center",gap:8}}><span>⏸️</span><span style=${{color:"#ffc832",fontSize:12}}>일시정지 중</span></div>`}
+    ${paused&&liveOn&&html`<div style=${{padding:"10px 16px",background:"rgba(255,200,50,.08)",display:"flex",alignItems:"center",gap:8}}><span>⏸️</span><span style=${{color:"#ffc832",fontSize:12}}>일시정지 중 - 카메라 위 재개 버튼을 누르세요</span></div>`}
     ${error&&html`<div style=${S.errBox}><span>⚠️ ${error}</span></div>`}
 
-    <!-- DETAIL RESULT -->
+    <!-- DETAIL -->
     ${detail&&html`<div class="fade-in" key=${cnt}><div style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 18px 4px"}}><span style=${{fontSize:18}}>${sm?sm.icon:""}</span><span style=${{color:"#f0f0f5",fontSize:15,fontWeight:700}}>상세 분석</span>${analyzing&&html`<div class="spinner-sm" style=${{marginLeft:8}}/>`}</div><${ResultText} text=${detail}/></div>`}
 
-    ${!result&&!error&&!analyzing&&liveOn&&html`<div style=${{padding:"40px 20px",textAlign:"center"}}><div class="spinner"/><p style=${{color:"#888",marginTop:16,fontSize:13}}>첫 분석 대기 중...</p></div>`}
-    ${!result&&!liveOn&&camReady&&html`<div style=${{padding:"30px 20px",textAlign:"center"}}><p style=${{color:"#888",fontSize:13,lineHeight:1.6}}>▶️ 버튼을 누르면 3초마다 자동 분석합니다</p></div>`}
+    ${!result&&!error&&liveOn&&html`<div style=${{padding:"40px 20px",textAlign:"center"}}><div class="spinner"/><p style=${{color:"#888",marginTop:16,fontSize:13}}>첫 분석 대기 중...</p></div>`}
   </div></div>`;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(html`<${App}/>`);
