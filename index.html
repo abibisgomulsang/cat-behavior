@@ -23,10 +23,16 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 @keyframes scanY{0%{top:10%}50%{top:85%}100%{top:10%}}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes progressBar{from{width:0}to{width:100%}}
 .spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:#4ECDC4;border-radius:50%;animation:spin .8s linear infinite}
+.spinner-sm{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:#4ECDC4;border-radius:50%;animation:spin .8s linear infinite}
 .fade-in{animation:fadeUp .5s ease-out}
 .card-anim{animation:fadeUp .5s ease-out both}
 .scan-line{position:absolute;left:8%;right:8%;height:2px;background:linear-gradient(90deg,transparent,#4ECDC4,transparent);box-shadow:0 0 12px rgba(78,205,196,.5);animation:scanY 3s ease-in-out infinite;pointer-events:none;z-index:2}
+.live-dot{width:10px;height:10px;border-radius:50%;background:#ff4444;animation:livePulse 1.2s ease-in-out infinite;flex-shrink:0}
+.progress-track{width:100%;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;animation:progressBar 3s linear infinite}
 </style>
 </head>
 <body>
@@ -37,22 +43,21 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 <script src="https://unpkg.com/htm@3.1.1/dist/htm.js"></script>
 
 <script>
-// htm binds to React.createElement — replaces JSX without Babel
-const html = htm.bind(React.createElement);
-const { useState, useEffect, useRef, useCallback } = React;
+var html = htm.bind(React.createElement);
+var useState = React.useState, useEffect = React.useEffect, useRef = React.useRef, useCallback = React.useCallback;
 
-const MODES = [
+var MODES = [
   {
-    id:"toy",icon:"\u{1F9F8}",label:"\uC7A5\uB09C\uAC10 \uBD84\uC11D",desc:"\uC7A5\uB09C\uAC10\uC744 \uCE74\uBA54\uB77C\uC5D0 \uBE44\uCDB0\uC8FC\uC138\uC694",color:"#FF6B6B",
-    prompt:"당신은 고양이 행동학 및 놀이 전문가입니다. 이 이미지에 보이는 장난감/물건을 분석하고 다음을 한국어로 상세히 답변하세요:\n1. 🧸 장난감 분석: 이 장난감의 종류, 재질, 특징\n2. 😺 고양이 반응 예측: 이 장난감에 고양이가 어떤 반응을 보일지\n3. ❌ 안 노는 이유: 고양이가 이 장난감에 흥미를 잃었을 수 있는 이유 3가지\n4. 💡 놀아주는 방법: 이 장난감으로 효과적으로 놀아주는 구체적 방법 3가지\n5. ⭐ 추천 장난감: 이 장난감과 함께 사용하면 좋은 보완 장난감 추천\n6. ⚠️ 주의사항: 안전 관련 주의점\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
+    id:"toy",icon:"\u{1F9F8}",label:"\uC7A5\uB09C\uAC10 \uBD84\uC11D",desc:"\uC7A5\uB09C\uAC10\uC744 \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uBD84\uC11D",color:"#FF6B6B",
+    prompt:"당신은 고양이 행동학 및 놀이 전문가입니다. 이 이미지에 보이는 장난감/물건을 분석하고 다음을 한국어로 상세히 답변하세요:\n1. 🧸 장난감 분석: 종류, 재질, 특징\n2. 😺 고양이 반응 예측\n3. ❌ 안 노는 이유 3가지\n4. 💡 놀아주는 방법 3가지\n5. ⭐ 추천 보완 장난감\n6. ⚠️ 안전 주의사항\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
   },
   {
-    id:"behavior",icon:"\u{1F431}",label:"\uD589\uB3D9 \uBD84\uC11D",desc:"\uACE0\uC591\uC774\uB97C \uCE74\uBA54\uB77C\uC5D0 \uBE44\uCDB0\uC8FC\uC138\uC694",color:"#4ECDC4",
-    prompt:"당신은 수의행동학 전문가입니다. 이 이미지에 보이는 고양이의 행동을 분석하고 다음을 한국어로 상세히 답변하세요:\n1. 🐱 현재 행동 분석: 고양이의 자세, 표정, 꼬리, 귀 상태 분석\n2. 💭 감정 상태: 현재 고양이의 기분과 감정\n3. 🗣️ 고양이 통역: 고양이가 지금 무슨 말을 하고 싶은지 (의인화하여 재미있게)\n4. ❤️ 원하는 것: 지금 고양이가 원하는 것\n5. 🎯 놀아주는 방법: 현재 상태에 맞는 최적의 놀이 방법\n6. 📊 스트레스 지수: 1-10 척도로 스트레스 수준 평가\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
+    id:"behavior",icon:"\u{1F431}",label:"\uD589\uB3D9 \uBD84\uC11D",desc:"\uACE0\uC591\uC774\uB97C \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uBD84\uC11D",color:"#4ECDC4",
+    prompt:"당신은 수의행동학 전문가입니다. 이 이미지에 보이는 고양이의 행동을 분석하고 다음을 한국어로 상세히 답변하세요:\n1. 🐱 현재 행동 분석: 자세, 표정, 꼬리, 귀\n2. 💭 감정 상태\n3. 🗣️ 고양이 통역 (의인화하여 재미있게)\n4. ❤️ 원하는 것\n5. 🎯 최적의 놀이 방법\n6. 📊 스트레스 지수: 1-10\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
   },
   {
-    id:"correction",icon:"\u{1FA7A}",label:"\uD589\uB3D9 \uAD50\uC815",desc:"\uBB38\uC81C\uD589\uB3D9\uC744 \uCE74\uBA54\uB77C\uC5D0 \uBE44\uCDB0\uC8FC\uC138\uC694",color:"#FF8C42",
-    prompt:"당신은 고양이 행동교정 전문 수의행동학자입니다. 이 이미지에서 보이는 고양이의 행동을 분석하고 행동 교정 솔루션을 한국어로 제공하세요:\n1. 🔍 문제 행동 진단: 현재 보이는 행동이 문제행동인지 정상행동인지 판단\n2. 🧠 원인 분석: 이 행동의 근본적 원인\n3. ⚡ 즉각 대응법: 지금 당장 할 수 있는 대처 방법\n4. 📋 교정 프로그램: 단계별 행동 교정 계획 (1주/2주/4주)\n5. 🏠 환경 개선: 집안 환경에서 바꿔야 할 것들\n6. 🍽️ 식이/건강: 식사나 건강 관련 체크사항\n7. ⚠️ 병원 방문 필요성: 수의사 상담이 필요한 경우 안내\n8. 💪 예방법: 재발 방지를 위한 장기 관리법\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
+    id:"correction",icon:"\u{1FA7A}",label:"\uD589\uB3D9 \uAD50\uC815",desc:"\uBB38\uC81C\uD589\uB3D9\uC744 \uBE44\uCD94\uBA74 \uC2E4\uC2DC\uAC04 \uAD50\uC815",color:"#FF8C42",
+    prompt:"당신은 고양이 행동교정 전문 수의행동학자입니다. 이 이미지에서 보이는 고양이의 행동을 분석하고 행동 교정 솔루션을 한국어로 제공하세요:\n1. 🔍 문제 행동 진단\n2. 🧠 원인 분석\n3. ⚡ 즉각 대응법\n4. 📋 단계별 교정 계획 (1주/2주/4주)\n5. 🏠 환경 개선\n6. 🍽️ 식이/건강 체크\n7. ⚠️ 병원 방문 필요성\n8. 💪 재발 방지 예방법\n마크다운 형식 없이 이모지와 줄바꿈으로 깔끔하게 답변하세요."
   }
 ];
 
@@ -66,7 +71,6 @@ var TIPS = [
   "고양이는 높은 곳을 좋아해요 - 캣타워를 추천해요 🏔️"
 ];
 
-/* ====== STYLES ====== */
 var S = {
   shell:{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",position:"relative",overflow:"hidden",display:"flex",flexDirection:"column"},
   home:{minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",padding:"0 20px 28px",display:"flex",flexDirection:"column",alignItems:"center",position:"relative"},
@@ -77,60 +81,66 @@ var S = {
   tipBox:{background:"rgba(255,255,255,.06)",borderRadius:12,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,width:"100%",marginBottom:20,border:"1px solid rgba(255,255,255,.05)"},
   modeCard:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:"15px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"},
   histBtn:{marginTop:16,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5},
-  topBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 14px",background:"#333",position:"sticky",top:0,zIndex:10,flexShrink:0},
+  topBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"#333",position:"sticky",top:0,zIndex:10,flexShrink:0},
   topTitle:{color:"#fff",fontSize:15,fontWeight:700},
   topBtn:{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5},
   scroll:{flex:1,overflowY:"auto",background:"linear-gradient(180deg,#13131f,#161630)",WebkitOverflowScrolling:"touch"},
-  camWrap:{position:"relative",width:"100%",aspectRatio:"4/3",background:"#000",overflow:"hidden"},
+  camWrap:{position:"relative",width:"100%",aspectRatio:"4/3",background:"#000",overflow:"hidden",flexShrink:0},
   video:{width:"100%",height:"100%",objectFit:"cover",display:"block"},
   camOverlay:{position:"absolute",inset:0,background:"rgba(0,0,0,.75)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)",zIndex:3},
-  captureDock:{position:"absolute",bottom:20,left:0,right:0,display:"flex",justifyContent:"center",zIndex:5},
-  captureBtn:{display:"flex",alignItems:"center",gap:10,padding:"16px 40px",borderRadius:50,color:"#fff",fontSize:15},
+  liveBar:{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",background:"rgba(255,255,255,.04)",borderBottom:"1px solid rgba(255,255,255,.06)"},
   errBox:{margin:"14px 18px",padding:"14px 16px",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",borderRadius:12,color:"#ff7070",fontSize:13,display:"flex",flexDirection:"column",gap:10},
   retryBtn:{alignSelf:"flex-start",padding:"8px 20px",background:"rgba(255,255,255,.12)",borderRadius:8,color:"#fff",fontSize:12.5},
-  bigBtn:{width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"16px 20px",borderRadius:14,color:"#fff"},
-  resTxt:{padding:"8px 20px 16px",color:"#ccccdd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"},
+  resTxt:{padding:"12px 18px 16px",color:"#ccccdd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"},
   hItem:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:14,cursor:"pointer",textAlign:"left",display:"block",marginBottom:10}
 };
 
-/* ====== RESULT TEXT COMPONENT ====== */
-function ResultText(props) {
-  var lines = props.text.split("\n");
+function ResultText(props){
+  var lines=props.text.split("\n");
   return html`<div style=${S.resTxt}>
-    ${lines.map(function(l,i){ return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`; })}
+    ${lines.map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`;})}
   </div>`;
 }
 
-/* ====== MAIN APP ====== */
-function App() {
-  var _mode = useState(null), mode = _mode[0], setMode = _mode[1];
-  var _scr = useState("home"), screen = _scr[0], setScreen = _scr[1];
-  var _az = useState(false), analyzing = _az[0], setAnalyzing = _az[1];
-  var _res = useState(null), result = _res[0], setResult = _res[1];
-  var _err = useState(null), error = _err[0], setError = _err[1];
-  var _hist = useState([]), history = _hist[0], setHistory = _hist[1];
-  var _tip = useState(TIPS[0]), tip = _tip[0], setTip = _tip[1];
-  var _img = useState(null), capturedImg = _img[0], setCapturedImg = _img[1];
-  var _vi = useState(null), viewItem = _vi[0], setViewItem = _vi[1];
-  var _cr = useState(false), camReady = _cr[0], setCamReady = _cr[1];
-  var _ce = useState(null), camError = _ce[0], setCamError = _ce[1];
-  var _fc = useState("environment"), facing = _fc[0], setFacing = _fc[1];
+function App(){
+  var _mode=useState(null),mode=_mode[0],setMode=_mode[1];
+  var _scr=useState("home"),screen=_scr[0],setScreen=_scr[1];
+  var _az=useState(false),analyzing=_az[0],setAnalyzing=_az[1];
+  var _res=useState(null),result=_res[0],setResult=_res[1];
+  var _err=useState(null),error=_err[0],setError=_err[1];
+  var _hist=useState([]),history=_hist[0],setHistory=_hist[1];
+  var _tip=useState(TIPS[0]),tip=_tip[0],setTip=_tip[1];
+  var _vi=useState(null),viewItem=_vi[0],setViewItem=_vi[1];
+  var _cr=useState(false),camReady=_cr[0],setCamReady=_cr[1];
+  var _ce=useState(null),camError=_ce[0],setCamError=_ce[1];
+  var _fc=useState("environment"),facing=_fc[0],setFacing=_fc[1];
+  var _live=useState(false),liveOn=_live[0],setLiveOn=_live[1];
+  var _cnt=useState(0),analyzeCount=_cnt[0],setAnalyzeCount=_cnt[1];
+  var _paused=useState(false),paused=_paused[0],setPaused=_paused[1];
 
-  var videoRef = useRef(null);
-  var canvasRef = useRef(null);
-  var streamRef = useRef(null);
-  var modeRef = useRef(mode);
+  var videoRef=useRef(null);
+  var canvasRef=useRef(null);
+  var streamRef=useRef(null);
+  var modeRef=useRef(mode);
+  var analyzingRef=useRef(false);
+  var liveRef=useRef(false);
+  var timerRef=useRef(null);
+  var pausedRef=useRef(false);
 
-  useEffect(function(){ modeRef.current = mode; }, [mode]);
+  useEffect(function(){modeRef.current=mode;},[mode]);
+  useEffect(function(){liveRef.current=liveOn;},[liveOn]);
+  useEffect(function(){analyzingRef.current=analyzing;},[analyzing]);
+  useEffect(function(){pausedRef.current=paused;},[paused]);
+
   useEffect(function(){
-    var iv = setInterval(function(){ setTip(TIPS[Math.floor(Math.random()*TIPS.length)]); },5000);
-    return function(){ clearInterval(iv); };
+    var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);
+    return function(){clearInterval(iv);};
   },[]);
 
   /* --- CAMERA --- */
-  var startCam = useCallback(function(face) {
-    setCamReady(false); setCamError(null);
-    if(streamRef.current){ streamRef.current.getTracks().forEach(function(t){t.stop();}); streamRef.current=null; }
+  var startCam=useCallback(function(face){
+    setCamReady(false);setCamError(null);
+    if(streamRef.current){streamRef.current.getTracks().forEach(function(t){t.stop();});streamRef.current=null;}
     navigator.mediaDevices.getUserMedia({
       video:{facingMode:face||facing,width:{ideal:1280},height:{ideal:960}},audio:false
     }).then(function(stream){
@@ -149,33 +159,36 @@ function App() {
     });
   },[facing]);
 
-  var stopCam = useCallback(function(){
-    if(streamRef.current){ streamRef.current.getTracks().forEach(function(t){t.stop();}); streamRef.current=null; }
+  var stopCam=useCallback(function(){
+    if(streamRef.current){streamRef.current.getTracks().forEach(function(t){t.stop();});streamRef.current=null;}
     setCamReady(false);
   },[]);
 
-  var flipCam = useCallback(function(){
-    var next = facing==="environment"?"user":"environment";
-    setFacing(next); startCam(next);
+  var flipCam=useCallback(function(){
+    var next=facing==="environment"?"user":"environment";
+    setFacing(next);startCam(next);
   },[facing,startCam]);
 
-  useEffect(function(){ return function(){ if(streamRef.current) streamRef.current.getTracks().forEach(function(t){t.stop();}); }; },[]);
+  useEffect(function(){return function(){
+    if(streamRef.current) streamRef.current.getTracks().forEach(function(t){t.stop();});
+    if(timerRef.current) clearInterval(timerRef.current);
+  };},[]);
 
-  /* --- CAPTURE --- */
-  var capture = useCallback(function(){
-    if(!videoRef.current||!canvasRef.current) return;
-    var v=videoRef.current, c=canvasRef.current;
-    c.width=v.videoWidth; c.height=v.videoHeight;
+  /* --- CAPTURE ONE FRAME --- */
+  function captureFrame(){
+    if(!videoRef.current||!canvasRef.current) return null;
+    var v=videoRef.current,c=canvasRef.current;
+    c.width=v.videoWidth;c.height=v.videoHeight;
     c.getContext("2d").drawImage(v,0,0);
-    var url=c.toDataURL("image/jpeg",0.85);
-    setCapturedImg(url); stopCam(); doAnalyze(url);
-  },[stopCam]);
+    return c.toDataURL("image/jpeg",0.8);
+  }
 
+  /* --- ANALYZE ONE FRAME --- */
   function doAnalyze(imgUrl){
-    var cur=modeRef.current; if(!cur) return;
+    var cur=modeRef.current;if(!cur) return;
     var b64=imgUrl.split(",")[1];
     var m=MODES.find(function(x){return x.id===cur;});
-    setAnalyzing(true); setResult(null); setError(null);
+    setAnalyzing(true);setError(null);
     fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -191,16 +204,49 @@ function App() {
       if(data.error) throw new Error(data.error.message);
       var txt=data.content?data.content.map(function(c){return c.text||"";}).join("\n"):"결과 없음";
       setResult(txt);
+      setAnalyzeCount(function(c){return c+1;});
       setHistory(function(p){return [{id:Date.now(),mode:m.label,icon:m.icon,image:imgUrl,result:txt,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
-    }).catch(function(err){ setError(err.message||"오류 발생"); })
-    .finally(function(){ setAnalyzing(false); });
+    }).catch(function(err){setError(err.message||"오류 발생");})
+    .finally(function(){setAnalyzing(false);});
   }
 
-  function retake(){ setCapturedImg(null); setResult(null); setError(null); startCam(facing); }
-  function goHome(){ stopCam(); setMode(null); setScreen("home"); setResult(null); setCapturedImg(null); setError(null); setViewItem(null); setCamError(null); }
-  function enterMode(id){ setMode(id); setScreen("analyze"); setResult(null); setCapturedImg(null); setError(null); setCamError(null); setTimeout(function(){ startCam(facing); },150); }
+  /* --- LIVE AUTO-ANALYSIS LOOP --- */
+  function startLive(){
+    setLiveOn(true);setPaused(false);
+    // immediate first capture
+    var img=captureFrame();
+    if(img) doAnalyze(img);
+    // then every 3 seconds
+    if(timerRef.current) clearInterval(timerRef.current);
+    timerRef.current=setInterval(function(){
+      if(!liveRef.current) return;
+      if(pausedRef.current) return;
+      if(analyzingRef.current) return; // skip if previous still running
+      var img2=captureFrame();
+      if(img2) doAnalyze(img2);
+    },3000);
+  }
 
-  var sm = MODES.find(function(x){return x.id===mode;});
+  function stopLive(){
+    setLiveOn(false);
+    if(timerRef.current){clearInterval(timerRef.current);timerRef.current=null;}
+  }
+
+  function togglePause(){
+    setPaused(function(p){return !p;});
+  }
+
+  function goHome(){
+    stopLive();stopCam();
+    setMode(null);setScreen("home");setResult(null);setError(null);setViewItem(null);setCamError(null);setAnalyzeCount(0);
+  }
+
+  function enterMode(id){
+    setMode(id);setScreen("analyze");setResult(null);setError(null);setCamError(null);setAnalyzeCount(0);setLiveOn(false);
+    setTimeout(function(){startCam(facing);},150);
+  }
+
+  var sm=MODES.find(function(x){return x.id===mode;});
 
   /* ===== HISTORY DETAIL ===== */
   if(viewItem) return html`
@@ -211,7 +257,7 @@ function App() {
         <span style=${{width:56}}/>
       </div>
       <div style=${S.scroll}>
-        ${viewItem.image && html`<img src=${viewItem.image} style=${{width:"100%",maxHeight:300,objectFit:"cover"}}/>`}
+        ${viewItem.image&&html`<img src=${viewItem.image} style=${{width:"100%",maxHeight:300,objectFit:"cover"}}/>`}
         <div style=${{padding:"10px 20px 4px",color:"#777",fontSize:11}}>${viewItem.time}</div>
         <${ResultText} text=${viewItem.result}/>
       </div>
@@ -227,15 +273,15 @@ function App() {
       </div>
       <div style=${S.scroll}>
         <div style=${{padding:16}}>
-          ${history.length===0 ? html`
+          ${history.length===0?html`
             <div style=${{textAlign:"center",paddingTop:60}}>
               <div style=${{fontSize:52}}>📭</div>
               <p style=${{color:"#888",marginTop:14}}>아직 분석 기록이 없어요</p>
             </div>
-          ` : history.map(function(h){ return html`
+          `:history.map(function(h){return html`
             <button key=${h.id} style=${S.hItem} onClick=${function(){setViewItem(h);}}>
               <div style=${{display:"flex",alignItems:"center",gap:12}}>
-                ${h.image && html`<img src=${h.image} style=${{width:52,height:52,borderRadius:10,objectFit:"cover"}}/>`}
+                ${h.image&&html`<img src=${h.image} style=${{width:52,height:52,borderRadius:10,objectFit:"cover"}}/>`}
                 <div style=${{flex:1,minWidth:0}}>
                   <div style=${{color:"#eee",fontSize:13,fontWeight:700}}>${h.icon} ${h.mode}</div>
                   <div style=${{color:"#777",fontSize:10,marginTop:2}}>${h.time}</div>
@@ -243,8 +289,7 @@ function App() {
                 </div>
                 <span style=${{color:"#555"}}>›</span>
               </div>
-            </button>`;
-          })}
+            </button>`;})}
         </div>
       </div>
     </div>`;
@@ -258,13 +303,14 @@ function App() {
           <div style=${S.logoCircle}><span style=${{fontSize:50}}>🐱</span></div>
           <h1 style=${S.appTitle}>냥냥 행동분석</h1>
           <p style=${S.appSub}>AI 고양이 행동교정 전문가</p>
+          <p style=${{fontSize:11,color:"#4ECDC4",marginTop:6}}>✨ 실시간 자동 분석 (3초 간격)</p>
         </div>
         <div style=${S.tipBox}>
           <span>💡</span>
           <span style=${{color:"#ccd",fontSize:12,lineHeight:1.5}}>${tip}</span>
         </div>
         <div style=${{width:"100%",display:"flex",flexDirection:"column",gap:10}}>
-          ${MODES.map(function(m,i){ return html`
+          ${MODES.map(function(m,i){return html`
             <button key=${m.id} class="card-anim"
               style=${{...S.modeCard,borderLeft:"4px solid "+m.color,animationDelay:i*.08+"s"}}
               onClick=${function(){enterMode(m.id);}}>
@@ -276,8 +322,7 @@ function App() {
                 </div>
               </div>
               <span style=${{fontSize:20,color:"#555"}}>›</span>
-            </button>`;
-          })}
+            </button>`;})}
         </div>
         <button style=${S.histBtn} onClick=${function(){setScreen("history");}}>📋 분석 기록 (${history.length})</button>
         <div style=${{marginTop:"auto",paddingTop:20,textAlign:"center"}}>
@@ -286,76 +331,108 @@ function App() {
       </div>
     </div>`;
 
-  /* ===== ANALYSIS (CAMERA) ===== */
+  /* ===== ANALYSIS (LIVE CAMERA) ===== */
+  var statusColor=sm?sm.color:"#4ECDC4";
+
   return html`
     <div style=${S.shell}>
+      <!-- HEADER -->
       <div style=${{...S.topBar,background:sm?sm.color:"#333"}}>
         <button style=${S.topBtn} onClick=${goHome}>← 홈</button>
         <span style=${S.topTitle}>${sm?sm.icon:""} ${sm?sm.label:""}</span>
-        <button style=${S.topBtn} onClick=${flipCam}>🔄 전환</button>
+        <button style=${S.topBtn} onClick=${flipCam}>🔄</button>
       </div>
+
       <div style=${S.scroll}>
+        <!-- CAMERA -->
+        <div style=${S.camWrap}>
+          <video ref=${videoRef} autoPlay playsInline muted style=${S.video}/>
+          <canvas ref=${canvasRef} style=${{display:"none"}}/>
 
-        ${!capturedImg && html`
-          <div style=${S.camWrap}>
-            <video ref=${videoRef} autoPlay playsInline muted style=${S.video}/>
-            <canvas ref=${canvasRef} style=${{display:"none"}}/>
+          ${!camReady&&!camError&&html`
+            <div style=${S.camOverlay}>
+              <div class="spinner"/>
+              <p style=${{color:"#fff",marginTop:12,fontSize:14}}>카메라 로딩 중...</p>
+            </div>`}
 
-            ${!camReady && !camError && html`
-              <div style=${S.camOverlay}>
-                <div class="spinner"/>
-                <p style=${{color:"#fff",marginTop:12,fontSize:14}}>카메라 로딩 중...</p>
-              </div>`}
+          ${camError&&html`
+            <div style=${S.camOverlay}>
+              <span style=${{fontSize:40}}>📷</span>
+              <p style=${{color:"#ff7070",marginTop:12,fontSize:13,textAlign:"center",whiteSpace:"pre-line",lineHeight:1.6,padding:"0 24px"}}>${camError}</p>
+              <button style=${{...S.retryBtn,marginTop:16}} onClick=${function(){startCam(facing);}}>다시 시도</button>
+            </div>`}
 
-            ${camError && html`
-              <div style=${S.camOverlay}>
-                <span style=${{fontSize:40}}>📷</span>
-                <p style=${{color:"#ff7070",marginTop:12,fontSize:13,textAlign:"center",whiteSpace:"pre-line",lineHeight:1.6,padding:"0 24px"}}>${camError}</p>
-                <button style=${{...S.retryBtn,marginTop:16}} onClick=${function(){startCam(facing);}}>다시 시도</button>
-              </div>`}
+          ${camReady&&liveOn&&html`<div class="scan-line"/>`}
 
-            ${camReady && html`<div class="scan-line"/>`}
-
-            ${camReady && html`
-              <div style=${S.captureDock}>
-                <button style=${{...S.captureBtn,background:sm?sm.color:"#4ECDC4",boxShadow:"0 4px 24px "+(sm?sm.color:"#4ECDC4")+"66"}} onClick=${capture}>
-                  <span style=${{fontSize:28}}>📸</span>
-                  <span style=${{fontSize:15,fontWeight:800}}>분석하기</span>
+          <!-- START / CONTROLS overlay -->
+          ${camReady&&html`
+            <div style=${{position:"absolute",bottom:0,left:0,right:0,padding:"12px 16px 16px",background:"linear-gradient(transparent,rgba(0,0,0,.7))",zIndex:5,display:"flex",justifyContent:"center",gap:12}}>
+              ${!liveOn?html`
+                <button style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 36px",borderRadius:50,color:"#fff",background:statusColor,boxShadow:"0 4px 24px "+statusColor+"66",fontSize:15,fontWeight:800}} onClick=${startLive}>
+                  <span style=${{fontSize:22}}>▶️</span> 실시간 분석 시작
                 </button>
-              </div>`}
-          </div>`}
+              `:html`
+                <button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:paused?"#4ECDC4":"rgba(255,255,255,.25)",fontSize:13,fontWeight:700}} onClick=${togglePause}>
+                  ${paused?"▶️ 재개":"⏸️ 일시정지"}
+                </button>
+                <button style=${{padding:"12px 24px",borderRadius:50,color:"#fff",background:"#ff4444",fontSize:13,fontWeight:700}} onClick=${stopLive}>
+                  ⏹️ 중지
+                </button>
+              `}
+            </div>`}
+        </div>
 
-        ${capturedImg && html`
-          <div style=${{position:"relative"}}>
-            <img src=${capturedImg} style=${{width:"100%",maxHeight:360,objectFit:"cover",display:"block"}}/>
-            ${analyzing && html`
-              <div style=${S.camOverlay}>
-                <div class="spinner"/>
-                <p style=${{color:"#fff",marginTop:14,fontSize:15,fontWeight:600}}>AI가 분석 중이에요...</p>
-                <p style=${{color:"#bbb",fontSize:12,marginTop:3}}>잠시만 기다려주세요 🐱</p>
-              </div>`}
-          </div>`}
+        <!-- LIVE STATUS BAR -->
+        ${liveOn&&html`
+          <div style=${S.liveBar}>
+            <div class="live-dot"/>
+            <span style=${{color:"#ff6666",fontSize:12,fontWeight:700}}>LIVE</span>
+            <span style=${{color:"#999",fontSize:11}}>3초마다 자동 분석</span>
+            <span style=${{marginLeft:"auto",color:"#4ECDC4",fontSize:11,fontWeight:600}}>분석 ${analyzeCount}회</span>
+            ${analyzing&&html`<div class="spinner-sm"/>`}
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style=${{background:statusColor}} key=${analyzeCount}/>
+          </div>
+        `}
 
-        ${error && html`
+        ${paused&&liveOn&&html`
+          <div style=${{padding:"10px 16px",background:"rgba(255,200,50,.08)",borderBottom:"1px solid rgba(255,200,50,.15)",display:"flex",alignItems:"center",gap:8}}>
+            <span style=${{fontSize:14}}>⏸️</span>
+            <span style=${{color:"#ffc832",fontSize:12}}>일시정지 중 - 재개 버튼을 누르세요</span>
+          </div>
+        `}
+
+        <!-- ERROR -->
+        ${error&&html`
           <div style=${S.errBox}>
             <span>⚠️ ${error}</span>
-            <button style=${S.retryBtn} onClick=${retake}>다시 시도</button>
           </div>`}
 
-        ${result && html`
-          <div class="fade-in">
-            <div style=${{display:"flex",alignItems:"center",gap:8,padding:"18px 20px 6px"}}>
-              <span style=${{fontSize:20}}>${sm?sm.icon:""}</span>
-              <span style=${{color:"#f0f0f5",fontSize:16,fontWeight:700}}>분석 결과</span>
+        <!-- RESULT -->
+        ${result&&html`
+          <div class="fade-in" key=${analyzeCount}>
+            <div style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 18px 4px"}}>
+              <span style=${{fontSize:18}}>${sm?sm.icon:""}</span>
+              <span style=${{color:"#f0f0f5",fontSize:15,fontWeight:700}}>분석 결과</span>
+              ${analyzing&&html`<div class="spinner-sm" style=${{marginLeft:8}}/>`}
             </div>
             <${ResultText} text=${result}/>
-            <div style=${{padding:"4px 20px 28px"}}>
-              <button style=${{...S.bigBtn,background:sm?sm.color:"#4ECDC4",boxShadow:"0 4px 20px "+(sm?sm.color:"#4ECDC4")+"44"}} onClick=${retake}>
-                <span style=${{fontSize:22}}>📷</span>
-                <span style=${{fontSize:15,fontWeight:700}}>다시 촬영하기</span>
-              </button>
-            </div>
           </div>`}
+
+        <!-- NO RESULT YET -->
+        ${!result&&!error&&!analyzing&&liveOn&&html`
+          <div style=${{padding:"40px 20px",textAlign:"center"}}>
+            <div class="spinner"/>
+            <p style=${{color:"#888",marginTop:16,fontSize:13}}>첫 번째 분석을 기다리는 중...</p>
+          </div>
+        `}
+
+        ${!result&&!liveOn&&camReady&&html`
+          <div style=${{padding:"30px 20px",textAlign:"center"}}>
+            <p style=${{color:"#888",fontSize:13,lineHeight:1.6}}>위의 <b style=${{color:statusColor}}>실시간 분석 시작</b> 버튼을 누르면${"\\n"}3초마다 자동으로 분석합니다</p>
+          </div>
+        `}
       </div>
     </div>`;
 }
