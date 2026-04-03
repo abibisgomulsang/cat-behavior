@@ -50,8 +50,14 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 <div id="root"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/htm@3.1.1/dist/htm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.js"></script>
 <script>
+if(typeof htm==="undefined"){document.write('<script src="https://unpkg.com/htm@3.1.1/dist/htm.js"><\/script>');}
+</script>
+<script>
+if(typeof htm==="undefined"||typeof React==="undefined"){
+  document.getElementById("root").innerHTML='<div style="padding:40px;text-align:center;color:#ff7070;font-family:sans-serif"><p style="font-size:18px;margin-bottom:12px">⚠️ 라이브러리 로딩 실패</p><p style="font-size:13px;color:#888">인터넷 연결을 확인하고 새로고침 해주세요</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;background:#4ECDC4;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer">🔄 새로고침</button></div>';
+}else{
 var WORKER_URL="https://abibisgomulsang--f439289c2d9c11f18dc942dde27851f2.web.val.run";
 var html=htm.bind(React.createElement);
 var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef,useCallback=React.useCallback;
@@ -194,17 +200,18 @@ function App(){
   var vRef=useRef(null),cRef=useRef(null),sRef=useRef(null),vidElRef=useRef(null);
   var mRef=useRef(mode),subLRef=useRef(false),lRef=useRef(false),tRef=useRef(null),pRef=useRef(false),srcRef=useRef(null);
   var autoStarted=useRef(false);
+  var killRef=useRef(false); // 동기식 kill 스위치 - 즉시 반영됨
   useEffect(function(){mRef.current=mode;},[mode]);
   useEffect(function(){lRef.current=liveOn;},[liveOn]);
   useEffect(function(){subLRef.current=subL;},[subL]);
   useEffect(function(){pRef.current=paused;},[paused]);
   useEffect(function(){srcRef.current=source;},[source]);
   useEffect(function(){var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);return function(){clearInterval(iv);};},[]);
-  useEffect(function(){if(camReady&&screen==="analyze"&&source==="cam"&&!autoStarted.current){autoStarted.current=true;startLive();}},[camReady,screen,source]);
+  useEffect(function(){if(camReady&&screen==="analyze"&&source==="cam"&&!autoStarted.current&&!killRef.current){autoStarted.current=true;startLive();}},[camReady,screen,source]);
 
   var startCam=useCallback(function(face){setCamReady(false);setCamError(null);autoStarted.current=false;if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}navigator.mediaDevices.getUserMedia({video:{facingMode:face||facing,width:{ideal:1280},height:{ideal:960}},audio:false}).then(function(st){sRef.current=st;if(vRef.current){vRef.current.srcObject=st;vRef.current.onloadedmetadata=function(){vRef.current.play().catch(function(){});setCamReady(true);};}}).catch(function(e){setCamError(e.name==="NotAllowedError"?"카메라 권한을 허용해주세요":"카메라 오류: "+e.message);});},[facing]);
   var stopCam=useCallback(function(){if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}setCamReady(false);},[]);
-  var flipCam=useCallback(function(){var n=facing==="environment"?"user":"environment";setFacing(n);stopLiveTimer();autoStarted.current=false;startCam(n);},[facing,startCam]);
+  var flipCam=useCallback(function(){var n=facing==="environment"?"user":"environment";setFacing(n);stopLiveTimer();killRef.current=false;autoStarted.current=false;startCam(n);},[facing,startCam]);
   useEffect(function(){return function(){if(sRef.current)sRef.current.getTracks().forEach(function(t){t.stop();});if(tRef.current)clearInterval(tRef.current);stopMic();};},[]);
 
   // Mic toggle
@@ -216,45 +223,48 @@ function App(){
   function capFrame(el){if(!el||!cRef.current)return null;var c=cRef.current;var w=el.videoWidth||el.width||720;var h=el.videoHeight||el.height||540;var sc=Math.min(720/w,1);c.width=Math.round(w*sc);c.height=Math.round(h*sc);c.getContext("2d").drawImage(el,0,0,c.width,c.height);return c.toDataURL("image/jpeg",0.75).split(",")[1];}
 
   function doAnalyze(b64,isOnce){
+    if(killRef.current)return; // 즉시 차단
     var cur=mRef.current;if(!cur)return;
     var audio=getAudioDesc();
     setSubL(true);setError(null);setCnt(function(c){return c+1;});setFbSent(false);setRecToy(null);
     callAPI({model:"claude-haiku-4-5-20251001",max_tokens:150,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:FAST[cur](audio)}]}]}).then(function(d){
+      if(killRef.current&&!isOnce)return; // 중지됐으면 결과 무시 (사진 1회는 허용)
       if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
       var t=d.content?d.content.map(function(c){return c.text||"";}).join("\n"):"";var p=parseSub(t);
       setSubtitle(p.subtitle||"...");setMood(p.mood||"");
-      // Match toy recommendation
       setRecToy(matchToy(p.subtitle+" "+p.mood));
-    }).catch(function(e){setError(e.message);}).finally(function(){setSubL(false);});
+    }).catch(function(e){if(!killRef.current||isOnce)setError(e.message);}).finally(function(){setSubL(false);});
     setDetL(true);
     callAPI({model:"claude-haiku-4-5-20251001",max_tokens:1800,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:DETAIL[cur](audio)}]}]}).then(function(d){
+      if(killRef.current&&!isOnce)return;
       if(d.error)return;var t=d.content?d.content.map(function(c){return c.text||"";}).join("\n"):"";setDetail(t);
       var m=MODES.find(function(x){return x.id===cur;});
       setHistory(function(p){return [{id:Date.now(),mode:m.label,icon:m.icon,result:t,subtitle:subtitle,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
     }).catch(function(){}).finally(function(){setDetL(false);});
   }
 
-  function analyzeEl(el){var b=capFrame(el);if(b)doAnalyze(b);}
+  function analyzeEl(el){if(killRef.current)return;var b=capFrame(el);if(b)doAnalyze(b);}
   function startLive(){
-    setLiveOn(true);setPaused(false);
+    killRef.current=false; // kill 해제
+    setLiveOn(true);setPaused(false);setStopped(false);
     if(srcRef.current==="cam"&&vRef.current)analyzeEl(vRef.current);
     else if(srcRef.current==="video"&&vidElRef.current)analyzeEl(vidElRef.current);
     if(tRef.current)clearInterval(tRef.current);
-    tRef.current=setInterval(function(){if(!lRef.current||pRef.current||subLRef.current)return;
+    tRef.current=setInterval(function(){
+      if(killRef.current){clearInterval(tRef.current);tRef.current=null;return;} // 이중 안전장치
+      if(!lRef.current||pRef.current||subLRef.current)return;
       if(srcRef.current==="cam"&&vRef.current)analyzeEl(vRef.current);
       else if(srcRef.current==="video"&&vidElRef.current&&!vidElRef.current.paused)analyzeEl(vidElRef.current);
     },3000);
   }
   function stopLiveTimer(){
+    killRef.current=true; // 즉시 동기 차단!
     setLiveOn(false);setStopped(true);
     if(tRef.current){clearInterval(tRef.current);tRef.current=null;}
-    // 카메라 정지
     if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}
     setCamReady(false);
-    // 영상 일시정지
     if(vidElRef.current&&!vidElRef.current.paused)vidElRef.current.pause();
     setVidPlay(false);
-    // 마이크 정지
     stopMic();setMicOn(false);
   }
 
@@ -265,11 +275,11 @@ function App(){
     setFbCount({c:catProfile.totalCorrect,w:catProfile.totalWrong});
   }
 
-  function resetAll(){setSubtitle("");setMood("");setDetail("");setCnt(0);setError(null);setSubL(false);setDetL(false);setPhotoSrc(null);setVidSrc(null);setVidPlay(false);setVidReady(false);setVidInfo(null);setVidLoad(false);setRecToy(null);setFbSent(false);setStopped(false);autoStarted.current=false;}
-  function goHome(){stopLiveTimer();stopCam();stopMic();setMicOn(false);setMode(null);setScreen("home");setSource(null);setViewItem(null);setCamError(null);resetAll();}
+  function resetAll(){setSubtitle("");setMood("");setDetail("");setCnt(0);setError(null);setSubL(false);setDetL(false);setPhotoSrc(null);setVidSrc(null);setVidPlay(false);setVidReady(false);setVidInfo(null);setVidLoad(false);setRecToy(null);setFbSent(false);setStopped(false);killRef.current=false;autoStarted.current=false;}
+  function goHome(){killRef.current=true;stopLiveTimer();stopCam();stopMic();setMicOn(false);setMode(null);setScreen("home");setSource(null);setViewItem(null);setCamError(null);resetAll();}
   function enterMode(id){setMode(id);setScreen("source");setSource(null);resetAll();}
   function pickCam(){setSource("cam");setScreen("analyze");resetAll();setTimeout(function(){startCam(facing);},150);}
-  function onPhoto(e){var f=e.target.files&&e.target.files[0];if(!f)return;e.target.value="";stopLiveTimer();resetAll();setSource("photo");setScreen("analyze");var r=new FileReader();r.onload=function(ev){setPhotoSrc(ev.target.result);var c=document.createElement("canvas"),img=new Image();img.onload=function(){var sc=Math.min(720/img.width,1);c.width=img.width*sc;c.height=img.height*sc;c.getContext("2d").drawImage(img,0,0,c.width,c.height);doAnalyze(c.toDataURL("image/jpeg",0.75).split(",")[1],true);};img.src=ev.target.result;};r.readAsDataURL(f);}
+  function onPhoto(e){var f=e.target.files&&e.target.files[0];if(!f)return;e.target.value="";stopLiveTimer();resetAll();killRef.current=false;setSource("photo");setScreen("analyze");var r=new FileReader();r.onload=function(ev){setPhotoSrc(ev.target.result);var c=document.createElement("canvas"),img=new Image();img.onload=function(){var sc=Math.min(720/img.width,1);c.width=img.width*sc;c.height=img.height*sc;c.getContext("2d").drawImage(img,0,0,c.width,c.height);doAnalyze(c.toDataURL("image/jpeg",0.75).split(",")[1],true);};img.src=ev.target.result;};r.readAsDataURL(f);}
   function fmtSize(b){return b<1024*1024?(b/1024).toFixed(0)+"KB":(b/1024/1024).toFixed(1)+"MB";}
   function fmtDur(s){return Math.floor(s/60)+"분 "+Math.floor(s%60)+"초";}
   function onVideo(e){var f=e.target.files&&e.target.files[0];if(!f)return;e.target.value="";if(f.size>500*1024*1024){alert("500MB 이하만 지원");return;}stopLiveTimer();resetAll();setSource("video");setScreen("analyze");setVidLoad(true);setVidInfo({name:f.name,size:fmtSize(f.size),duration:null});setVidSrc(URL.createObjectURL(f));}
@@ -370,6 +380,7 @@ function App(){
   </div></div>`;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(html`<${App}/>`);
+} // end else (library check)
 </script>
 </body>
 </html>
