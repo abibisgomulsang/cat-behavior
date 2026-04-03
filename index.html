@@ -12,38 +12,21 @@
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif;-webkit-tap-highlight-color:transparent}
 html,body,#root{width:100%;min-height:100dvh;background:#111119;overflow-x:hidden}
 button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
-.paw{position:absolute;opacity:.1;pointer-events:none}
-.p1{top:28px;left:18px;font-size:26px;animation:fl1 4s ease-in-out infinite}
-.p2{top:85px;right:28px;font-size:20px;animation:fl2 5s ease-in-out infinite .5s}
-.p3{top:190px;left:45px;font-size:16px;animation:fl3 6s ease-in-out infinite 1s}
-@keyframes fl1{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-18px) rotate(15deg)}}
-@keyframes fl2{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(-10deg)}}
-@keyframes fl3{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-22px) rotate(20deg)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 @keyframes scanY{0%{top:10%}50%{top:85%}100%{top:10%}}
 @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes progressBar{from{width:0}to{width:100%}}
-@keyframes subtitleIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes subtitleIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,68,68,.3)}70%{box-shadow:0 0 0 8px rgba(255,68,68,0)}}
-.spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:#4ECDC4;border-radius:50%;animation:spin .8s linear infinite}
-.spinner-sm{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:#4ECDC4;border-radius:50%;animation:spin .8s linear infinite}
+.spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:#4ECDC4;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+.spinner-sm{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:#4ECDC4;border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
 .fade-in{animation:fadeUp .5s ease-out}
-.card-anim{animation:fadeUp .5s ease-out both}
 .scan-line{position:absolute;left:8%;right:8%;height:2px;background:linear-gradient(90deg,transparent,#4ECDC4,transparent);box-shadow:0 0 12px rgba(78,205,196,.5);animation:scanY 3s ease-in-out infinite;pointer-events:none;z-index:2}
 .live-dot{width:10px;height:10px;border-radius:50%;background:#ff4444;animation:livePulse 1.2s ease-in-out infinite;flex-shrink:0}
-.progress-track{width:100%;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;border-radius:2px;animation:progressBar 3s linear infinite}
-.subtitle-bar{background:rgba(0,0,0,.85);backdrop-filter:blur(8px);padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);animation:subtitleIn .4s ease-out}
-.subtitle-text{color:#FFD700;font-size:15px;font-weight:700;line-height:1.5;text-align:center}
-.subtitle-mood{color:#4ECDC4;font-size:12px;text-align:center;margin-top:4px}
 .src-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 10px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#ccc;font-size:13px;position:relative;overflow:hidden}
 .src-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
-.mic-active{animation:micPulse 1.5s ease-out infinite}
-.fb-btn{flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
-.toy-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;margin:12px 18px;animation:fadeUp .5s ease-out}
 </style>
 </head>
 <body>
@@ -51,372 +34,304 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.js"></script>
-<script>
-if(typeof htm==="undefined"){document.write('<script src="https://unpkg.com/htm@3.1.1/dist/htm.js"><\/script>');}
-</script>
+<script>if(typeof htm==="undefined"){document.write('<script src="https://unpkg.com/htm@3.1.1/dist/htm.js"><\/script>');}</script>
 <script>
 if(typeof htm==="undefined"||typeof React==="undefined"){
-  document.getElementById("root").innerHTML='<div style="padding:40px;text-align:center;color:#ff7070;font-family:sans-serif"><p style="font-size:18px;margin-bottom:12px">⚠️ 라이브러리 로딩 실패</p><p style="font-size:13px;color:#888">인터넷 연결을 확인하고 새로고침 해주세요</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;background:#4ECDC4;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer">🔄 새로고침</button></div>';
+  document.getElementById("root").innerHTML='<div style="padding:40px;text-align:center;color:#ff7070"><p>라이브러리 로딩 실패</p><button onclick="location.reload()" style="margin-top:16px;padding:12px 24px;background:#4ECDC4;color:#fff;border:none;border-radius:8px">새로고침</button></div>';
 }else{
 var WORKER_URL="https://abibisgomulsang--f439289c2d9c11f18dc942dde27851f2.web.val.run";
 var html=htm.bind(React.createElement);
 var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef,useCallback=React.useCallback;
 
-/* ========== TOY CATALOG (아비비 고물상) ========== */
 var TOYS=[
-  {id:1,name:"깃털 낚싯대",price:"15,000원",mood:["bored","hunting","playful"],desc:"사냥 본능 자극! 불규칙하게 움직여주세요",tag:"사냥형",emoji:"🪶"},
-  {id:2,name:"캣닢 쥐인형",price:"8,000원",mood:["bored","curious","playful"],desc:"캣닢 향으로 흥미 유발, 물고 차기 놀이",tag:"후각형",emoji:"🐭"},
-  {id:3,name:"숨숨 터널",price:"25,000원",mood:["anxious","hiding","stressed"],desc:"안전한 은신처 + 터널 추격 놀이",tag:"안정형",emoji:"🕳️"},
-  {id:4,name:"퍼즐 간식볼",price:"18,000원",mood:["bored","smart","hungry"],desc:"두뇌 자극 + 간식 보상 = 최고의 조합",tag:"두뇌형",emoji:"🧩"},
-  {id:5,name:"자동 레이저",price:"22,000원",mood:["bored","hunting","energetic"],desc:"혼자서도 사냥놀이 가능, 자동 움직임",tag:"자동형",emoji:"🔴"},
-  {id:6,name:"스크래처 보드",price:"12,000원",mood:["stressed","scratching","territorial"],desc:"스트레스 해소 + 영역 표시 욕구 충족",tag:"스트레스해소",emoji:"🪵"},
-  {id:7,name:"창문 해먹",price:"20,000원",mood:["relaxed","watching","calm"],desc:"바깥 구경하며 편안한 휴식",tag:"휴식형",emoji:"🛏️"},
-  {id:8,name:"방울 공세트",price:"10,000원",mood:["playful","curious","kitten"],desc:"소리 자극 + 굴리기 놀이, 아기고양이 최적",tag:"소리형",emoji:"🔔"}
+  {name:"깃털 낚싯대",price:"15,000원",desc:"사냥 본능 자극",tag:"사냥형",emoji:"🪶",
+   weights:{bored:3,hunting:5,playful:4,energetic:4,curious:2,anxious:0,stressed:0,relaxed:0}},
+  {name:"캣닢 쥐인형",price:"8,000원",desc:"캣닢 향 흥미 유발",tag:"후각형",emoji:"🐭",
+   weights:{bored:4,hunting:3,playful:3,curious:5,energetic:1,anxious:1,stressed:0,relaxed:1}},
+  {name:"숨숨 터널",price:"25,000원",desc:"안전한 은신처+추격",tag:"안정형",emoji:"🕳️",
+   weights:{bored:1,hunting:2,playful:2,curious:3,anxious:5,stressed:4,hiding:5,relaxed:1}},
+  {name:"퍼즐 간식볼",price:"18,000원",desc:"두뇌 자극+간식 보상",tag:"두뇌형",emoji:"🧩",
+   weights:{bored:5,hunting:1,playful:2,curious:4,smart:5,hungry:5,anxious:0,stressed:1}},
+  {name:"자동 레이저",price:"22,000원",desc:"혼자서 사냥놀이",tag:"자동형",emoji:"🔴",
+   weights:{bored:5,hunting:5,playful:3,energetic:5,curious:2,anxious:0,stressed:0,relaxed:0}},
+  {name:"스크래처 보드",price:"12,000원",desc:"스트레스 해소+영역표시",tag:"해소형",emoji:"🪵",
+   weights:{bored:1,hunting:0,playful:1,stressed:5,scratching:5,territorial:5,anxious:3,relaxed:1}},
+  {name:"창문 해먹",price:"20,000원",desc:"바깥 구경 편안 휴식",tag:"휴식형",emoji:"🛏️",
+   weights:{bored:2,relaxed:5,calm:5,watching:5,anxious:1,stressed:1,hunting:0,playful:0}},
+  {name:"방울 공세트",price:"10,000원",desc:"소리+굴리기 놀이",tag:"소리형",emoji:"🔔",
+   weights:{bored:3,hunting:2,playful:5,curious:4,energetic:3,kitten:5,anxious:0,stressed:0}}
 ];
 
-function matchToy(moodText){
+var MOOD_KEYWORDS={
+  bored:["심심","지루","무료","따분"],hunting:["사냥","잡고","쫓","먹잇감"],
+  playful:["놀","재미","장난","신나"],anxious:["불안","긴장","무서","겁"],
+  stressed:["스트레스","짜증","예민","화남","화가"],hungry:["배고","밥","간식","먹"],
+  curious:["호기심","궁금","탐색","관심"],relaxed:["편안","이완","졸","쉬","느긋"],
+  energetic:["활발","에너지","뛰","흥분"],hiding:["숨","은신","도망"],
+  scratching:["긁","스크래치"],calm:["차분","평온","안정"],
+  smart:["똑똑","영리","지능"],kitten:["아기","새끼"],
+  territorial:["영역","텃세"],watching:["구경","바라봄","관찰"]
+};
+function scoreToy(toy,moodText){
   var text=(moodText||"").toLowerCase();
-  var keywords={bored:["심심","지루","무료"],hunting:["사냥","잡고","쫓"],playful:["놀","재미","장난"],anxious:["불안","긴장","무서"],stressed:["스트레스","짜증","예민"],hungry:["배고","밥","간식","먹"],curious:["호기심","궁금","탐색"],relaxed:["편안","이완","졸","쉬"],hiding:["숨","은신"],scratching:["긁","스크래치"],energetic:["활발","에너지","뛰"]};
-  var scores={};
-  TOYS.forEach(function(toy){scores[toy.id]=0;toy.mood.forEach(function(m){var kws=keywords[m]||[];kws.forEach(function(k){if(text.indexOf(k)>=0)scores[toy.id]+=2;});});});
-  var best=TOYS.slice().sort(function(a,b){return scores[b.id]-scores[a.id];})[0];
-  return scores[best.id]>0?best:TOYS[Math.floor(Math.random()*TOYS.length)];
-}
-
-/* ========== AUDIO ANALYZER ========== */
-var audioCtx=null,analyser=null,micStream=null;
-function startMic(){
-  return navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-    micStream=stream;
-    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    analyser=audioCtx.createAnalyser();
-    analyser.fftSize=2048;
-    audioCtx.createMediaStreamSource(stream).connect(analyser);
-    return true;
-  }).catch(function(){return false;});
-}
-function stopMic(){
-  if(micStream){micStream.getTracks().forEach(function(t){t.stop();});micStream=null;}
-  if(audioCtx){audioCtx.close();audioCtx=null;analyser=null;}
-}
-function getAudioDesc(){
-  if(!analyser)return"마이크 없음";
-  var data=new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteFrequencyData(data);
-  var sum=0,peak=0,peakIdx=0;
-  for(var i=0;i<data.length;i++){sum+=data[i];if(data[i]>peak){peak=data[i];peakIdx=i;}}
-  var avg=sum/data.length;
-  var peakHz=Math.round(peakIdx*audioCtx.sampleRate/analyser.fftSize);
-  // Cat meow range: 500-2000Hz
-  var catRange=0;
-  var lo=Math.floor(500*analyser.fftSize/audioCtx.sampleRate);
-  var hi=Math.ceil(2000*analyser.fftSize/audioCtx.sampleRate);
-  for(var j=lo;j<=hi&&j<data.length;j++)catRange+=data[j];
-  catRange=catRange/(hi-lo+1);
-  var desc="";
-  if(avg<10)desc="주변이 조용합니다. 고양이 울음소리가 감지되지 않습니다.";
-  else if(catRange>50&&peakHz>=400&&peakHz<=2500)desc="고양이 울음소리 감지! 주파수:"+peakHz+"Hz, 볼륨:"+Math.round(catRange)+"/255. "+(peakHz<800?"낮고 길게 우는 소리(불만/요구)":peakHz<1200?"보통 높이의 야옹(인사/관심요구)":"높고 짧은 소리(흥분/긴급)");
-  else if(avg>30)desc="배경 소음 감지(볼륨:"+Math.round(avg)+"). 고양이 울음소리 대역(500-2000Hz)에서 뚜렷한 신호 없음.";
-  else desc="약한 소리 감지. 고양이 울음소리 여부 불확실.";
-  return desc;
-}
-
-/* ========== CAT PROFILE (feedback) ========== */
-var catProfile={feedbacks:[],personality:"",totalCorrect:0,totalWrong:0};
-function addFeedback(isCorrect,subtitle,mood){
-  catProfile.feedbacks.push({correct:isCorrect,subtitle:subtitle,mood:mood,time:Date.now()});
-  if(catProfile.feedbacks.length>20)catProfile.feedbacks.shift();
-  if(isCorrect)catProfile.totalCorrect++;else catProfile.totalWrong++;
-}
-function getProfileContext(){
-  if(catProfile.feedbacks.length===0)return"";
-  var recent=catProfile.feedbacks.slice(-5);
-  var lines=["[이전 피드백 기록 - 이 고양이의 특성 참고용]"];
-  recent.forEach(function(f){
-    lines.push((f.correct?"✅정확":"❌부정확")+": 자막'"+f.subtitle+"' 기분'"+f.mood+"'");
+  var score=0;
+  Object.keys(toy.weights).forEach(function(mood){
+    var kws=MOOD_KEYWORDS[mood]||[];
+    kws.forEach(function(kw){
+      if(text.indexOf(kw)>=0) score+=toy.weights[mood];
+    });
   });
-  lines.push("정확도: "+catProfile.totalCorrect+"/"+(catProfile.totalCorrect+catProfile.totalWrong));
-  if(catProfile.totalWrong>3)lines.push("⚠️ 이전에 부정확한 판단이 있었으니 더 신중하게 관찰하세요.");
+  return score;
+}
+function bestToy(moodText){
+  var best=TOYS[0],bestScore=0;
+  TOYS.forEach(function(t){
+    var s=scoreToy(t,moodText);
+    if(s>bestScore){bestScore=s;best=t;}
+  });
+  return bestScore>0?best:TOYS[Math.floor(Math.random()*TOYS.length)];
+}
+
+var catDB=(function(){try{var d=JSON.parse(localStorage.getItem("catDB"));if(d&&d.feedbacks)return d;}catch(e){}return{feedbacks:[],okCnt:0,noCnt:0};})();
+function saveCatDB(){try{localStorage.setItem("catDB",JSON.stringify(catDB));}catch(e){}}
+function addFB(ok,sub,mood){
+  catDB.feedbacks.push({ok:ok,sub:sub,mood:mood,t:Date.now()});
+  if(catDB.feedbacks.length>20)catDB.feedbacks.shift();
+  ok?catDB.okCnt++:catDB.noCnt++;
+  saveCatDB();
+}
+function personalitySummary(){
+  if(catDB.feedbacks.length<2)return"";
+  var recent=catDB.feedbacks.slice(-5);
+  var emotions={},wants={};
+  recent.forEach(function(f){
+    var m=(f.mood||"").toLowerCase();
+    ["편안","불안","흥분","스트레스","호기심","지루","행복","경계","짜증"].forEach(function(e){
+      if(m.indexOf(e)>=0){emotions[e]=(emotions[e]||0)+(f.ok?2:0.5);}
+    });
+    ["놀이","간식","휴식","관심","사냥","안전","밥"].forEach(function(w){
+      if(m.indexOf(w)>=0||f.sub.indexOf(w)>=0){wants[w]=(wants[w]||0)+1;}
+    });
+  });
+  var topEmo=Object.entries(emotions).sort(function(a,b){return b[1]-a[1];}).slice(0,3).map(function(e){return e[0];});
+  var topWant=Object.entries(wants).sort(function(a,b){return b[1]-a[1];}).slice(0,2).map(function(e){return e[0];});
+  var lines=["[이 고양이 성격 프로필 (피드백 "+catDB.feedbacks.length+"회 기반)]"];
+  if(topEmo.length)lines.push("주요 감정 패턴: "+topEmo.join(", "));
+  if(topWant.length)lines.push("자주 원하는 것: "+topWant.join(", "));
+  lines.push("정확도: "+catDB.okCnt+"/"+(catDB.okCnt+catDB.noCnt));
+  if(catDB.noCnt>3)lines.push("⚠️ 과거 부정확 판단 "+catDB.noCnt+"회 — 더 신중하게 관찰 필요");
+  var wrongs=recent.filter(function(f){return !f.ok;});
+  if(wrongs.length)lines.push("최근 오답 패턴: "+wrongs.map(function(f){return "'"+f.sub+"'→틀림";}).join(", "));
   return lines.join("\n")+"\n\n";
 }
 
-/* ========== PROMPTS ========== */
 var FAST={
-  toy:function(audio,prev){return getProfileContext()+"당신은 고양이 행동학 박사+놀이치료 전문가입니다.\n이미지를 정확히 관찰하세요.\n[음성정보] "+audio+"\n"+(prev?"[주의] 이전 자막: '"+prev+"' ← 이것과 다른 새로운 관점으로 답변하세요!\n":"")+"반드시 이 형식으로만:\n[자막] (고양이 입장 솔직 반응 ~30자, 이전과 겹치지 않게)\n[기분] (흥미도:★1-5 | 사냥본능:높음/중간/낮음 | 놀이가치:상/중/하 | 신뢰도:상/중/하)";},
-  behavior:function(audio,prev){return getProfileContext()+"당신은 CAAB 인증 수의행동학 전문가입니다.\n이미지에서 보이는 것을 구체적으로 관찰하세요 (귀방향,동공크기,꼬리위치,자세,수염방향,체중분배). 고양이 안보이면 솔직히.\n[음성정보] "+audio+"\n"+(prev?"[주의] 이전 자막: '"+prev+"' ← 다른 표현/관점으로 답변!\n":"")+"반드시 이 형식으로만:\n[자막] (고양이가 하고싶은 말 ~30자, 관찰 근거 기반, 이전과 다르게)\n[기분] (감정:구체적 | 스트레스:1-10 | 원하는것:구체적 | 신뢰도:상/중/하)";},
-  correction:function(audio,prev){return getProfileContext()+"당신은 DACVB 자격 행동교정 전문가입니다.\n이미지에서 관찰되는 구체적 행동 근거를 먼저 파악하세요. 정상이면 정상이라고.\n[음성정보] "+audio+"\n"+(prev?"[주의] 이전 자막: '"+prev+"' ← 다른 관점으로 답변!\n":"")+"반드시 이 형식으로만:\n[자막] (고양이 속마음 ~30자, 관찰 근거 기반, 이전과 다르게)\n[기분] (긴급도:상/중/하/정상 | 문제유형:구체적 | 신뢰도:상/중/하)";}
+  toy:function(a,p){return personalitySummary()+"당신은 고양이 행동학 박사입니다.\n\n[Chain of Thought 필수]\nStep1: 이미지에서 보이는 물체를 한 줄로 기술 (색상,형태,크기)\nStep2: 이 물체가 고양이에게 어떤 자극(시각/촉각/후각/청각)을 주는지 판단\nStep3: 최종 고양이 반응 도출\n\n[음성] "+a+"\n"+(p?"[이전자막] "+p+" ← 반드시 다른 표현!\n":"")+"최종 출력 형식만:\n[자막] (고양이 반응 ~25자)\n[기분] (흥미도:★1-5 | 사냥본능:높/중/낮 | 신뢰도:상/중/하)";},
+  behavior:function(a,p){return personalitySummary()+"당신은 CAAB 인증 수의행동학 전문가입니다.\n\n[Chain of Thought 필수 — 각 부위를 반드시 순서대로 관찰]\nStep1-귀: 방향(전방/측면/후방), 각도\nStep2-눈: 동공 크기(확대/축소/정상), 눈 깜빡임\nStep3-꼬리: 위치(높/낮), 형태(곧음/구부림/부풀림)\nStep4-자세: 체중분배, 근육 긴장도, 전체 형태\nStep5-수염: 방향(전방/측면)\nStep6-종합판단: 위 5가지 관찰을 종합하여 감정 도출\n\n고양이 안 보이면 '고양이가 보이지 않습니다'로.\n[음성] "+a+"\n"+(p?"[이전자막] "+p+" ← 반드시 다른 표현!\n":"")+"최종 출력 형식만:\n[자막] (고양이가 하고싶은 말 ~25자, 위 관찰 근거 기반)\n[기분] (감정:구체적 | 스트레스:1-10 | 원하는것 | 신뢰도:상/중/하)";},
+  correction:function(a,p){return personalitySummary()+"당신은 DACVB 자격 행동교정 전문가입니다.\n\n[Chain of Thought 필수]\nStep1: 관찰되는 구체적 행동 기술\nStep2: 정상행동 vs 문제행동 판별 근거\nStep3: 문제라면 카테고리 분류 (공격/불안/강박/파괴/배변/기타)\nStep4: 정상이면 '정상 범위 행동'으로 명시\n\n[음성] "+a+"\n"+(p?"[이전자막] "+p+" ← 반드시 다른 표현!\n":"")+"최종 출력 형식만:\n[자막] (속마음 ~25자, 관찰근거 기반)\n[기분] (긴급도:상/중/하/정상 | 문제유형 | 신뢰도:상/중/하)";}
 };
 var DETAIL={
-  toy:function(audio){return getProfileContext()+"고양이 행동학 박사+놀이치료 전문가. 반드시 이미지에서 보이는 것만 근거로 답변하세요.\n[음성정보] "+audio+"\n\n⚠️ 먼저 이미지에서 관찰한 것을 구체적으로 기술한 후 분석하세요:\n\n📷 관찰 내용: (이미지에서 보이는 장난감/물체의 모양,색상,크기,상태를 구체적으로 기술)\n\n1.🧸식별(종류/재질/크기/자극유형)\n2.😺반응예측(성격별/연령별)\n3.❌흥미잃는이유5가지\n4.💡놀이방법(사냥놀이/추격/숨바꼭질/두뇌/함께놀이/변형3가지)\n5.🛠️DIY업그레이드아이디어\n6.🎁추천조합3개\n7.📅놀이루틴(아침/저녁)\n8.⚠️안전주의\n이모지+줄바꿈 답변.";},
-  behavior:function(audio){return getProfileContext()+"CAAB 수의행동학 전문가. 반드시 이미지에서 관찰 가능한 근거만 사용하세요.\n[음성정보] "+audio+"\n\n⚠️ 먼저 이미지에서 관찰한 것을 구체적으로 기술한 후 분석하세요:\n\n📷 관찰 내용: (귀 방향, 눈 상태, 꼬리 위치, 자세, 수염, 주변 환경 등 보이는 것 기술)\n\n1.🐱신체언어(귀/동공/수염/꼬리/자세/털)+음성분석\n2.💭감정(주감정/각성수준/정서가) - 관찰 근거 명시\n3.🗣️통역상세(관찰+음성 종합)\n4.❤️욕구분석\n5.🎯최적상호작용\n6.📊스트레스1-10(근거)\n이모지+줄바꿈 답변.";},
-  correction:function(audio){return getProfileContext()+"DACVB 행동교정전문가. 반드시 이미지에서 관찰 가능한 근거만 사용하세요.\n[음성정보] "+audio+"\n\n⚠️ 먼저 이미지에서 관찰한 것을 구체적으로 기술한 후 분석하세요:\n\n📷 관찰 내용: (행동, 자세, 표정, 주변 환경 등 보이는 것 기술)\n\n1.🔍행동분류(정상vs문제)+관찰근거+음성이상여부\n2.🧠원인감별(관찰근거 기반)\n3.⚡즉각대응\n4.📋교정프로그램(1/2/4주)\n5.🏠환경강화\n6.⚠️수의사의뢰기준\n이모지+줄바꿈 답변.";}
+  toy:function(a){return personalitySummary()+"고양이 행동학 박사+놀이치료 전문가.\n[음성] "+a+"\n\n[Chain of Thought — 관찰 먼저!]\n📷 Step1 관찰: 이미지에서 보이는 장난감의 종류,색상,재질,크기,상태를 구체적 기술\n📷 Step2 자극분석: 시각/촉각/후각/청각 자극 유형 분류\n\n이후 분석:\n1.🧸식별결과 2.😺반응예측(성격별/연령별) 3.❌흥미잃는이유5가지 4.💡놀이방법(사냥/추격/숨바꼭질/두뇌/함께/변형3가지) 5.🛠️DIY업그레이드 6.🎁추천조합3개 7.📅놀이루틴 8.⚠️안전\n이모지+줄바꿈.";},
+  behavior:function(a){return personalitySummary()+"CAAB 수의행동학 전문가.\n[음성] "+a+"\n\n[Chain of Thought — 부위별 관찰 필수!]\n📷 Step1: 귀 방향/각도 → Step2: 동공 크기/눈 상태 → Step3: 꼬리 위치/형태 → Step4: 자세/체중분배 → Step5: 수염 방향 → Step6: 종합 감정 도출\n\n이후 분석:\n1.🐱신체언어종합+음성 2.💭감정(주감정/각성수준/정서가)—각 관찰근거 명시 3.🗣️통역상세 4.❤️욕구 5.🎯최적상호작용 6.📊스트레스1-10(근거)\n이모지+줄바꿈.";},
+  correction:function(a){return personalitySummary()+"DACVB 행동교정전문가.\n[음성] "+a+"\n\n[Chain of Thought — 관찰→판별→진단 순서!]\n📷 Step1: 관찰되는 행동 구체 기술\n📷 Step2: 정상/문제 판별 (근거 제시)\n📷 Step3: 문제시 카테고리 분류\n\n이후 분석:\n1.🔍행동분류+판별근거 2.🧠원인감별 3.⚡즉각대응 4.📋교정(1/2/4주) 5.🏠환경강화 6.⚠️수의사기준\n이모지+줄바꿈.";}
 };
 
 var MODES=[
-  {id:"toy",icon:"\u{1F9F8}",label:"\uC7A5\uB09C\uAC10 \uBD84\uC11D",desc:"\uBD84\uC11D + \uB2E4\uC591\uD55C \uB180\uC774\uBC95 + \uCD94\uCC9C",color:"#FF6B6B"},
+  {id:"toy",icon:"\u{1F9F8}",label:"\uC7A5\uB09C\uAC10 \uBD84\uC11D",desc:"\uBD84\uC11D + \uB2E4\uC591\uD55C \uB180\uC774\uBC95",color:"#FF6B6B"},
   {id:"behavior",icon:"\u{1F431}",label:"\uD589\uB3D9 \uBD84\uC11D",desc:"\uC74C\uC131+\uC601\uC0C1 \uD1B5\uD569 \uBD84\uC11D",color:"#4ECDC4"},
   {id:"correction",icon:"\u{1FA7A}",label:"\uD589\uB3D9 \uAD50\uC815",desc:"\uBB38\uC81C\uD589\uB3D9 \uC9C4\uB2E8 \uBC0F \uAD50\uC815",color:"#FF8C42"}
 ];
-var TIPS=["고양이는 하루 평균 15시간 수면을 취해요 😴","꼬리를 세우고 끝을 살짝 구부리면 반가운 인사예요 🐱","느린 눈 깜빡임은 '사랑해'라는 뜻이에요 😻","사냥 본능이 있어 움직이는 장난감을 좋아해요 🎯","캣닢에 반응하는 고양이는 약 70%예요 🌿","골골송은 치유와 편안함의 신호예요 🎵","높은 곳을 좋아해요 - 캣타워 추천! 🏔️"];
 
-var S={shell:{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"},home:{minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",padding:"0 20px 28px",display:"flex",flexDirection:"column",alignItems:"center",position:"relative"},logoWrap:{textAlign:"center",paddingTop:44,marginBottom:16,animation:"fadeUp .6s ease-out"},logoCircle:{width:90,height:90,borderRadius:45,background:"linear-gradient(135deg,#FF6B6B,#FF8C42,#4ECDC4)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",boxShadow:"0 6px 28px rgba(255,107,107,.25)",animation:"pulse 3s ease-in-out infinite"},tipBox:{background:"rgba(255,255,255,.06)",borderRadius:12,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,width:"100%",marginBottom:20,border:"1px solid rgba(255,255,255,.05)"},modeCard:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:"15px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",textAlign:"left"},histBtn:{marginTop:14,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5,width:"100%"},topBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"#333",position:"sticky",top:0,zIndex:10,flexShrink:0},topTitle:{color:"#fff",fontSize:15,fontWeight:700},topBtn:{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5},scroll:{flex:1,overflowY:"auto",background:"linear-gradient(180deg,#13131f,#161630)",WebkitOverflowScrolling:"touch"},camWrap:{position:"relative",width:"100%",aspectRatio:"4/3",background:"#000",overflow:"hidden",flexShrink:0},video:{width:"100%",height:"100%",objectFit:"cover",display:"block"},camOverlay:{position:"absolute",inset:0,background:"rgba(0,0,0,.75)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:3},liveBar:{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",background:"rgba(255,255,255,.04)",borderBottom:"1px solid rgba(255,255,255,.06)"},errBox:{margin:"14px 18px",padding:"14px 16px",background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",borderRadius:12,color:"#ff7070",fontSize:12,wordBreak:"break-all"},resTxt:{padding:"12px 18px 16px",color:"#ccccdd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"},hItem:{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:14,cursor:"pointer",textAlign:"left",display:"block",marginBottom:10}};
-
-function Txt(p){var lines=p.text.split("\n");return html`<div style=${S.resTxt}>${lines.map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0",lineHeight:1.75}}>${l}</p>`;})}</div>`;}
-function callAPI(body){return fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){return r.json();});}
 function parseSub(t){var s="",m="";t.split("\n").forEach(function(l){l=l.trim();if(l.startsWith("[자막]"))s=l.replace("[자막]","").trim();else if(l.startsWith("[기분]"))m=l.replace("[기분]","").trim();});return{subtitle:s,mood:m};}
+
+var _aCtx=null,_aAn=null,_aMic=null;
+function micStart(){return navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){_aMic=s;_aCtx=new(window.AudioContext||window.webkitAudioContext)();_aAn=_aCtx.createAnalyser();_aAn.fftSize=2048;_aCtx.createMediaStreamSource(s).connect(_aAn);return true;}).catch(function(){return false;});}
+function micStop(){if(_aMic){_aMic.getTracks().forEach(function(t){t.stop();});_aMic=null;}if(_aCtx){_aCtx.close();_aCtx=null;_aAn=null;}}
+function micDesc(){if(!_aAn)return"마이크 없음";var d=new Uint8Array(_aAn.frequencyBinCount);_aAn.getByteFrequencyData(d);var sum=0,pk=0,pi=0;for(var i=0;i<d.length;i++){sum+=d[i];if(d[i]>pk){pk=d[i];pi=i;}}var avg=sum/d.length;var hz=Math.round(pi*_aCtx.sampleRate/_aAn.fftSize);var lo=Math.floor(500*_aAn.fftSize/_aCtx.sampleRate),hi=Math.ceil(2000*_aAn.fftSize/_aCtx.sampleRate),cr=0;for(var j=lo;j<=hi&&j<d.length;j++)cr+=d[j];cr=cr/(hi-lo+1);if(avg<10)return"조용함";if(cr>50&&hz>=400&&hz<=2500)return"고양이울음감지 "+hz+"Hz 볼륨"+Math.round(cr);return avg>30?"배경소음":"약한소리";}
+
+var S={shell:{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"},topBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"#333",position:"sticky",top:0,zIndex:10},topTitle:{color:"#fff",fontSize:15,fontWeight:700},topBtn:{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5},scroll:{flex:1,overflowY:"auto",background:"linear-gradient(180deg,#13131f,#161630)"},camWrap:{position:"relative",width:"100%",aspectRatio:"4/3",background:"#000",overflow:"hidden"},video:{width:"100%",height:"100%",objectFit:"cover",display:"block"},overlay:{position:"absolute",inset:0,background:"rgba(0,0,0,.75)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:3},resTxt:{padding:"12px 18px 16px",color:"#ccccdd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}};
+function Txt(p){return html`<div style=${S.resTxt}>${p.text.split("\n").map(function(l,i){return html`<p key=${i} style=${{margin:l.trim()?"5px 0":"10px 0"}}>${l}</p>`;})}</div>`;}
 
 function App(){
   var _m=useState(null),mode=_m[0],setMode=_m[1];
-  var _s=useState("home"),screen=_s[0],setScreen=_s[1];
-  var _src=useState(null),source=_src[0],setSource=_src[1];
-  var _e=useState(null),error=_e[0],setError=_e[1];
-  var _h=useState([]),history=_h[0],setHistory=_h[1];
-  var _t=useState(TIPS[0]),tip=_t[0],setTip=_t[1];
-  var _vi=useState(null),viewItem=_vi[0],setViewItem=_vi[1];
-  var _cr=useState(false),camReady=_cr[0],setCamReady=_cr[1];
-  var _ce=useState(null),camError=_ce[0],setCamError=_ce[1];
-  var _f=useState("environment"),facing=_f[0],setFacing=_f[1];
-  var _l=useState(false),liveOn=_l[0],setLiveOn=_l[1];
-  var _c=useState(0),cnt=_c[0],setCnt=_c[1];
-  var _p=useState(false),paused=_p[0],setPaused=_p[1];
-  var _sub=useState(""),subtitle=_sub[0],setSubtitle=_sub[1];
+  var _scr=useState("home"),scr=_scr[0],setScr=_scr[1];
+  var _src=useState(null),src=_src[0],setSrc=_src[1];
+  var _err=useState(null),err=_err[0],setErr=_err[1];
+  var _hist=useState([]),hist=_hist[0],setHist=_hist[1];
+  var _vi=useState(null),vi=_vi[0],setVi=_vi[1];
+  var _camOk=useState(false),camOk=_camOk[0],setCamOk=_camOk[1];
+  var _camErr=useState(null),camErr=_camErr[0],setCamErr=_camErr[1];
+  var _face=useState("environment"),face=_face[0],setFace=_face[1];
+  var _live=useState(false),live=_live[0],setLive=_live[1];
+  var _cnt=useState(0),cnt=_cnt[0],setCnt=_cnt[1];
+  var _sub=useState(""),sub=_sub[0],setSub=_sub[1];
   var _mood=useState(""),mood=_mood[0],setMood=_mood[1];
-  var _det=useState(""),detail=_det[0],setDetail=_det[1];
+  var _det=useState(""),det=_det[0],setDet=_det[1];
   var _subL=useState(false),subL=_subL[0],setSubL=_subL[1];
   var _detL=useState(false),detL=_detL[0],setDetL=_detL[1];
-  var _ps=useState(null),photoSrc=_ps[0],setPhotoSrc=_ps[1];
-  var _vs=useState(null),vidSrc=_vs[0],setVidSrc=_vs[1];
-  var _vp=useState(false),vidPlay=_vp[0],setVidPlay=_vp[1];
-  var _vr=useState(false),vidReady=_vr[0],setVidReady=_vr[1];
-  var _vinfo=useState(null),vidInfo=_vinfo[0],setVidInfo=_vinfo[1];
-  var _vload=useState(false),vidLoad=_vload[0],setVidLoad=_vload[1];
-  // NEW: mic + feedback + toy
-  var _stopped=useState(false),stopped=_stopped[0],setStopped=_stopped[1];
+  var _photo=useState(null),photo=_photo[0],setPhoto=_photo[1];
+  var _vidUrl=useState(null),vidUrl=_vidUrl[0],setVidUrl=_vidUrl[1];
+  var _vidOk=useState(false),vidOk=_vidOk[0],setVidOk=_vidOk[1];
+  var _vidPlay=useState(false),vidPlay=_vidPlay[0],setVidPlay=_vidPlay[1];
+  var _vidInfo=useState(null),vidInfo=_vidInfo[0],setVidInfo=_vidInfo[1];
   var _micOn=useState(false),micOn=_micOn[0],setMicOn=_micOn[1];
-  var _recToy=useState(null),recToy=_recToy[0],setRecToy=_recToy[1];
-  var _fbSent=useState(false),fbSent=_fbSent[0],setFbSent=_fbSent[1];
-  var _fbCount=useState({c:0,w:0}),fbCount=_fbCount[0],setFbCount=_fbCount[1];
+  var _toy=useState(null),toy=_toy[0],setToy=_toy[1];
+  var _fbOk=useState(false),fbOk=_fbOk[0],setFbOk=_fbOk[1];
+  var _stopped=useState(false),stopped=_stopped[0],setStopped=_stopped[1];
 
-  var vRef=useRef(null),cRef=useRef(null),sRef=useRef(null),vidElRef=useRef(null);
-  var mRef=useRef(mode),srcRef=useRef(null),tRef=useRef(null);
-  var autoStarted=useRef(false);
-  var sessionRef=useRef(0); // 세션 버전 번호 - 중지시 증가하면 모든 구 콜백 무효화
-  var prevSubRef=useRef("");
-  var busyRef=useRef(false); // 현재 분석 진행 중 여부
-  useEffect(function(){mRef.current=mode;},[mode]);
-  useEffect(function(){srcRef.current=source;},[source]);
-  useEffect(function(){var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);return function(){clearInterval(iv);};},[]);
-  useEffect(function(){if(camReady&&screen==="analyze"&&source==="cam"&&!autoStarted.current){autoStarted.current=true;startLive();}},[camReady,screen,source]);
+  var vRef=useRef(null),cRef=useRef(null),stRef=useRef(null),vidRef=useRef(null);
+  var mRef=useRef(mode),srcRef=useRef(null),prevSub=useRef("");
+  var latestSubRef=useRef("");
+  var prevVidUrlRef=useRef(null);
+  var autoS=useRef(false);
 
-  var startCam=useCallback(function(face){setCamReady(false);setCamError(null);autoStarted.current=false;if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}navigator.mediaDevices.getUserMedia({video:{facingMode:face||facing,width:{ideal:1280},height:{ideal:960}},audio:false}).then(function(st){sRef.current=st;if(vRef.current){vRef.current.srcObject=st;vRef.current.onloadedmetadata=function(){vRef.current.play().catch(function(){});setCamReady(true);};}}).catch(function(e){setCamError(e.name==="NotAllowedError"?"카메라 권한을 허용해주세요":"카메라 오류: "+e.message);});},[facing]);
-  var stopCam=useCallback(function(){if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}setCamReady(false);},[]);
-  var flipCam=useCallback(function(){var n=facing==="environment"?"user":"environment";setFacing(n);fullStop();autoStarted.current=false;startCam(n);},[facing,startCam]);
-  useEffect(function(){return function(){sessionRef.current++;if(sRef.current)sRef.current.getTracks().forEach(function(t){t.stop();});if(tRef.current)clearTimeout(tRef.current);stopMic();};},[]);
+  var activeRequestRef=useRef([]);
+  var busyRef=useRef(false);
+  var timerRef=useRef(null);
+  var sessionRef=useRef(0);
 
-  function toggleMic(){
-    if(micOn){stopMic();setMicOn(false);}
-    else{startMic().then(function(ok){setMicOn(ok);if(!ok)setError("마이크 권한을 허용해주세요");});}
+  function abortAllRequests(){
+    activeRequestRef.current.forEach(function(c){try{c.abort();}catch(e){}});
+    activeRequestRef.current=[];
+  }
+  function safeFetch(body){
+    var ctrl=new AbortController();
+    activeRequestRef.current.push(ctrl);
+    return fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctrl.signal})
+    .then(function(r){return r.json();})
+    .catch(function(e){return e.name==="AbortError"?{_skip:true}:Promise.reject(e);})
+    .finally(function(){var idx=activeRequestRef.current.indexOf(ctrl);if(idx>-1)activeRequestRef.current.splice(idx,1);});
+  }
+  function fullStop(){
+    var s=++sessionRef.current;
+    abortAllRequests();
+    busyRef.current=false;
+    if(timerRef.current){clearTimeout(timerRef.current);timerRef.current=null;}
+    setLive(false);setStopped(true);
+    if(stRef.current){stRef.current.getTracks().forEach(function(t){t.stop();});stRef.current=null;}
+    setCamOk(false);
+    if(vidRef.current&&!vidRef.current.paused)vidRef.current.pause();
+    setVidPlay(false);
+    micStop();setMicOn(false);
+    return s;
   }
 
-  function capFrame(el){if(!el||!cRef.current)return null;var c=cRef.current;var w=el.videoWidth||el.width||720;var h=el.videoHeight||el.height||540;var sc=Math.min(720/w,1);c.width=Math.round(w*sc);c.height=Math.round(h*sc);c.getContext("2d").drawImage(el,0,0,c.width,c.height);return c.toDataURL("image/jpeg",0.75).split(",")[1];}
+  useEffect(function(){mRef.current=mode;},[mode]);
+  useEffect(function(){srcRef.current=src;},[src]);
+  useEffect(function(){if(camOk&&scr==="analyze"&&src==="cam"&&!autoS.current){autoS.current=true;goLive();}},[camOk,scr,src]);
+  useEffect(function(){return function(){fullStop();};},[]);
 
-  /* ===== 핵심: 1회 분석 함수 (세션 버전 체크) ===== */
+  function openCam(f){setCamOk(false);setCamErr(null);autoS.current=false;if(stRef.current){stRef.current.getTracks().forEach(function(t){t.stop();});stRef.current=null;}navigator.mediaDevices.getUserMedia({video:{facingMode:f||face,width:{ideal:1280},height:{ideal:960}},audio:false}).then(function(s){stRef.current=s;if(vRef.current){vRef.current.srcObject=s;vRef.current.onloadedmetadata=function(){vRef.current.play().catch(function(){});setCamOk(true);};}}).catch(function(e){setCamErr(e.name==="NotAllowedError"?"카메라 권한 허용 필요":"카메라 오류");});}
+  function closeCam(){if(stRef.current){stRef.current.getTracks().forEach(function(t){t.stop();});stRef.current=null;}setCamOk(false);}
+  function flipCam(){var n=face==="environment"?"user":"environment";setFace(n);fullStop();autoS.current=false;openCam(n);}
+
+  function cap(el){if(!el||!cRef.current)return null;var c=cRef.current,w=el.videoWidth||el.width||720,h=el.videoHeight||el.height||540,sc=Math.min(720/w,1);c.width=Math.round(w*sc);c.height=Math.round(h*sc);c.getContext("2d").drawImage(el,0,0,c.width,c.height);return c.toDataURL("image/jpeg",0.75).split(",")[1];}
+  function toggleMic(){if(micOn){micStop();setMicOn(false);}else{micStart().then(function(ok){setMicOn(ok);});}}
+  function onFb(ok){addFB(ok,sub,mood);setFbOk(true);}
+
   function doAnalyze(b64,mySession,isOnce){
-    if(mySession!==sessionRef.current)return; // 세션 불일치 → 즉시 무시
+    if(mySession!==sessionRef.current)return;
     var cur=mRef.current;if(!cur)return;
     busyRef.current=true;
-    var audio=getAudioDesc();
-    var prev=prevSubRef.current||"";
-    setSubL(true);setError(null);setCnt(function(c){return c+1;});setFbSent(false);setRecToy(null);
-    var doneCount=0;
-    function checkAllDone(){
-      doneCount++;
-      if(doneCount>=2){
+    var audio=micDesc(),prev=prevSub.current;
+    setSubL(true);setErr(null);setCnt(function(c){return c+1;});setFbOk(false);setToy(null);
+    var done=0;
+    function checkDone(){
+      done++;
+      if(done>=2){
         busyRef.current=false;
-        // 1회 분석이 아니고 세션 유효하면 → 3초 후 다음 분석 예약
+        if(isOnce&&mySession===sessionRef.current){
+          setStopped(true);
+        }
         if(!isOnce&&mySession===sessionRef.current){
           scheduleNext(mySession);
         }
       }
     }
-    // Stage 1: 빠른 자막
-    callAPI({model:"claude-haiku-4-5-20251001",max_tokens:150,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:FAST[cur](audio,prev)}]}]}).then(function(d){
-      if(mySession!==sessionRef.current&&!isOnce)return;
+    safeFetch({model:"claude-haiku-4-5-20251001",max_tokens:150,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:FAST[cur](audio,prev)}]}]}).then(function(d){
+      if(d._skip||mySession!==sessionRef.current)return;
       if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
-      var t=d.content?d.content.map(function(c){return c.text||"";}).join("\n"):"";var p=parseSub(t);
-      var newSub=p.subtitle||"...";
-      setSubtitle(newSub);setMood(p.mood||"");
-      prevSubRef.current=newSub;
-      setRecToy(matchToy(newSub+" "+p.mood));
-    }).catch(function(e){if(mySession===sessionRef.current||isOnce)setError(e.message);}).finally(function(){setSubL(false);checkAllDone();});
-    // Stage 2: 상세 분석
+      var t=(d.content||[]).map(function(c){return c.text||"";}).join("\n");
+      var p=parseSub(t),ns=p.subtitle||"...";
+      setSub(ns);setMood(p.mood||"");prevSub.current=ns;latestSubRef.current=ns;
+      setToy(bestToy(ns+" "+p.mood));
+    }).catch(function(e){if(mySession===sessionRef.current)setErr(e.message);}).finally(function(){setSubL(false);checkDone();});
     setDetL(true);
-    callAPI({model:"claude-haiku-4-5-20251001",max_tokens:1800,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:DETAIL[cur](audio)}]}]}).then(function(d){
-      if(mySession!==sessionRef.current&&!isOnce)return;
-      if(d.error)return;var t=d.content?d.content.map(function(c){return c.text||"";}).join("\n"):"";setDetail(t);
+    safeFetch({model:"claude-haiku-4-5-20251001",max_tokens:1800,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:DETAIL[cur](audio)}]}]}).then(function(d){
+      if(d._skip||mySession!==sessionRef.current)return;
+      if(d.error)return;var t=(d.content||[]).map(function(c){return c.text||"";}).join("\n");setDet(t);
       var m=MODES.find(function(x){return x.id===cur;});
-      setHistory(function(p){return [{id:Date.now(),mode:m.label,icon:m.icon,result:t,subtitle:subtitle,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
-    }).catch(function(){}).finally(function(){setDetL(false);checkAllDone();});
+      setHist(function(p){return [{id:Date.now(),mode:m.label,icon:m.icon,result:t,subtitle:latestSubRef.current,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
+    }).catch(function(){}).finally(function(){setDetL(false);checkDone();});
   }
 
-  /* 다음 분석 예약 (3초 후) - 세션 체크 */
   function scheduleNext(mySession){
-    if(tRef.current)clearTimeout(tRef.current);
-    tRef.current=setTimeout(function(){
-      if(mySession!==sessionRef.current)return; // 세션 바뀌면 무시
-      if(busyRef.current)return; // 아직 분석 중이면 건너뜀
-      var el=null;
-      if(srcRef.current==="cam"&&vRef.current)el=vRef.current;
-      else if(srcRef.current==="video"&&vidElRef.current&&!vidElRef.current.paused)el=vidElRef.current;
-      if(!el){scheduleNext(mySession);return;} // 소스 없으면 다시 대기
-      var b=capFrame(el);
-      if(b)doAnalyze(b,mySession,false);
+    if(timerRef.current)clearTimeout(timerRef.current);
+    timerRef.current=setTimeout(function(){
+      timerRef.current=null;
+      if(mySession!==sessionRef.current||busyRef.current)return;
+      var el=srcRef.current==="cam"?vRef.current:srcRef.current==="video"&&vidRef.current&&!vidRef.current.paused?vidRef.current:null;
+      if(!el)return;
+      var b=cap(el);if(b)doAnalyze(b,mySession,false);
     },3000);
   }
 
-  /* 실시간 분석 시작 */
-  function startLive(){
-    sessionRef.current++; // 새 세션 시작
-    var mySession=sessionRef.current;
-    setLiveOn(true);setPaused(false);setStopped(false);
+  function goLive(){
+    var s=++sessionRef.current;
     busyRef.current=false;
-    // 첫 분석 즉시
-    var el=null;
-    if(srcRef.current==="cam"&&vRef.current)el=vRef.current;
-    else if(srcRef.current==="video"&&vidElRef.current)el=vidElRef.current;
-    if(el){var b=capFrame(el);if(b)doAnalyze(b,mySession,false);}
-    else{scheduleNext(mySession);} // 소스 아직 준비 안됐으면 대기
+    setLive(true);setStopped(false);
+    var el=srcRef.current==="cam"?vRef.current:srcRef.current==="video"?vidRef.current:null;
+    if(el){var b=cap(el);if(b)doAnalyze(b,s,false);}
+    else scheduleNext(s);
   }
 
-  /* ===== 완전 정지 ===== */
-  function fullStop(){
-    sessionRef.current++; // 세션 번호 증가 → 모든 구 콜백 무효화!
-    setLiveOn(false);setStopped(true);
-    busyRef.current=false;
-    if(tRef.current){clearTimeout(tRef.current);tRef.current=null;}
-    // 카메라 정지
-    if(sRef.current){sRef.current.getTracks().forEach(function(t){t.stop();});sRef.current=null;}
-    setCamReady(false);
-    // 영상 정지
-    if(vidElRef.current&&!vidElRef.current.paused)vidElRef.current.pause();
-    setVidPlay(false);
-    // 마이크 정지
-    stopMic();setMicOn(false);
-  }
-
-  // Feedback
-  function onFeedback(isCorrect){
-    addFeedback(isCorrect,subtitle,mood);
-    setFbSent(true);
-    setFbCount({c:catProfile.totalCorrect,w:catProfile.totalWrong});
-  }
-
-  function resetAll(){setSubtitle("");setMood("");setDetail("");setCnt(0);setError(null);setSubL(false);setDetL(false);setPhotoSrc(null);setVidSrc(null);setVidPlay(false);setVidReady(false);setVidInfo(null);setVidLoad(false);setRecToy(null);setFbSent(false);setStopped(false);prevSubRef.current="";autoStarted.current=false;}
-  function goHome(){fullStop();stopCam();stopMic();setMicOn(false);setMode(null);setScreen("home");setSource(null);setViewItem(null);setCamError(null);resetAll();}
-  function enterMode(id){setMode(id);setScreen("source");setSource(null);resetAll();}
-  function pickCam(){setSource("cam");setScreen("analyze");resetAll();setTimeout(function(){startCam(facing);},150);}
-  function onPhoto(e){var f=e.target.files&&e.target.files[0];if(!f)return;e.target.value="";fullStop();resetAll();setSource("photo");setScreen("analyze");var mySession=sessionRef.current;var r=new FileReader();r.onload=function(ev){setPhotoSrc(ev.target.result);var c=document.createElement("canvas"),img=new Image();img.onload=function(){var sc=Math.min(720/img.width,1);c.width=img.width*sc;c.height=img.height*sc;c.getContext("2d").drawImage(img,0,0,c.width,c.height);doAnalyze(c.toDataURL("image/jpeg",0.75).split(",")[1],mySession,true);};img.src=ev.target.result;};r.readAsDataURL(f);}
-  function fmtSize(b){return b<1024*1024?(b/1024).toFixed(0)+"KB":(b/1024/1024).toFixed(1)+"MB";}
-  function fmtDur(s){return Math.floor(s/60)+"분 "+Math.floor(s%60)+"초";}
-  function onVideo(e){var f=e.target.files&&e.target.files[0];if(!f)return;e.target.value="";if(f.size>500*1024*1024){alert("500MB 이하만 지원");return;}fullStop();resetAll();setSource("video");setScreen("analyze");setVidLoad(true);setVidInfo({name:f.name,size:fmtSize(f.size),duration:null});setVidSrc(URL.createObjectURL(f));}
-  function onVidLoaded(){setVidLoad(false);setVidReady(true);if(vidElRef.current&&isFinite(vidElRef.current.duration))setVidInfo(function(p){return p?Object.assign({},p,{duration:fmtDur(vidElRef.current.duration)}):p;});}
-  function onVidPlay(){setVidPlay(true);startLive();}
+  function reset(){setSub("");setMood("");setDet("");setCnt(0);setErr(null);setSubL(false);setDetL(false);setPhoto(null);if(prevVidUrlRef.current){URL.revokeObjectURL(prevVidUrlRef.current);prevVidUrlRef.current=null;}setVidUrl(null);setVidOk(false);setVidPlay(false);setVidInfo(null);setToy(null);setFbOk(false);setStopped(false);prevSub.current="";latestSubRef.current="";autoS.current=false;}
+  function goHome(){fullStop();setMode(null);setScr("home");setSrc(null);setVi(null);setCamErr(null);reset();}
+  function pickMode(id){setMode(id);setScr("source");setSrc(null);reset();}
+  function pickCam(){setSrc("cam");setScr("analyze");reset();setTimeout(function(){openCam(face);},150);}
+  function onPhoto(e){var f=e.target.files&&e.target.files[0];if(!f)return;e.target.value="";fullStop();reset();setSrc("photo");setScr("analyze");var r=new FileReader();r.onload=function(ev){setPhoto(ev.target.result);var s=++sessionRef.current;var c=document.createElement("canvas"),img=new Image();img.onload=function(){var sc=Math.min(720/img.width,1);c.width=img.width*sc;c.height=img.height*sc;c.getContext("2d").drawImage(img,0,0,c.width,c.height);doAnalyze(c.toDataURL("image/jpeg",0.75).split(",")[1],s,true);};img.src=ev.target.result;};r.readAsDataURL(f);}
+  function onVideo(e){var f=e.target.files&&e.target.files[0];if(!f)return;e.target.value="";fullStop();reset();setSrc("video");setScr("analyze");setVidInfo({name:f.name,size:(f.size/1024/1024).toFixed(1)+"MB"});var url=URL.createObjectURL(f);prevVidUrlRef.current=url;setVidUrl(url);}
+  function onVidLoaded(){setVidOk(true);if(vidRef.current&&isFinite(vidRef.current.duration))setVidInfo(function(p){return p?Object.assign({},p,{dur:Math.floor(vidRef.current.duration/60)+"분"+Math.floor(vidRef.current.duration%60)+"초"}):p;});}
+  function onVidPlay(){setVidPlay(true);goLive();}
   function onVidPause(){setVidPlay(false);fullStop();}
 
   var sm=MODES.find(function(x){return x.id===mode;});
-
-  // HISTORY DETAIL
-  if(viewItem)return html`<div style=${S.shell}><div style=${S.topBar}><button style=${S.topBtn} onClick=${function(){setViewItem(null);}}>← 뒤로</button><span style=${S.topTitle}>${viewItem.icon} ${viewItem.mode}</span><span style=${{width:56}}/></div><div style=${S.scroll}>${viewItem.subtitle&&html`<div class="subtitle-bar"><div class="subtitle-text">${viewItem.subtitle}</div></div>`}<div style=${{padding:"10px 20px 4px",color:"#777",fontSize:11}}>${viewItem.time}</div><${Txt} text=${viewItem.result}/></div></div>`;
-
-  // HISTORY LIST
-  if(screen==="history")return html`<div style=${S.shell}><div style=${S.topBar}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>📋 분석 기록</span><span style=${{width:56}}/></div><div style=${S.scroll}><div style=${{padding:16}}>${history.length===0?html`<div style=${{textAlign:"center",paddingTop:60}}><div style=${{fontSize:52}}>📭</div><p style=${{color:"#888",marginTop:14}}>아직 기록이 없어요</p></div>`:history.map(function(h){return html`<button key=${h.id} style=${S.hItem} onClick=${function(){setViewItem(h);}}><div style=${{display:"flex",alignItems:"center",gap:12}}><div style=${{flex:1,minWidth:0}}><div style=${{color:"#eee",fontSize:13,fontWeight:700}}>${h.icon} ${h.mode}</div>${h.subtitle&&html`<div style=${{color:"#FFD700",fontSize:11,marginTop:2}}>"${h.subtitle.slice(0,35)}"</div>`}<div style=${{color:"#777",fontSize:10,marginTop:2}}>${h.time}</div></div><span style=${{color:"#555"}}>›</span></div></button>`;})}</div></div></div>`;
-
-  // HOME
-  if(screen==="home")return html`<div style=${S.shell}><div style=${S.home}><div class="paw p1">🐾</div><div class="paw p2">🐾</div><div class="paw p3">🐾</div><div style=${S.logoWrap}><div style=${S.logoCircle}><span style=${{fontSize:50}}>🐱</span></div><h1 style=${{fontSize:25,fontWeight:900,color:"#f0f0f5"}}>냥냥 행동분석</h1><p style=${{fontSize:12,color:"#8888aa",marginTop:4}}>AI 고양이 행동교정 전문가</p><p style=${{fontSize:11,color:"#4ECDC4",marginTop:6}}>✨ 음성+영상 통합 분석 · 장난감 추천</p></div>
-    ${(fbCount.c+fbCount.w>0)&&html`<div style=${{width:"100%",background:"rgba(78,205,196,.06)",borderRadius:10,padding:"8px 14px",marginBottom:12,border:"1px solid rgba(78,205,196,.1)",display:"flex",alignItems:"center",gap:8,fontSize:11,color:"#4ECDC4"}}><span>📊</span> 피드백 ${fbCount.c+fbCount.w}회 (정확 ${fbCount.c} / 수정 ${fbCount.w})</div>`}
-    <div style=${S.tipBox}><span>💡</span><span style=${{color:"#ccd",fontSize:12,lineHeight:1.5}}>${tip}</span></div><div style=${{width:"100%",display:"flex",flexDirection:"column",gap:10}}>${MODES.map(function(m,i){return html`<button key=${m.id} class="card-anim" style=${{...S.modeCard,borderLeft:"4px solid "+m.color,animationDelay:i*.08+"s"}} onClick=${function(){enterMode(m.id);}}><div style=${{display:"flex",alignItems:"center",gap:14}}><span style=${{fontSize:34}}>${m.icon}</span><div><div style=${{fontSize:15,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:11,color:"#888",marginTop:2}}>${m.desc}</div></div></div><span style=${{fontSize:20,color:"#555"}}>›</span></button>`;})}</div><button style=${S.histBtn} onClick=${function(){setScreen("history");}}>📋 분석 기록 (${history.length})</button><div style=${{marginTop:"auto",paddingTop:20,textAlign:"center"}}><span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span></div></div></div>`;
-
-  // SOURCE SELECT
-  if(screen==="source")return html`<div style=${S.shell}><div style=${{...S.topBar,background:sm?sm.color:"#333"}}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>${sm?sm.icon:""} ${sm?sm.label:""}</span><span style=${{width:56}}/></div><div style=${S.scroll}><div style=${{padding:"30px 20px",animation:"fadeUp .5s ease-out"}}><p style=${{color:"#eee",fontSize:16,fontWeight:700,textAlign:"center",marginBottom:24}}>분석 소스 선택</p>
-    <div style=${{display:"flex",gap:10,marginBottom:14}}><button class="src-btn" style=${{borderColor:sm?sm.color+"44":"#333"}} onClick=${pickCam}><span style=${{fontSize:36}}>📷</span><span style=${{fontWeight:700,color:sm?sm.color:"#4ECDC4"}}>실시간 카메라</span><span style=${{fontSize:10,color:"#888"}}>🎤 마이크 연동 가능</span></button></div>
-    <div style=${{display:"flex",gap:10,marginBottom:20}}><div class="src-btn"><span style=${{fontSize:36}}>🖼️</span><span style=${{fontWeight:700,color:"#FFD700"}}>사진 (1회 분석)</span><input type="file" accept="image/*" onChange=${onPhoto}/></div><div class="src-btn"><span style=${{fontSize:36}}>🎬</span><span style=${{fontWeight:700,color:"#a29bfe"}}>영상 (MP4·5분이내)</span><input type="file" accept="video/*" onChange=${onVideo}/></div></div>
-    <div style=${{background:"rgba(255,255,255,.03)",borderRadius:12,padding:14,border:"1px solid rgba(255,255,255,.05)"}}><div style=${{color:"#aaa",fontSize:12,fontWeight:700,marginBottom:8}}>📌 새 기능</div><div style=${{color:"#777",fontSize:11,lineHeight:1.7}}>🎤 카메라 모드에서 마이크 ON → 울음소리+영상 동시 분석\n👍👎 분석 결과에 피드백 → AI가 점점 정확해짐\n🧸 분석 결과에 맞는 장난감 자동 추천</div></div>
-  </div></div></div>`;
-
-  // ANALYSIS
   var clr=sm?sm.color:"#4ECDC4";
+
+  if(vi)return html`<div style=${S.shell}><div style=${S.topBar}><button style=${S.topBtn} onClick=${function(){setVi(null);}}>← 뒤로</button><span style=${S.topTitle}>${vi.icon} ${vi.mode}</span><span style=${{width:56}}/></div><div style=${S.scroll}>${vi.subtitle&&html`<div style=${{background:"rgba(0,0,0,.85)",padding:"14px 18px"}}><div style=${{color:"#FFD700",fontSize:15,fontWeight:700,textAlign:"center"}}>${vi.subtitle}</div></div>`}<div style=${{padding:"10px 20px 4px",color:"#777",fontSize:11}}>${vi.time}</div><${Txt} text=${vi.result}/></div></div>`;
+  if(scr==="history")return html`<div style=${S.shell}><div style=${S.topBar}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>📋 기록</span><span style=${{width:56}}/></div><div style=${S.scroll}><div style=${{padding:16}}>${hist.length===0?html`<div style=${{textAlign:"center",paddingTop:60,color:"#888"}}>📭 기록 없음</div>`:hist.map(function(h){return html`<button key=${h.id} style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:14,textAlign:"left",display:"block",marginBottom:10}} onClick=${function(){setVi(h);}}><div style=${{color:"#eee",fontSize:13,fontWeight:700}}>${h.icon} ${h.mode}</div>${h.subtitle&&html`<div style=${{color:"#FFD700",fontSize:11,marginTop:2}}>"${h.subtitle.slice(0,35)}"</div>`}<div style=${{color:"#777",fontSize:10,marginTop:2}}>${h.time}</div></button>`;})}</div></div></div>`;
+  if(scr==="home")return html`<div style=${S.shell}><div style=${{minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",padding:"0 20px 28px",display:"flex",flexDirection:"column",alignItems:"center"}}><div style=${{textAlign:"center",paddingTop:44,marginBottom:20}}><div style=${{width:90,height:90,borderRadius:45,background:"linear-gradient(135deg,#FF6B6B,#FF8C42,#4ECDC4)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",animation:"pulse 3s ease-in-out infinite"}}><span style=${{fontSize:50}}>🐱</span></div><h1 style=${{fontSize:25,fontWeight:900,color:"#f0f0f5"}}>냥냥 행동분석</h1><p style=${{fontSize:12,color:"#888",marginTop:4}}>AI 고양이 행동교정 전문가</p></div>${(catDB.okCnt+catDB.noCnt>0)&&html`<div style=${{width:"100%",background:"rgba(78,205,196,.06)",borderRadius:10,padding:"8px 14px",marginBottom:12,border:"1px solid rgba(78,205,196,.1)",fontSize:11,color:"#4ECDC4"}}>📊 피드백 ${catDB.okCnt+catDB.noCnt}회 (정확 ${catDB.okCnt} / 수정 ${catDB.noCnt})</div>`}<div style=${{width:"100%",display:"flex",flexDirection:"column",gap:10}}>${MODES.map(function(m,i){return html`<button key=${m.id} style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderLeft:"4px solid "+m.color,borderRadius:14,padding:"15px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",textAlign:"left"}} onClick=${function(){pickMode(m.id);}}><div style=${{display:"flex",alignItems:"center",gap:14}}><span style=${{fontSize:34}}>${m.icon}</span><div><div style=${{fontSize:15,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:11,color:"#888",marginTop:2}}>${m.desc}</div></div></div><span style=${{fontSize:20,color:"#555"}}>›</span></button>`;})}</div><button style=${{marginTop:14,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5,width:"100%"}} onClick=${function(){setScr("history");}}>📋 기록 (${hist.length})</button><div style=${{marginTop:"auto",paddingTop:20,fontSize:10,color:"#666",textAlign:"center"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</div></div></div>`;
+  if(scr==="source")return html`<div style=${S.shell}><div style=${{...S.topBar,background:clr}}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>${sm?sm.icon:""} ${sm?sm.label:""}</span><span style=${{width:56}}/></div><div style=${S.scroll}><div style=${{padding:"30px 20px"}}><p style=${{color:"#eee",fontSize:16,fontWeight:700,textAlign:"center",marginBottom:24}}>분석 소스 선택</p><div style=${{display:"flex",gap:10,marginBottom:14}}><button class="src-btn" style=${{borderColor:clr+"44"}} onClick=${pickCam}><span style=${{fontSize:36}}>📷</span><span style=${{fontWeight:700,color:clr}}>실시간 카메라</span><span style=${{fontSize:10,color:"#888"}}>🎤 마이크 연동</span></button></div><div style=${{display:"flex",gap:10}}><div class="src-btn"><span style=${{fontSize:36}}>🖼️</span><span style=${{fontWeight:700,color:"#FFD700"}}>사진 (1회)</span><input type="file" accept="image/*" onChange=${onPhoto}/></div><div class="src-btn"><span style=${{fontSize:36}}>🎬</span><span style=${{fontWeight:700,color:"#a29bfe"}}>영상 (MP4)</span><input type="file" accept="video/*" onChange=${onVideo}/></div></div></div></div></div>`;
+
   return html`<div style=${S.shell}><div style=${{...S.topBar,background:clr}}><button style=${S.topBtn} onClick=${goHome}>← 홈</button><span style=${S.topTitle}>${sm?sm.icon:""} ${sm?sm.label:""}</span>
-    ${source==="cam"?html`<div style=${{display:"flex",gap:6}}><button style=${{...S.topBtn,background:micOn?"rgba(255,68,68,.4)":"rgba(255,255,255,.18)"}} class=${micOn?"mic-active":""} onClick=${toggleMic}>${micOn?"🎤":"🔇"}</button><button style=${S.topBtn} onClick=${flipCam}>🔄</button></div>`:html`<span style=${{width:56}}/>`}
+    ${src==="cam"?html`<div style=${{display:"flex",gap:6}}><button style=${{...S.topBtn,background:micOn?"rgba(255,68,68,.4)":"rgba(255,255,255,.18)"}} onClick=${toggleMic}>${micOn?"🎤":"🔇"}</button><button style=${S.topBtn} onClick=${flipCam}>🔄</button></div>`:html`<span style=${{width:56}}/>`}
   </div><div style=${S.scroll}>
-
-    <!-- CAM -->
-    ${source==="cam"&&html`<div style=${S.camWrap}><video ref=${vRef} autoPlay playsInline muted style=${S.video}/><canvas ref=${cRef} style=${{display:"none"}}/>${!camReady&&!camError&&!stopped&&html`<div style=${S.camOverlay}><div class="spinner"/><p style=${{color:"#fff",marginTop:12,fontSize:14}}>카메라 시작 중...</p></div>`}${stopped&&html`<div style=${S.camOverlay}><span style=${{fontSize:40}}>✅</span><p style=${{color:"#4ECDC4",marginTop:12,fontSize:14,fontWeight:700}}>분석 종료</p></div>`}${camError&&!stopped&&html`<div style=${S.camOverlay}><span style=${{fontSize:40}}>📷</span><p style=${{color:"#ff7070",marginTop:12,fontSize:13,textAlign:"center",whiteSpace:"pre-line"}}>${camError}</p></div>`}${camReady&&liveOn&&html`<div class="scan-line"/>`}${camReady&&liveOn&&html`<div style=${{position:"absolute",bottom:0,left:0,right:0,padding:"10px 16px 14px",background:"linear-gradient(transparent,rgba(0,0,0,.6))",zIndex:5,display:"flex",justifyContent:"center",gap:12}}><button style=${{padding:"10px 22px",borderRadius:50,color:"#fff",background:paused?"#4ECDC4":"rgba(255,255,255,.2)",fontSize:13,fontWeight:700}} onClick=${function(){setPaused(function(p){return !p;});}}>${paused?"▶️ 재개":"⏸️ 일시정지"}</button><button style=${{padding:"10px 22px",borderRadius:50,color:"#fff",background:"rgba(255,70,70,.6)",fontSize:13,fontWeight:700}} onClick=${fullStop}>⏹️ 중지</button></div>`}</div>`}
-    <!-- MIC STATUS -->
-    ${source==="cam"&&micOn&&html`<div style=${{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:"rgba(255,68,68,.08)",borderBottom:"1px solid rgba(255,68,68,.12)",fontSize:12}}><span class="mic-active" style=${{width:8,height:8,borderRadius:4,background:"#ff4444",flexShrink:0}}></span><span style=${{color:"#ff6666",fontWeight:700}}>MIC ON</span><span style=${{color:"#999"}}>울음소리 감지 중</span></div>`}
-    <!-- PHOTO -->
-    ${source==="photo"&&photoSrc&&html`<div><img src=${photoSrc} style=${{width:"100%",maxHeight:360,objectFit:"contain",background:"#000"}}/><canvas ref=${cRef} style=${{display:"none"}}/></div>`}
-    <!-- VIDEO -->
-    ${source==="video"&&vidSrc&&html`<div style=${{position:"relative"}}><video ref=${vidElRef} src=${vidSrc} controls playsInline onLoadedData=${onVidLoaded} onError=${function(){setVidLoad(false);setError("MP4 형식을 사용해주세요");}} onPlay=${onVidPlay} onPause=${onVidPause} onEnded=${onVidPause} style=${{width:"100%",maxHeight:400,background:"#000"}}/><canvas ref=${cRef} style=${{display:"none"}}/></div>`}
-    ${source==="video"&&vidInfo&&html`<div style=${{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:"rgba(78,205,196,.06)",borderBottom:"1px solid rgba(78,205,196,.1)",fontSize:12,color:"#4ECDC4",flexWrap:"wrap"}}><span>🎬 ${(vidInfo.name||"").slice(0,20)}</span><span>📦 ${vidInfo.size}</span>${vidInfo.duration&&html`<span>⏱️ ${vidInfo.duration}</span>`}${vidPlay&&html`<span style=${{color:"#ff6666",fontWeight:700}}>● 분석중</span>`}</div>`}
-    ${source==="video"&&vidLoad&&!vidReady&&html`<div style=${{padding:30,textAlign:"center"}}><div class="spinner" style=${{margin:"0 auto"}}/><p style=${{color:"#888",marginTop:12,fontSize:13}}>영상 로딩 중...</p></div>`}
-    ${source==="video"&&vidReady&&!vidPlay&&!liveOn&&html`<div style=${{padding:24,textAlign:"center"}}><div style=${{fontSize:32,animation:"bounce 1.5s ease-in-out infinite"}}>👆</div><p style=${{color:"#a29bfe",fontSize:15,fontWeight:800,marginTop:8}}>▶ 재생 버튼을 눌러주세요!</p><p style=${{color:"#888",fontSize:12,marginTop:6}}>재생하면 3초마다 자동 분석</p></div>`}
-
-    <!-- SUBTITLE -->
-    ${subtitle&&html`<div class="subtitle-bar" key=${cnt}><div class="subtitle-text">🐱 "${subtitle}"</div>${mood&&html`<div class="subtitle-mood">${mood}</div>`}</div>`}
-    ${subL&&!subtitle&&html`<div class="subtitle-bar"><div style=${{display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><div class="spinner-sm"/><span style=${{color:"#FFD700",fontSize:13}}>${micOn?"음성+영상 통합 분석 중...":"정밀 통역 중..."}</span></div></div>`}
-
-    <!-- FEEDBACK BUTTONS -->
-    ${subtitle&&!subL&&html`<div style=${{display:"flex",gap:10,padding:"10px 18px",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
-      ${fbSent?html`<div style=${{flex:1,textAlign:"center",color:"#4ECDC4",fontSize:12,padding:8}}>✅ 피드백 반영됨! 다음 분석에 적용됩니다</div>`
-      :html`<${React.Fragment}><button class="fb-btn" style=${{background:"rgba(78,205,196,.1)",color:"#4ECDC4"}} onClick=${function(){onFeedback(true);}}>👍 맞아요</button><button class="fb-btn" style=${{background:"rgba(255,80,80,.1)",color:"#ff7070"}} onClick=${function(){onFeedback(false);}}>👎 틀려요</button></$>`}
+    ${src==="cam"&&html`<div style=${S.camWrap}><video ref=${vRef} autoPlay playsInline muted style=${S.video}/><canvas ref=${cRef} style=${{display:"none"}}/>
+      ${!camOk&&!camErr&&!stopped&&html`<div style=${S.overlay}><div class="spinner"/><p style=${{color:"#fff",marginTop:12}}>카메라 시작 중...</p></div>`}
+      ${stopped&&html`<div style=${S.overlay}><span style=${{fontSize:40}}>✅</span><p style=${{color:"#4ECDC4",marginTop:12,fontWeight:700}}>분석 종료</p></div>`}
+      ${camErr&&html`<div style=${S.overlay}><p style=${{color:"#ff7070"}}>${camErr}</p></div>`}
+      ${camOk&&live&&html`<div class="scan-line"/>`}
+      ${camOk&&live&&html`<div style=${{position:"absolute",bottom:0,left:0,right:0,padding:"10px 16px 14px",background:"linear-gradient(transparent,rgba(0,0,0,.6))",zIndex:5,display:"flex",justifyContent:"center"}}><button style=${{padding:"12px 28px",borderRadius:50,color:"#fff",background:"rgba(255,70,70,.7)",fontSize:14,fontWeight:700}} onClick=${fullStop}>⏹ 분석 중지</button></div>`}
     </div>`}
-
-    <!-- TOY RECOMMENDATION -->
-    ${recToy&&subtitle&&html`<div class="toy-card">
-      <div style=${{display:"flex",alignItems:"center",gap:10,marginBottom:10}}><span style=${{fontSize:11,color:"#FF6B6B",fontWeight:700,background:"rgba(255,107,107,.1)",padding:"3px 8px",borderRadius:6}}>🧸 추천 장난감</span><span style=${{fontSize:10,color:"#888"}}>아비비 고물상</span></div>
-      <div style=${{display:"flex",alignItems:"center",gap:14}}>
-        <div style=${{width:56,height:56,borderRadius:12,background:"rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,flexShrink:0}}>${recToy.emoji}</div>
-        <div style=${{flex:1}}>
-          <div style=${{color:"#eee",fontSize:14,fontWeight:700}}>${recToy.name}</div>
-          <div style=${{color:"#888",fontSize:11,marginTop:2}}>${recToy.desc}</div>
-          <div style=${{display:"flex",alignItems:"center",gap:8,marginTop:6}}>
-            <span style=${{color:"#FFD700",fontSize:13,fontWeight:700}}>${recToy.price}</span>
-            <span style=${{fontSize:10,color:"#666",background:"rgba(255,255,255,.06)",padding:"2px 6px",borderRadius:4}}>${recToy.tag}</span>
-          </div>
-        </div>
-      </div>
-    </div>`}
-
-    <!-- LIVE STATUS -->
-    ${liveOn&&html`<div style=${S.liveBar}><div class="live-dot"/><span style=${{color:"#ff6666",fontSize:12,fontWeight:700}}>${source==="video"?"VIDEO":"LIVE"}</span>${micOn&&html`<span style=${{color:"#ff6666",fontSize:10}}>🎤</span>`}<span style=${{color:"#999",fontSize:11}}>3초</span><span style=${{marginLeft:"auto",color:"#4ECDC4",fontSize:11,fontWeight:600}}>분석 ${cnt}회</span>${subL&&html`<div class="spinner-sm"/>`}</div><div class="progress-track"><div class="progress-fill" style=${{background:clr}} key=${cnt}/></div>`}
-
-    ${source==="photo"&&subL&&!subtitle&&html`<div style=${{padding:40,textAlign:"center"}}><div class="spinner" style=${{margin:"0 auto"}}/><p style=${{color:"#888",marginTop:16,fontSize:13}}>사진 분석 중...</p></div>`}
-    ${paused&&liveOn&&html`<div style=${{padding:"10px 16px",background:"rgba(255,200,50,.08)",display:"flex",alignItems:"center",gap:8}}><span>⏸️</span><span style=${{color:"#ffc832",fontSize:12}}>일시정지 중</span></div>`}
-    ${error&&html`<div style=${S.errBox}>⚠️ ${error}</div>`}
-
-    <!-- DETAIL -->
-    ${detL&&!detail&&html`<div style=${{padding:20,textAlign:"center",display:"flex",alignItems:"center",justifyContent:"center",gap:8,color:"#888",fontSize:12}}><div class="spinner-sm"/>상세 분석 로딩 중...</div>`}
-    ${detail&&html`<div class="fade-in" key=${cnt}><div style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 18px 4px"}}><span style=${{fontSize:18}}>${sm?sm.icon:""}</span><span style=${{color:"#f0f0f5",fontSize:15,fontWeight:700}}>상세 분석</span></div><${Txt} text=${detail}/></div>`}
-
-    ${source==="photo"&&!subL&&subtitle&&html`<div style=${{padding:"4px 20px 20px",display:"flex",gap:10}}><div class="src-btn" style=${{borderColor:clr+"44",padding:"14px 10px"}}><span>🖼️ 다른 사진 분석</span><input type="file" accept="image/*" onChange=${onPhoto}/></div></div>`}
-    ${!subtitle&&!subL&&!error&&source==="cam"&&liveOn&&html`<div style=${{padding:40,textAlign:"center"}}><div class="spinner" style=${{margin:"0 auto"}}/><p style=${{color:"#888",marginTop:16,fontSize:13}}>첫 분석 준비 중...</p></div>`}
-
-    <!-- STOPPED STATE: 분석 완료 -->
-    ${stopped&&!subL&&!detL&&html`<div style=${{padding:"16px 18px",animation:"fadeUp .4s ease-out"}}>
-      <div style=${{background:"rgba(78,205,196,.06)",border:"1px solid rgba(78,205,196,.12)",borderRadius:12,padding:"14px 16px",textAlign:"center",marginBottom:14}}>
-        <div style=${{color:"#4ECDC4",fontSize:14,fontWeight:700,marginBottom:4}}>✅ 분석 완료</div>
-        <div style=${{color:"#888",fontSize:12}}>총 ${cnt}회 분석 | ${source==="cam"?"실시간 카메라":source==="video"?"영상 분석":"사진 분석"}</div>
-      </div>
-      <div style=${{display:"flex",gap:10}}>
-        <button style=${{flex:1,padding:"14px",borderRadius:12,background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.08)",color:"#aaa",fontSize:13,fontWeight:700}} onClick=${goHome}>🏠 홈으로</button>
-        <button style=${{flex:1,padding:"14px",borderRadius:12,background:clr+"22",border:"1px solid "+clr+"44",color:clr,fontSize:13,fontWeight:700}} onClick=${function(){resetAll();setSource(null);setScreen("source");}}>🔄 다시 분석</button>
-      </div>
-    </div>`}
-    ${stopped&&(subL||detL)&&html`<div style=${{padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"center",gap:8,color:"#4ECDC4",fontSize:12}}><div class="spinner-sm"/>마지막 분석 마무리 중...</div>`}
+    ${src==="photo"&&photo&&html`<div><img src=${photo} style=${{width:"100%",maxHeight:360,objectFit:"contain",background:"#000"}}/><canvas ref=${cRef} style=${{display:"none"}}/></div>`}
+    ${src==="video"&&vidUrl&&html`<div><video ref=${vidRef} src=${vidUrl} controls playsInline onLoadedData=${onVidLoaded} onPlay=${onVidPlay} onPause=${onVidPause} onEnded=${onVidPause} style=${{width:"100%",maxHeight:400,background:"#000"}}/><canvas ref=${cRef} style=${{display:"none"}}/></div>`}
+    ${src==="video"&&vidInfo&&html`<div style=${{padding:"8px 16px",background:"rgba(78,205,196,.06)",fontSize:12,color:"#4ECDC4"}}>🎬 ${(vidInfo.name||"").slice(0,20)} · ${vidInfo.size}${vidInfo.dur?" · "+vidInfo.dur:""}</div>`}
+    ${src==="video"&&vidOk&&!vidPlay&&!stopped&&html`<div style=${{padding:24,textAlign:"center"}}><div style=${{fontSize:32,animation:"bounce 1.5s infinite"}}>👆</div><p style=${{color:"#a29bfe",fontSize:15,fontWeight:800,marginTop:8}}>▶ 재생하면 분석 시작!</p></div>`}
+    ${src==="cam"&&micOn&&html`<div style=${{display:"flex",alignItems:"center",gap:8,padding:"8px 16px",background:"rgba(255,68,68,.08)",fontSize:12}}><span style=${{width:8,height:8,borderRadius:4,background:"#ff4444"}}></span><span style=${{color:"#ff6666",fontWeight:700}}>MIC ON</span></div>`}
+    ${sub&&!subL&&html`<div style=${{background:"rgba(0,0,0,.85)",padding:"14px 18px",animation:"subtitleIn .4s ease-out"}}><div style=${{color:"#FFD700",fontSize:15,fontWeight:700,textAlign:"center"}}>🐱 "${sub}"</div>${mood&&html`<div style=${{color:"#4ECDC4",fontSize:12,textAlign:"center",marginTop:4}}>${mood}</div>`}</div>`}
+    ${subL&&html`<div style=${{background:"rgba(0,0,0,.85)",padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><div class="spinner-sm"/><span style=${{color:"#FFD700",fontSize:13}}>통역 중...</span></div>`}
+    ${sub&&!subL&&html`<div style=${{display:"flex",gap:10,padding:"10px 18px"}}>${fbOk?html`<div style=${{flex:1,textAlign:"center",color:"#4ECDC4",fontSize:12,padding:8}}>✅ 반영됨</div>`:html`<${React.Fragment}><button style=${{flex:1,padding:12,borderRadius:10,background:"rgba(78,205,196,.1)",color:"#4ECDC4",fontSize:13,fontWeight:700}} onClick=${function(){onFb(true);}}>👍 맞아요</button><button style=${{flex:1,padding:12,borderRadius:10,background:"rgba(255,80,80,.1)",color:"#ff7070",fontSize:13,fontWeight:700}} onClick=${function(){onFb(false);}}>👎 틀려요</button></$>`}</div>`}
+    ${toy&&sub&&html`<div style=${{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:16,margin:"8px 18px"}}><div style=${{fontSize:11,color:"#FF6B6B",fontWeight:700,marginBottom:10}}>🧸 추천 (아비비 고물상)</div><div style=${{display:"flex",alignItems:"center",gap:14}}><div style=${{width:48,height:48,borderRadius:12,background:"rgba(255,255,255,.06)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>${toy.emoji}</div><div><div style=${{color:"#eee",fontSize:14,fontWeight:700}}>${toy.name}</div><div style=${{color:"#888",fontSize:11,marginTop:2}}>${toy.desc}</div><div style=${{color:"#FFD700",fontSize:13,fontWeight:700,marginTop:4}}>${toy.price} <span style=${{fontSize:10,color:"#666",background:"rgba(255,255,255,.06)",padding:"2px 6px",borderRadius:4}}>${toy.tag}</span></div></div></div></div>`}
+    ${live&&html`<div style=${{display:"flex",alignItems:"center",gap:8,padding:"10px 16px",background:"rgba(255,255,255,.04)"}}><div class="live-dot"/><span style=${{color:"#ff6666",fontSize:12,fontWeight:700}}>LIVE</span><span style=${{color:"#999",fontSize:11}}>3초</span><span style=${{marginLeft:"auto",color:"#4ECDC4",fontSize:11,fontWeight:600}}>분석 ${cnt}회</span>${subL&&html`<div class="spinner-sm"/>`}</div>`}
+    ${err&&html`<div style=${{margin:"14px 18px",padding:14,background:"rgba(255,80,80,.12)",border:"1px solid rgba(255,80,80,.25)",borderRadius:12,color:"#ff7070",fontSize:12}}>⚠️ ${err}</div>`}
+    ${detL&&!det&&html`<div style=${{padding:20,textAlign:"center",color:"#888",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><div class="spinner-sm"/>상세 분석 중...</div>`}
+    ${det&&html`<div class="fade-in"><div style=${{display:"flex",alignItems:"center",gap:8,padding:"14px 18px 4px"}}><span style=${{fontSize:18}}>${sm?sm.icon:""}</span><span style=${{color:"#f0f0f5",fontSize:15,fontWeight:700}}>상세 분석</span></div><${Txt} text=${det}/></div>`}
+    ${src==="photo"&&!subL&&sub&&html`<div style=${{padding:"4px 20px 20px"}}><div class="src-btn" style=${{padding:"14px 10px"}}><span>🖼️ 다른 사진</span><input type="file" accept="image/*" onChange=${onPhoto}/></div></div>`}
+    ${stopped&&!subL&&!detL&&html`<div style=${{padding:16}}><div style=${{background:"rgba(78,205,196,.06)",border:"1px solid rgba(78,205,196,.12)",borderRadius:12,padding:14,textAlign:"center",marginBottom:14}}><div style=${{color:"#4ECDC4",fontSize:14,fontWeight:700}}>✅ 분석 완료 (${cnt}회)</div></div><div style=${{display:"flex",gap:10}}><button style=${{flex:1,padding:14,borderRadius:12,background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.08)",color:"#aaa",fontSize:13,fontWeight:700}} onClick=${goHome}>🏠 홈</button><button style=${{flex:1,padding:14,borderRadius:12,background:clr+"22",border:"1px solid "+clr+"44",color:clr,fontSize:13,fontWeight:700}} onClick=${function(){reset();setSrc(null);setScr("source");}}>🔄 다시</button></div></div>`}
   </div></div>`;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(html`<${App}/>`);
-} // end else (library check)
+}
 </script>
 </body>
 </html>
