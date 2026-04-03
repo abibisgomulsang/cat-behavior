@@ -142,14 +142,14 @@ function getProfileContext(){
 
 /* ========== PROMPTS ========== */
 var FAST={
-  toy:function(audio){return getProfileContext()+"당신은 고양이 행동학 박사+놀이치료 전문가입니다.\n이미지를 정확히 관찰하세요.\n[음성정보] "+audio+"\n반드시 이 형식으로만:\n[자막] (고양이 입장 솔직 반응 ~30자)\n[기분] (흥미도:★1-5 | 사냥본능:높음/중간/낮음 | 놀이가치:상/중/하 | 신뢰도:상/중/하)";},
-  behavior:function(audio){return getProfileContext()+"당신은 CAAB 인증 수의행동학 전문가입니다.\n이미지 정밀 관찰 (귀,동공,꼬리,자세,수염,체중분배). 고양이 안보이면 솔직히.\n[음성정보] "+audio+"\n반드시 이 형식으로만:\n[자막] (고양이가 하고싶은 말 ~30자, 음성+몸짓 종합 판단)\n[기분] (감정:구체적 | 스트레스:1-10 | 원하는것:구체적 | 신뢰도:상/중/하)";},
-  correction:function(audio){return getProfileContext()+"당신은 DACVB 자격 행동교정 전문가입니다.\n이미지 정밀 관찰. 정상이면 정상이라고.\n[음성정보] "+audio+"\n반드시 이 형식으로만:\n[자막] (고양이 속마음 ~30자, 음성+행동 종합)\n[기분] (긴급도:상/중/하/정상 | 문제유형:구체적 | 신뢰도:상/중/하)";}
+  toy:function(audio,prev){return getProfileContext()+"당신은 고양이 행동학 박사+놀이치료 전문가입니다.\n이미지를 정확히 관찰하세요.\n[음성정보] "+audio+"\n"+(prev?"[주의] 이전 자막: '"+prev+"' ← 이것과 다른 새로운 관점으로 답변하세요!\n":"")+"반드시 이 형식으로만:\n[자막] (고양이 입장 솔직 반응 ~30자, 이전과 겹치지 않게)\n[기분] (흥미도:★1-5 | 사냥본능:높음/중간/낮음 | 놀이가치:상/중/하 | 신뢰도:상/중/하)";},
+  behavior:function(audio,prev){return getProfileContext()+"당신은 CAAB 인증 수의행동학 전문가입니다.\n이미지에서 보이는 것을 구체적으로 관찰하세요 (귀방향,동공크기,꼬리위치,자세,수염방향,체중분배). 고양이 안보이면 솔직히.\n[음성정보] "+audio+"\n"+(prev?"[주의] 이전 자막: '"+prev+"' ← 다른 표현/관점으로 답변!\n":"")+"반드시 이 형식으로만:\n[자막] (고양이가 하고싶은 말 ~30자, 관찰 근거 기반, 이전과 다르게)\n[기분] (감정:구체적 | 스트레스:1-10 | 원하는것:구체적 | 신뢰도:상/중/하)";},
+  correction:function(audio,prev){return getProfileContext()+"당신은 DACVB 자격 행동교정 전문가입니다.\n이미지에서 관찰되는 구체적 행동 근거를 먼저 파악하세요. 정상이면 정상이라고.\n[음성정보] "+audio+"\n"+(prev?"[주의] 이전 자막: '"+prev+"' ← 다른 관점으로 답변!\n":"")+"반드시 이 형식으로만:\n[자막] (고양이 속마음 ~30자, 관찰 근거 기반, 이전과 다르게)\n[기분] (긴급도:상/중/하/정상 | 문제유형:구체적 | 신뢰도:상/중/하)";}
 };
 var DETAIL={
-  toy:function(audio){return getProfileContext()+"고양이 행동학 박사+놀이치료 전문가. 보이는것만 근거.\n[음성정보] "+audio+"\n1.🧸식별(종류/재질/크기/자극유형)\n2.😺반응예측(성격별/연령별)\n3.❌흥미잃는이유5가지\n4.💡놀이방법(사냥놀이/추격/숨바꼭질/두뇌/함께놀이/변형3가지)\n5.🛠️DIY업그레이드아이디어\n6.🎁추천조합3개\n7.📅놀이루틴(아침/저녁)\n8.⚠️안전주의\n이모지+줄바꿈 답변.";},
-  behavior:function(audio){return getProfileContext()+"CAAB 수의행동학 전문가.\n[음성정보] "+audio+"\n1.🐱신체언어(귀/동공/수염/꼬리/자세/털)+음성분석\n2.💭감정(주감정/각성수준/정서가)\n3.🗣️통역상세(음성+몸짓 종합)\n4.❤️욕구분석\n5.🎯최적상호작용\n6.📊스트레스1-10(근거)\n이모지+줄바꿈 답변.";},
-  correction:function(audio){return getProfileContext()+"DACVB 행동교정전문가.\n[음성정보] "+audio+"\n1.🔍행동분류(정상vs문제)+음성이상여부\n2.🧠원인감별\n3.⚡즉각대응\n4.📋교정프로그램(1/2/4주)\n5.🏠환경강화\n6.⚠️수의사의뢰기준\n이모지+줄바꿈 답변.";}
+  toy:function(audio){return getProfileContext()+"고양이 행동학 박사+놀이치료 전문가. 반드시 이미지에서 보이는 것만 근거로 답변하세요.\n[음성정보] "+audio+"\n\n⚠️ 먼저 이미지에서 관찰한 것을 구체적으로 기술한 후 분석하세요:\n\n📷 관찰 내용: (이미지에서 보이는 장난감/물체의 모양,색상,크기,상태를 구체적으로 기술)\n\n1.🧸식별(종류/재질/크기/자극유형)\n2.😺반응예측(성격별/연령별)\n3.❌흥미잃는이유5가지\n4.💡놀이방법(사냥놀이/추격/숨바꼭질/두뇌/함께놀이/변형3가지)\n5.🛠️DIY업그레이드아이디어\n6.🎁추천조합3개\n7.📅놀이루틴(아침/저녁)\n8.⚠️안전주의\n이모지+줄바꿈 답변.";},
+  behavior:function(audio){return getProfileContext()+"CAAB 수의행동학 전문가. 반드시 이미지에서 관찰 가능한 근거만 사용하세요.\n[음성정보] "+audio+"\n\n⚠️ 먼저 이미지에서 관찰한 것을 구체적으로 기술한 후 분석하세요:\n\n📷 관찰 내용: (귀 방향, 눈 상태, 꼬리 위치, 자세, 수염, 주변 환경 등 보이는 것 기술)\n\n1.🐱신체언어(귀/동공/수염/꼬리/자세/털)+음성분석\n2.💭감정(주감정/각성수준/정서가) - 관찰 근거 명시\n3.🗣️통역상세(관찰+음성 종합)\n4.❤️욕구분석\n5.🎯최적상호작용\n6.📊스트레스1-10(근거)\n이모지+줄바꿈 답변.";},
+  correction:function(audio){return getProfileContext()+"DACVB 행동교정전문가. 반드시 이미지에서 관찰 가능한 근거만 사용하세요.\n[음성정보] "+audio+"\n\n⚠️ 먼저 이미지에서 관찰한 것을 구체적으로 기술한 후 분석하세요:\n\n📷 관찰 내용: (행동, 자세, 표정, 주변 환경 등 보이는 것 기술)\n\n1.🔍행동분류(정상vs문제)+관찰근거+음성이상여부\n2.🧠원인감별(관찰근거 기반)\n3.⚡즉각대응\n4.📋교정프로그램(1/2/4주)\n5.🏠환경강화\n6.⚠️수의사의뢰기준\n이모지+줄바꿈 답변.";}
 };
 
 var MODES=[
@@ -201,6 +201,7 @@ function App(){
   var mRef=useRef(mode),subLRef=useRef(false),lRef=useRef(false),tRef=useRef(null),pRef=useRef(false),srcRef=useRef(null);
   var autoStarted=useRef(false);
   var killRef=useRef(false); // 동기식 kill 스위치 - 즉시 반영됨
+  var prevSubRef=useRef(""); // 이전 자막 - 중복 방지
   useEffect(function(){mRef.current=mode;},[mode]);
   useEffect(function(){lRef.current=liveOn;},[liveOn]);
   useEffect(function(){subLRef.current=subL;},[subL]);
@@ -226,13 +227,16 @@ function App(){
     if(killRef.current)return; // 즉시 차단
     var cur=mRef.current;if(!cur)return;
     var audio=getAudioDesc();
+    var prev=prevSubRef.current||"";
     setSubL(true);setError(null);setCnt(function(c){return c+1;});setFbSent(false);setRecToy(null);
-    callAPI({model:"claude-haiku-4-5-20251001",max_tokens:150,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:FAST[cur](audio)}]}]}).then(function(d){
+    callAPI({model:"claude-haiku-4-5-20251001",max_tokens:150,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:FAST[cur](audio,prev)}]}]}).then(function(d){
       if(killRef.current&&!isOnce)return; // 중지됐으면 결과 무시 (사진 1회는 허용)
       if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
       var t=d.content?d.content.map(function(c){return c.text||"";}).join("\n"):"";var p=parseSub(t);
-      setSubtitle(p.subtitle||"...");setMood(p.mood||"");
-      setRecToy(matchToy(p.subtitle+" "+p.mood));
+      var newSub=p.subtitle||"...";
+      setSubtitle(newSub);setMood(p.mood||"");
+      prevSubRef.current=newSub;
+      setRecToy(matchToy(newSub+" "+p.mood));
     }).catch(function(e){if(!killRef.current||isOnce)setError(e.message);}).finally(function(){setSubL(false);});
     setDetL(true);
     callAPI({model:"claude-haiku-4-5-20251001",max_tokens:1800,messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}},{type:"text",text:DETAIL[cur](audio)}]}]}).then(function(d){
@@ -275,7 +279,7 @@ function App(){
     setFbCount({c:catProfile.totalCorrect,w:catProfile.totalWrong});
   }
 
-  function resetAll(){setSubtitle("");setMood("");setDetail("");setCnt(0);setError(null);setSubL(false);setDetL(false);setPhotoSrc(null);setVidSrc(null);setVidPlay(false);setVidReady(false);setVidInfo(null);setVidLoad(false);setRecToy(null);setFbSent(false);setStopped(false);killRef.current=false;autoStarted.current=false;}
+  function resetAll(){setSubtitle("");setMood("");setDetail("");setCnt(0);setError(null);setSubL(false);setDetL(false);setPhotoSrc(null);setVidSrc(null);setVidPlay(false);setVidReady(false);setVidInfo(null);setVidLoad(false);setRecToy(null);setFbSent(false);setStopped(false);killRef.current=false;prevSubRef.current="";autoStarted.current=false;}
   function goHome(){killRef.current=true;stopLiveTimer();stopCam();stopMic();setMicOn(false);setMode(null);setScreen("home");setSource(null);setViewItem(null);setCamError(null);resetAll();}
   function enterMode(id){setMode(id);setScreen("source");setSource(null);resetAll();}
   function pickCam(){setSource("cam");setScreen("analyze");resetAll();setTimeout(function(){startCam(facing);},150);}
