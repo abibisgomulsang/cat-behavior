@@ -212,7 +212,9 @@ var SCENE_RENDER={hunt:SceneHunt,fish:SceneFish,hide:SceneHide,roll:SceneRoll,ch
 
 function PlayCard(props){
   var m=props.method,i=props.index;
-  var sceneKey=getScene(m.action);
+  // ★ 핵심: 인덱스로 강제 배분 → 절대 같은 장면 안 나옴
+  var sceneKeys=["hunt","fish","hide","roll","chase"];
+  var sceneKey=sceneKeys[i%5];
   var info=SCENE_INFO[sceneKey];
   var SceneComp=SCENE_RENDER[sceneKey];
   var colors=["#FF6B6B","#4ECDC4","#FF8C42"];
