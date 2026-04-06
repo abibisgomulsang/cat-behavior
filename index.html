@@ -16,13 +16,26 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 @keyframes recPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,68,68,.4)}50%{opacity:.7;box-shadow:0 0 0 12px rgba(255,68,68,0)}}
-@keyframes countDown{from{transform:scale(1.3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+@keyframes checkPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes gentlePulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes catWalk{0%{transform:translateX(-30px)}50%{transform:translateX(30px)}100%{transform:translateX(-30px)}}
 .spinner{width:50px;height:50px;border:3px solid rgba(255,255,255,.15);border-top-color:#4ECDC4;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 .fade-in{animation:fadeUp .5s ease-out}
 .rec-dot{width:14px;height:14px;border-radius:50%;background:#ff4444;animation:recPulse 1.5s ease-in-out infinite;flex-shrink:0}
-.count-num{animation:countDown .3s ease-out}
-.progress-ring{transform:rotate(-90deg)}
-.progress-ring circle{transition:stroke-dashoffset .3s linear}
+.overlay{position:fixed;inset:0;background:linear-gradient(170deg,#0a0a18,#111130 40%,#0a1a35);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;padding:30px}
+.overlay-cat{font-size:60px;animation:catWalk 3s ease-in-out infinite;margin-bottom:20px}
+.overlay-title{color:#fff;font-size:20px;font-weight:800;margin-bottom:8px;text-align:center}
+.overlay-sub{color:#888;font-size:13px;text-align:center;line-height:1.6}
+.overlay-dots::after{content:'';animation:dots 1.5s steps(4) infinite}
+.check-circle{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#4ECDC4,#44b8b0);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:checkPop .5s ease-out}
+.analysis-steps{display:flex;flex-direction:column;gap:12px;margin-top:24px;width:100%;max-width:280px}
+.step-item{display:flex;align-items:center;gap:10px;font-size:12px;color:#666}
+.step-item.active{color:#4ECDC4}
+.step-item.done{color:#4ECDC4}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#333;flex-shrink:0}
+.step-item.active .step-dot{background:#4ECDC4;animation:gentlePulse 1s ease-in-out infinite}
+.step-item.done .step-dot{background:#4ECDC4}
 </style>
 </head>
 <body>
@@ -42,41 +55,45 @@ function api(body){
   return fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(function(r){return r.json();});
 }
 
-/* ===== 4개 모드 ===== */
 var MODES=[
   {id:"toy",icon:"🧸",label:"장난감 분석",desc:"20초 촬영 → AI 장난감 분석",color:"#FF6B6B",sec:20,type:"video",
-    prompt:"당신은 고양이 행동학 박사이자 장난감 전문가입니다.\n\n아래 이미지들은 고양이 장난감을 20초 동안 촬영한 영상에서 추출한 프레임입니다.\n여러 각도에서 관찰한 내용을 종합하여 분석해주세요.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 관찰 내용\n- 이미지에서 실제로 보이는 장난감의 모양, 색상, 크기, 상태를 구체적으로 기술\n\n🧸 재질 분석\n- 재질 추정 (플라스틱/천/깃털/고무/나무/실/복합 등)\n- 내구성 평가\n- 질감이 고양이에게 주는 자극\n\n😺 고양이가 좋아할 부분\n- 사냥 본능 자극 요소 (움직임/소리/크기)\n- 촉각 자극 요소\n- 후각 자극 가능성\n- 어떤 성격의 고양이에게 적합한지\n\n😾 고양이가 좋아하지 않을 부분\n- 흥미를 잃을 수 있는 요소\n- 거부감을 줄 수 있는 요소\n- 크기/무게 문제\n\n💡 효과적인 사용법\n- 구체적인 놀이 방법 3가지\n- 사냥 시퀀스(탐색→추적→덮침→포획→먹기) 활용법\n- 하루 놀이 시간/횟수 추천\n\n⚠️ 안전 주의사항\n- 삼킴/감김/독성 위험\n- 관리 방법\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요. 불확실한 것은 '추정'이라고 표시하세요."},
+    loadMsg:"장난감을 분석하고 있어요",
+    steps:["이미지 인식 중","재질/형태 분석 중","고양이 반응 예측 중","놀이법 생성 중"],
+    prompt:"당신은 고양이 행동학 박사이자 장난감 전문가입니다.\n\n아래 이미지들은 고양이 장난감을 20초 동안 촬영한 영상에서 추출한 프레임입니다.\n여러 각도에서 관찰한 내용을 종합하여 분석해주세요.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 관찰 내용\n- 이미지에서 실제로 보이는 장난감의 모양, 색상, 크기, 상태를 구체적으로 기술\n\n🧸 재질 분석\n- 재질 추정 (플라스틱/천/깃털/고무/나무/실/복합 등)\n- 내구성 평가\n- 질감이 고양이에게 주는 자극\n\n😺 고양이가 좋아할 부분\n- 사냥 본능 자극 요소\n- 촉각/후각 자극\n- 어떤 성격의 고양이에게 적합한지\n\n😾 고양이가 좋아하지 않을 부분\n- 흥미를 잃을 수 있는 요소\n- 거부감/크기/무게 문제\n\n💡 효과적인 사용법\n- 구체적인 놀이 방법 3가지\n- 사냥 시퀀스 활용법\n- 하루 놀이 시간/횟수 추천\n\n⚠️ 안전 주의사항\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."},
   {id:"behavior",icon:"🐱",label:"고양이 번역",desc:"1분 촬영 → AI 행동 번역",color:"#4ECDC4",sec:60,type:"video",
-    prompt:"당신은 CAAB(공인동물행동학자) 인증 수의행동학 전문가입니다.\n\n아래 이미지들은 고양이를 1분 동안 촬영한 영상에서 추출한 프레임입니다.\n시간순으로 행동 변화를 관찰하여 종합 분석해주세요.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 관찰 내용 (프레임별)\n- 각 프레임에서 보이는 구체적 행동 기술\n\n🐱 신체 언어 정밀 분석\n- 꼬리: 위치(높이/낮음), 형태(곧음/구부림/부풀림/감싸기), 움직임\n- 귀: 방향(전방/측면/후방 회전), 각도\n- 눈: 동공 크기, 눈 뜨인 정도, 깜빡임\n- 수염: 방향(전방/측면/후방)\n- 자세: 체중분배, 근육 긴장도, 전체 형태\n- 털: 세워짐 여부(입모근 반사)\n\n💭 감정 상태 판정\n- 주요 감정 (이완/경계/공포/흥분/불안/만족/호기심/짜증)\n- 각성 수준: 낮음/보통/높음\n- 정서가: 긍정/중립/부정\n\n🗣️ 고양이 통역 (번역)\n- 이 고양이가 지금 하고 싶은 말 3가지 (고양이 말투로 재미있게)\n- 각 통역의 근거 (어떤 신체 신호에서 판단했는지)\n\n❤️ 현재 욕구\n- 안전/식사/놀이/휴식/사회적접촉/영역 중 무엇을 원하는지\n\n🎯 최적의 대응\n- 지금 해야 할 것\n- 지금 하면 안 되는 것\n\n📊 스트레스 지수: 1-10 (구체적 근거)\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요. 보이지 않는 부위는 '확인불가'로 표시하세요."},
+    loadMsg:"우리 아이의 마음을 읽고 있어요",
+    steps:["신체 언어 관찰 중","꼬리/귀/눈 분석 중","감정 상태 판단 중","통역 생성 중"],
+    prompt:"당신은 CAAB 인증 수의행동학 전문가입니다.\n\n아래 이미지들은 고양이를 1분 동안 촬영한 영상에서 추출한 프레임입니다.\n시간순으로 행동 변화를 관찰하여 종합 분석해주세요.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 관찰 내용 (프레임별)\n- 각 프레임에서 보이는 구체적 행동 기술\n\n🐱 신체 언어 정밀 분석\n- 꼬리: 위치, 형태, 움직임\n- 귀: 방향, 각도\n- 눈: 동공 크기, 깜빡임\n- 수염: 방향\n- 자세: 체중분배, 긴장도\n\n💭 감정 상태\n- 주요 감정, 각성 수준, 정서가\n\n🗣️ 고양이 통역\n- 이 고양이가 하고 싶은 말 3가지 (고양이 말투로)\n- 각 통역의 근거\n\n❤️ 현재 욕구\n🎯 최적의 대응 (해야 할 것 / 하면 안 되는 것)\n📊 스트레스 지수: 1-10 (근거)\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."},
   {id:"problem",icon:"🩺",label:"문제행동 분석",desc:"1분 촬영 → 문제행동 진단",color:"#FF8C42",sec:60,type:"video",
-    prompt:"당신은 DACVB(미국수의행동학전문의) 자격의 행동교정 전문가입니다.\n\n아래 이미지들은 문제행동이 의심되는 고양이를 1분 동안 촬영한 영상에서 추출한 프레임입니다.\n시간순으로 행동 변화를 관찰하여 진단해주세요.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 관찰 내용 (프레임별)\n- 각 프레임에서 보이는 구체적 행동 기술\n\n🔍 행동 분류\n- 관찰된 행동이 정상인지 문제인지 판별 (근거 제시)\n- 문제행동 카테고리: 공격성/불안/강박(상동행동)/부적절배변/파괴/과도발성/섭식장애\n- 정상이면 '현재 정상 범위 행동으로 보입니다'라고 명시\n\n🤒 건강 문제 가능성\n- 아픈 신호가 있는지 (통증 자세, 과도한 그루밍, 식욕 변화 징후 등)\n- 수의사 방문 필요성 판단\n\n😿 심리 상태\n- 심심한 건지, 스트레스인지, 불안인지 구분\n- 근거 설명\n\n📋 교정 치료 계획 (문제행동일 경우)\n- 1주차: 환경 조성 + 관찰\n- 2주차: 행동 수정 시작\n- 4주차: 강화 및 유지\n- 각 단계별 구체적 실행 항목\n\n🏠 환경 개선 방안\n- 구체적인 환경 강화(Environmental Enrichment) 방법\n\n⚠️ 병원 방문 기준\n- 이런 경우 반드시 수의사 상담 필요\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요. 불확실한 것은 '가능성 있음, 수의사 확인 필요'로 표시하세요."},
+    loadMsg:"행동 패턴을 분석하고 있어요",
+    steps:["행동 관찰 중","정상/비정상 판별 중","원인 분석 중","교정 계획 생성 중"],
+    prompt:"당신은 DACVB 자격의 행동교정 전문가입니다.\n\n아래 이미지들은 문제행동이 의심되는 고양이를 1분 동안 촬영한 영상에서 추출한 프레임입니다.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 관찰 내용 (프레임별)\n\n🔍 행동 분류\n- 정상 vs 문제 판별 (근거)\n- 카테고리: 공격성/불안/강박/부적절배변/파괴/과도발성/섭식장애\n\n🤒 건강 문제 가능성\n- 아픈 신호 (통증 자세, 과도한 그루밍 등)\n- 수의사 방문 필요성\n\n😿 심리 상태\n- 심심/스트레스/불안 구분 + 근거\n\n📋 교정 계획 (문제행동일 경우)\n- 1주차/2주차/4주차 계획\n\n🏠 환경 개선 방안\n⚠️ 병원 방문 기준\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."},
   {id:"food",icon:"🍽️",label:"사료/간식 분석",desc:"성분표 사진 → 영양 분석",color:"#a29bfe",sec:0,type:"photo",
-    prompt:"당신은 수의영양학 전문가(보드인증 수의영양학 전문의)입니다.\n\n아래 이미지는 고양이 사료/간식/영양제의 영양성분표 또는 원재료 표시입니다.\n이미지에 보이는 텍스트를 정확히 읽고 분석해주세요.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 인식된 내용\n- 이미지에서 읽을 수 있는 제품명, 성분, 수치를 기술\n- 읽기 어려운 부분은 '판독불가'로 표시\n\n✅ 고양이에게 좋은 성분\n- 각 성분이 왜 좋은지 설명\n- 동물성 단백질 함량 평가\n- 타우린, 오메가3 등 필수 영양소 확인\n\n❌ 고양이에게 해로운/주의할 성분\n- 위험 성분 (양파/마늘/포도/자일리톨/카페인/초콜릿 등)\n- 과다 섭취 주의 성분 (나트륨/인/마그네슘 등)\n- 불필요한 첨가물 (인공색소/방부제/향료)\n- 곡물 함량 평가\n\n📊 영양 균형 평가\n- 단백질/지방/탄수화물 비율 평가\n- AAFCO 기준 충족 여부 (추정)\n- 수분 함량 (습식/건식)\n\n🐱 급여 추천\n- 어떤 고양이에게 적합한지 (연령/체중/건강상태)\n- 급여량 추천\n- 주의사항\n\n⭐ 종합 평점: ★1-5 (근거 포함)\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요. 성분표가 안 보이면 솔직히 말하세요."}
+    loadMsg:"영양성분을 분석하고 있어요",
+    steps:["성분표 텍스트 인식 중","유해 성분 검사 중","영양 균형 평가 중","종합 평점 산출 중"],
+    prompt:"당신은 수의영양학 전문가입니다.\n\n아래 이미지는 고양이 사료/간식/영양제의 영양성분표입니다.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 인식된 내용\n- 제품명, 성분, 수치 기술\n\n✅ 고양이에게 좋은 성분\n- 동물성 단백질, 타우린, 오메가3 등\n\n❌ 해로운/주의할 성분\n- 양파/마늘/포도/자일리톨 등 위험 성분\n- 인공첨가물, 과다 나트륨/인\n- 곡물 함량\n\n📊 영양 균형 평가\n- 단백질/지방/탄수화물 비율\n- AAFCO 기준\n\n🐱 급여 추천\n- 적합한 고양이 (연령/체중)\n- 급여량/주의사항\n\n⭐ 종합 평점: ★1-5 (근거)\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."}
 ];
-var TIPS=["고양이는 하루 15시간 수면 😴","꼬리를 세우면 반가운 인사 🐱","느린 눈 깜빡임은 사랑해 😻","사냥 본능으로 움직이는 장난감 좋아해 🎯","골골송은 편안함의 신호 🎵","고양이 사료에 양파/마늘은 절대 금지 🚫","타우린은 고양이 필수 아미노산 💊"];
+var TIPS=["고양이는 하루 15시간 수면 😴","꼬리를 세우면 반가운 인사 🐱","느린 눈 깜빡임은 사랑해 😻","사냥 본능으로 움직이는 장난감 좋아해 🎯","골골송은 편안함의 신호 🎵","사료에 양파/마늘은 절대 금지 🚫","타우린은 고양이 필수 아미노산 💊"];
 
 function App(){
   var _scr=useState("home"),scr=_scr[0],setScr=_scr[1];
   var _mode=useState(null),mode=_mode[0],setMode=_mode[1];
-  // recording
   var _camOk=useState(false),camOk=_camOk[0],setCamOk=_camOk[1];
   var _recording=useState(false),recording=_recording[0],setRecording=_recording[1];
   var _remain=useState(0),remain=_remain[0],setRemain=_remain[1];
-  var _frames=useState([]),frames=_frames[0],setFrames=_frames[1];
-  // analysis
-  var _analyzing=useState(false),analyzing=_analyzing[0],setAnalyzing=_analyzing[1];
+  // overlay states
+  var _phase=useState("idle"),phase=_phase[0],setPhase=_phase[1]; // idle|analyzing|done|result
+  var _stepIdx=useState(0),stepIdx=_stepIdx[0],setStepIdx=_stepIdx[1];
   var _result=useState(""),result=_result[0],setResult=_result[1];
   var _error=useState(null),error=_error[0],setError=_error[1];
-  // photo mode
   var _photo=useState(null),photo=_photo[0],setPhoto=_photo[1];
-  // misc
   var _face=useState("environment"),face=_face[0],setFace=_face[1];
   var _tip=useState(TIPS[0]),tip=_tip[0],setTip=_tip[1];
   var _hist=useState([]),hist=_hist[0],setHist=_hist[1];
   var _hv=useState(null),hv=_hv[0],setHv=_hv[1];
-
   var vRef=useRef(),cRef=useRef(),stRef=useRef();
-  var timerRef=useRef(),frameRef=useRef();
+  var timerRef=useRef(),frameRef=useRef(),stepTimerRef=useRef();
+  var collectedRef=useRef([]);
 
   useEffect(function(){var iv=setInterval(function(){setTip(TIPS[Math.floor(Math.random()*TIPS.length)]);},5000);return function(){clearInterval(iv);cleanup();};},[]);
 
@@ -84,103 +101,87 @@ function App(){
     if(stRef.current){stRef.current.getTracks().forEach(function(t){t.stop();});}
     if(timerRef.current)clearInterval(timerRef.current);
     if(frameRef.current)clearInterval(frameRef.current);
+    if(stepTimerRef.current)clearInterval(stepTimerRef.current);
   }
-
   function startCam(f){
     setCamOk(false);
     if(stRef.current){stRef.current.getTracks().forEach(function(t){t.stop();});}
     navigator.mediaDevices.getUserMedia({video:{facingMode:f||face,width:{ideal:1280},height:{ideal:960}},audio:false}).then(function(s){
-      stRef.current=s;
-      if(vRef.current){vRef.current.srcObject=s;vRef.current.onloadedmetadata=function(){vRef.current.play();setCamOk(true);};}
+      stRef.current=s;if(vRef.current){vRef.current.srcObject=s;vRef.current.onloadedmetadata=function(){vRef.current.play();setCamOk(true);};}
     }).catch(function(){setError("카메라 권한을 허용해주세요");});
   }
-
   function capFrame(){
     if(!vRef.current||!cRef.current)return null;
-    var v=vRef.current,c=cRef.current;
-    var sc=Math.min(720/v.videoWidth,1);
+    var v=vRef.current,c=cRef.current,sc=Math.min(720/v.videoWidth,1);
     c.width=v.videoWidth*sc;c.height=v.videoHeight*sc;
     c.getContext("2d").drawImage(v,0,0,c.width,c.height);
     return c.toDataURL("image/jpeg",0.75).split(",")[1];
   }
+  function stopCam(){if(stRef.current){stRef.current.getTracks().forEach(function(t){t.stop();});stRef.current=null;}setCamOk(false);}
+
+  // ===== 단계 애니메이션 (분석 중 진행 표시) =====
+  function startStepAnim(){
+    setStepIdx(0);
+    var idx=0;
+    stepTimerRef.current=setInterval(function(){
+      idx++;if(idx>3)idx=3;
+      setStepIdx(idx);
+    },3000);
+  }
+  function stopStepAnim(){if(stepTimerRef.current){clearInterval(stepTimerRef.current);stepTimerRef.current=null;}}
 
   // ===== 녹화 시작 =====
   function startRec(){
-    var sm=MODES.find(function(x){return x.id===mode;});
-    if(!sm)return;
+    var sm=MODES.find(function(x){return x.id===mode;});if(!sm)return;
     var totalSec=sm.sec;
-    setRecording(true);setRemain(totalSec);setFrames([]);setResult("");setError(null);
-    // 첫 프레임
-    var f0=capFrame();
-    var collected=f0?[f0]:[];
-    // 5초마다 프레임 캡처 (장난감은 5초, 1분짜리는 10초 간격)
+    setRecording(true);setRemain(totalSec);setResult("");setError(null);setPhase("idle");
+    collectedRef.current=[];
+    var f0=capFrame();if(f0)collectedRef.current.push(f0);
     var interval=totalSec<=20?5:10;
-    frameRef.current=setInterval(function(){
-      var fr=capFrame();
-      if(fr)collected.push(fr);
-    },interval*1000);
-    // 카운트다운
+    frameRef.current=setInterval(function(){var fr=capFrame();if(fr)collectedRef.current.push(fr);},interval*1000);
     var left=totalSec;
     timerRef.current=setInterval(function(){
       left--;setRemain(left);
       if(left<=0){
-        clearInterval(timerRef.current);
-        clearInterval(frameRef.current);
-        // 마지막 프레임
-        var last=capFrame();if(last)collected.push(last);
-        setRecording(false);
-        setFrames(collected);
-        // 카메라 정지
-        if(stRef.current){stRef.current.getTracks().forEach(function(t){t.stop();});}
-        setCamOk(false);
-        // 분석 시작
-        doAnalyze(collected,sm);
+        clearInterval(timerRef.current);clearInterval(frameRef.current);
+        var last=capFrame();if(last)collectedRef.current.push(last);
+        setRecording(false);stopCam();
+        doAnalyze(collectedRef.current,sm);
       }
     },1000);
   }
-
-  // ===== 녹화 중 수동 중지 =====
-  function stopRec(){
-    clearInterval(timerRef.current);
-    clearInterval(frameRef.current);
-    var last=capFrame();
-    setRecording(false);
-    setFrames(function(prev){
-      var all=last?prev.concat([last]):prev;
-      if(stRef.current){stRef.current.getTracks().forEach(function(t){t.stop();});}
-      setCamOk(false);
-      var sm=MODES.find(function(x){return x.id===mode;});
-      if(all.length>0&&sm)doAnalyze(all,sm);
-      return all;
-    });
+  function stopRecEarly(){
+    clearInterval(timerRef.current);clearInterval(frameRef.current);
+    var last=capFrame();if(last)collectedRef.current.push(last);
+    setRecording(false);stopCam();
+    var sm=MODES.find(function(x){return x.id===mode;});
+    if(collectedRef.current.length>0&&sm)doAnalyze(collectedRef.current,sm);
   }
 
-  // ===== AI 분석 =====
+  // ===== AI 분석 (전체화면 오버레이) =====
   function doAnalyze(frameList,sm){
-    setAnalyzing(true);setError(null);
-    // 프레임을 최대 4개로 제한 (토큰 절약)
+    setPhase("analyzing");
+    startStepAnim();
+    setError(null);
     var selected=[];
     if(frameList.length<=4){selected=frameList;}
-    else{
-      var step=Math.floor(frameList.length/4);
-      for(var i=0;i<4;i++){selected.push(frameList[Math.min(i*step,frameList.length-1)]);}
-    }
-    // API 메시지 구성
+    else{var step=Math.floor(frameList.length/4);for(var i=0;i<4;i++){selected.push(frameList[Math.min(i*step,frameList.length-1)]);}}
     var content=[];
-    selected.forEach(function(f,i){
-      content.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:f}});
-    });
+    selected.forEach(function(f){content.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:f}});});
     content.push({type:"text",text:sm.prompt});
-
     api({model:"claude-haiku-4-5-20251001",max_tokens:2500,messages:[{role:"user",content:content}]}).then(function(d){
+      stopStepAnim();
       if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
       var t=d.content?d.content.map(function(c){return c.text||"";}).join("\n"):"결과 없음";
       setResult(t);
       setHist(function(p){return [{id:Date.now(),mode:sm.label,icon:sm.icon,result:t,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
-    }).catch(function(e){setError(e.message);}).finally(function(){setAnalyzing(false);});
+      // "완료!" 표시 → 1.5초 후 결과
+      setPhase("done");
+      setTimeout(function(){setPhase("result");},1500);
+    }).catch(function(e){stopStepAnim();setError(e.message);setPhase("result");});
   }
 
-  // ===== 사진 분석 (사료/간식) =====
+  // ===== 사진 분석 =====
   function onPhoto(e){
     var f=e.target.files&&e.target.files[0];if(!f)return;e.target.value="";
     setPhoto(null);setResult("");setError(null);
@@ -198,12 +199,29 @@ function App(){
     };r.readAsDataURL(f);
   }
 
-  function goHome(){cleanup();setScr("home");setMode(null);setRecording(false);setRemain(0);setFrames([]);setResult("");setError(null);setPhoto(null);setCamOk(false);setAnalyzing(false);setHv(null);}
-  function enterMode(id){setMode(id);var m=MODES.find(function(x){return x.id===id;});if(m.type==="photo"){setScr("photo");}else{setScr("record");setResult("");setError(null);setFrames([]);setRecording(false);setTimeout(function(){startCam(face);},100);}}
+  function goHome(){cleanup();setScr("home");setMode(null);setRecording(false);setRemain(0);setResult("");setError(null);setPhoto(null);setCamOk(false);setPhase("idle");setStepIdx(0);setHv(null);collectedRef.current=[];}
+  function enterMode(id){setMode(id);var m=MODES.find(function(x){return x.id===id;});setResult("");setError(null);setPhase("idle");setPhoto(null);if(m.type==="photo"){setScr("photo");}else{setScr("record");setTimeout(function(){startCam(face);},100);}}
   function flipCam(){var f2=face==="environment"?"user":"environment";setFace(f2);startCam(f2);}
 
-  var sm=MODES.find(function(x){return x.id===mode;});
-  var clr=sm?sm.color:"#4ECDC4";
+  var sm=MODES.find(function(x){return x.id===mode;});var clr=sm?sm.color:"#4ECDC4";
+
+  // ===== 전체화면 분석 오버레이 =====
+  if(phase==="analyzing"&&sm)return h`<div class="overlay">
+    <div class="overlay-cat">🐱</div>
+    <div class="overlay-title">우리 아이를 위해<br/>분석중입니다<span class="overlay-dots"></span></div>
+    <div class="overlay-sub">${sm.loadMsg}</div>
+    <div style=${{marginTop:30}}><div class="spinner"/></div>
+    <div class="analysis-steps">
+      ${sm.steps.map(function(s,i){return h`<div key=${i} class=${"step-item"+(i<stepIdx?" done":i===stepIdx?" active":"")}><div class="step-dot"/><span>${i<stepIdx?"✅ ":""}${s}${i===stepIdx?"...":i<stepIdx?" 완료":""}</span></div>`;})}
+    </div>
+    <div style=${{marginTop:30,color:"#555",fontSize:11}}>잠시만 기다려주세요</div>
+  </div>`;
+
+  if(phase==="done"&&sm)return h`<div class="overlay">
+    <div class="check-circle"><span style=${{fontSize:40,color:"#fff"}}>✓</span></div>
+    <div class="overlay-title">AI 분석이 완료되었습니다!</div>
+    <div class="overlay-sub">결과를 보여드릴게요 🐾</div>
+  </div>`;
 
   // ===== HISTORY DETAIL =====
   if(hv)return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"}}><div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"#333"}}><button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){setHv(null);}}>← 뒤로</button><span style=${{color:"#fff",fontSize:15,fontWeight:700}}>${hv.icon} ${hv.mode}</span><span style=${{width:56}}/></div><div style=${{flex:1,overflowY:"auto",padding:"10px 18px",background:"#13131f"}}><div style=${{color:"#777",fontSize:11,marginBottom:10}}>${hv.time}</div><div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${hv.result}</div></div></div>`;
@@ -222,103 +240,80 @@ function App(){
     <div style=${{width:"100%",display:"flex",flexDirection:"column",gap:10}}>
       ${MODES.map(function(m){return h`<button key=${m.id} class="fade-in" style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderLeft:"4px solid "+m.color,borderRadius:14,padding:"15px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",textAlign:"left"}} onClick=${function(){enterMode(m.id);}}>
         <div style=${{display:"flex",alignItems:"center",gap:14}}><span style=${{fontSize:34}}>${m.icon}</span><div><div style=${{fontSize:15,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:11,color:"#888",marginTop:2}}>${m.desc}</div></div></div>
-        <span style=${{fontSize:20,color:"#555"}}>›</span>
-      </button>`;})}
+        <span style=${{fontSize:20,color:"#555"}}>›</span></button>`;})}
     </div>
     <button style=${{marginTop:14,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5,width:"100%"}} onClick=${function(){setScr("history");}}>📋 분석 기록 (${hist.length})</button>
     <div style=${{marginTop:"auto",paddingTop:20}}><span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span></div>
   </div>`;
 
-  // ===== PHOTO MODE (사료/간식 분석) =====
+  // ===== PHOTO MODE (사료/간식) =====
   if(scr==="photo")return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"}}>
     <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:clr}}><button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${goHome}>← 홈</button><span style=${{color:"#fff",fontSize:15,fontWeight:700}}>${sm.icon} ${sm.label}</span><span style=${{width:56}}/></div>
     <div style=${{flex:1,overflowY:"auto",padding:20}}>
-      ${!photo&&!analyzing&&!result&&h`<div class="fade-in" style=${{textAlign:"center",paddingTop:30}}>
+      ${phase==="result"&&result?h`<div class="fade-in">
+        ${photo&&h`<img src=${photo} style=${{width:"100%",maxHeight:250,objectFit:"contain",background:"#000",borderRadius:12,marginBottom:16}}/>`}
+        <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><span style=${{fontSize:22}}>${sm.icon}</span><span style=${{color:"#f0f0f5",fontSize:17,fontWeight:800}}>분석 결과</span></div>
+        <div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${result}</div>
+        ${error&&h`<div style=${{padding:14,background:"rgba(255,80,80,.12)",borderRadius:12,color:"#ff7070",fontSize:12,marginTop:14}}>⚠️ ${error}</div>`}
+        <div style=${{marginTop:24,display:"flex",gap:10}}>
+          <button style=${{flex:1,padding:14,borderRadius:12,background:"rgba(255,255,255,.06)",color:"#aaa",fontSize:13,fontWeight:700}} onClick=${goHome}>🏠 홈</button>
+          <div style=${{flex:1,position:"relative"}}><button style=${{width:"100%",padding:14,borderRadius:12,background:clr+"22",border:"1px solid "+clr+"44",color:clr,fontSize:13,fontWeight:700}}>📷 다른 제품</button><input type="file" accept="image/*" capture="environment" onChange=${function(e){setPhoto(null);setResult("");setPhase("idle");onPhoto(e);}} style=${{position:"absolute",inset:0,opacity:0,cursor:"pointer"}}/></div>
+        </div>
+      </div>`
+      :h`<div class="fade-in" style=${{textAlign:"center",paddingTop:30}}>
         <div style=${{fontSize:64,marginBottom:16}}>📸</div>
         <p style=${{color:"#eee",fontSize:16,fontWeight:700,marginBottom:8}}>성분표를 촬영해주세요</p>
-        <p style=${{color:"#888",fontSize:12,lineHeight:1.6,marginBottom:24}}>사료, 간식, 영양제의 영양성분표/원재료를\n가까이서 선명하게 촬영하세요</p>
-        <div style=${{position:"relative",display:"inline-block"}}>
-          <button style=${{padding:"16px 40px",borderRadius:50,background:clr,color:"#fff",fontSize:16,fontWeight:800}}>📷 사진 촬영 / 선택</button>
-          <input type="file" accept="image/*" capture="environment" onChange=${onPhoto} style=${{position:"absolute",inset:0,opacity:0,cursor:"pointer"}}/>
-        </div>
-      </div>`}
-      ${photo&&h`<img src=${photo} style=${{width:"100%",maxHeight:300,objectFit:"contain",background:"#000",borderRadius:12,marginBottom:16}}/>`}
-      ${analyzing&&h`<div style=${{textAlign:"center",padding:"30px 0"}}><div class="spinner"/><p style=${{color:"#4ECDC4",marginTop:16,fontSize:14,fontWeight:700}}>영양성분 분석 중...</p><p style=${{color:"#888",fontSize:12,marginTop:6}}>성분표를 읽고 있어요</p></div>`}
-      ${error&&h`<div style=${{padding:14,background:"rgba(255,80,80,.12)",borderRadius:12,color:"#ff7070",fontSize:12,marginBottom:14}}>⚠️ ${error}</div>`}
-      ${result&&h`<div class="fade-in"><div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${result}</div>
-        <div style=${{marginTop:20,display:"flex",gap:10}}>
-          <button style=${{flex:1,padding:14,borderRadius:12,background:"rgba(255,255,255,.06)",color:"#aaa",fontSize:13,fontWeight:700}} onClick=${goHome}>🏠 홈</button>
-          <div style=${{flex:1,position:"relative"}}><button style=${{width:"100%",padding:14,borderRadius:12,background:clr+"22",border:"1px solid "+clr+"44",color:clr,fontSize:13,fontWeight:700}}>📷 다른 제품</button><input type="file" accept="image/*" capture="environment" onChange=${function(e){setPhoto(null);setResult("");onPhoto(e);}} style=${{position:"absolute",inset:0,opacity:0,cursor:"pointer"}}/></div>
-        </div>
+        <p style=${{color:"#888",fontSize:12,lineHeight:1.6,marginBottom:24}}>사료, 간식, 영양제의 영양성분표를\n가까이서 선명하게 촬영하세요</p>
+        <div style=${{position:"relative",display:"inline-block"}}><button style=${{padding:"16px 40px",borderRadius:50,background:clr,color:"#fff",fontSize:16,fontWeight:800}}>📷 사진 촬영</button><input type="file" accept="image/*" capture="environment" onChange=${onPhoto} style=${{position:"absolute",inset:0,opacity:0,cursor:"pointer"}}/></div>
       </div>`}
     </div>
   </div>`;
 
-  // ===== RECORD & ANALYZE SCREEN =====
+  // ===== RECORD SCREEN =====
   var totalSec=sm?sm.sec:20;
   var progress=totalSec>0?(totalSec-remain)/totalSec:0;
-  var circumference=2*Math.PI*54;
+  var circ=2*Math.PI*54;
 
+  // 결과 화면
+  if(phase==="result"&&result)return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"}}>
+    <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:clr}}><button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${goHome}>← 홈</button><span style=${{color:"#fff",fontSize:15,fontWeight:700}}>${sm.icon} ${sm.label} 결과</span><span style=${{width:56}}/></div>
+    <div style=${{flex:1,overflowY:"auto",padding:"20px 18px",background:"linear-gradient(180deg,#13131f,#161630)"}} class="fade-in">
+      <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><span style=${{fontSize:22}}>${sm.icon}</span><span style=${{color:"#f0f0f5",fontSize:17,fontWeight:800}}>분석 결과</span></div>
+      ${error&&h`<div style=${{padding:14,background:"rgba(255,80,80,.12)",borderRadius:12,color:"#ff7070",fontSize:12,marginBottom:14}}>⚠️ ${error}</div>`}
+      <div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${result}</div>
+      <div style=${{marginTop:30,display:"flex",gap:10}}>
+        <button style=${{flex:1,padding:14,borderRadius:12,background:"rgba(255,255,255,.06)",color:"#aaa",fontSize:13,fontWeight:700}} onClick=${goHome}>🏠 홈</button>
+        <button style=${{flex:1,padding:14,borderRadius:12,background:clr+"22",border:"1px solid "+clr+"44",color:clr,fontSize:13,fontWeight:700}} onClick=${function(){setResult("");setPhase("idle");setError(null);collectedRef.current=[];setScr("record");setTimeout(function(){startCam(face);},100);}}>🔄 다시 촬영</button>
+      </div>
+    </div>
+  </div>`;
+
+  // 촬영 화면
   return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"}}>
     <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:clr,position:"sticky",top:0,zIndex:10}}>
       <button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){cleanup();goHome();}}>← 홈</button>
       <span style=${{color:"#fff",fontSize:15,fontWeight:700}}>${sm?sm.icon:""} ${sm?sm.label:""}</span>
-      ${!recording&&!analyzing&&!result?h`<button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${flipCam}>🔄</button>`:h`<span style=${{width:56}}/>`}
+      ${!recording?h`<button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${flipCam}>🔄</button>`:h`<span style=${{width:56}}/>`}
     </div>
-    <div style=${{flex:1,overflowY:"auto",background:"linear-gradient(180deg,#13131f,#161630)"}}>
-      <!-- CAMERA PREVIEW -->
-      ${!result&&!analyzing&&h`<div style=${{position:"relative",width:"100%",aspectRatio:"4/3",background:"#000",overflow:"hidden"}}>
+    <div style=${{flex:1,background:"linear-gradient(180deg,#13131f,#161630)"}}>
+      <div style=${{position:"relative",width:"100%",aspectRatio:"4/3",background:"#000",overflow:"hidden"}}>
         <video ref=${vRef} autoPlay playsInline muted style=${{width:"100%",height:"100%",objectFit:"cover"}}/>
         <canvas ref=${cRef} style=${{display:"none"}}/>
         ${!camOk&&h`<div style=${{position:"absolute",inset:0,background:"rgba(0,0,0,.8)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}><div class="spinner"/><p style=${{color:"#fff",marginTop:12}}>카메라 준비 중...</p></div>`}
-        <!-- 녹화 중 오버레이 -->
         ${recording&&h`<div style=${{position:"absolute",top:12,left:12,display:"flex",alignItems:"center",gap:8,background:"rgba(0,0,0,.6)",padding:"6px 14px",borderRadius:20,zIndex:5}}><div class="rec-dot"/><span style=${{color:"#ff6666",fontSize:13,fontWeight:700}}>REC</span></div>`}
-        <!-- 카운트다운 원형 -->
         ${recording&&h`<div style=${{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:5}}>
-          <svg width="120" height="120" class="progress-ring"><circle cx="60" cy="60" r="54" fill="rgba(0,0,0,.4)" stroke="rgba(255,255,255,.15)" stroke-width="4"/><circle cx="60" cy="60" r="54" fill="none" stroke=${clr} stroke-width="4" stroke-linecap="round" stroke-dasharray=${circumference} stroke-dashoffset=${circumference*(1-progress)} style=${{transition:"stroke-dashoffset 1s linear",transform:"rotate(-90deg)",transformOrigin:"center"}}/></svg>
-          <div style=${{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column"}}>
-            <div class="count-num" key=${remain} style=${{color:"#fff",fontSize:32,fontWeight:900}}>${remain}</div>
-            <div style=${{color:"rgba(255,255,255,.6)",fontSize:11}}>초 남음</div>
-          </div>
+          <svg width="120" height="120"><circle cx="60" cy="60" r="54" fill="rgba(0,0,0,.4)" stroke="rgba(255,255,255,.15)" stroke-width="4"/><circle cx="60" cy="60" r="54" fill="none" stroke=${clr} stroke-width="4" stroke-linecap="round" stroke-dasharray=${circ} stroke-dashoffset=${circ*(1-progress)} style=${{transition:"stroke-dashoffset 1s linear",transform:"rotate(-90deg)",transformOrigin:"center"}}/></svg>
+          <div style=${{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column"}}><div style=${{color:"#fff",fontSize:32,fontWeight:900}}>${remain}</div><div style=${{color:"rgba(255,255,255,.6)",fontSize:11}}>초 남음</div></div>
         </div>`}
-      </div>`}
-
-      <!-- 촬영 전: 시작 버튼 -->
-      ${!recording&&!analyzing&&!result&&camOk&&h`<div style=${{padding:"24px 20px",textAlign:"center"}}>
+      </div>
+      ${!recording&&camOk&&h`<div style=${{padding:"24px 20px",textAlign:"center"}}>
         <p style=${{color:"#eee",fontSize:15,fontWeight:700,marginBottom:6}}>${sm?sm.icon:""} ${sm?sm.label:""}</p>
-        <p style=${{color:"#888",fontSize:12,marginBottom:20}}>${sm&&sm.sec>0?sm.sec+"초 동안 촬영합니다. 준비되면 시작!":"사진을 촬영하세요"}</p>
-        <button style=${{padding:"18px 50px",borderRadius:50,background:clr,color:"#fff",fontSize:18,fontWeight:900,boxShadow:"0 4px 24px "+clr+"66"}} onClick=${startRec}>
-          🎬 촬영 시작
-        </button>
+        <p style=${{color:"#888",fontSize:12,marginBottom:20}}>${totalSec}초 동안 촬영합니다. 준비되면 시작!</p>
+        <button style=${{padding:"18px 50px",borderRadius:50,background:clr,color:"#fff",fontSize:18,fontWeight:900,boxShadow:"0 4px 24px "+clr+"66"}} onClick=${startRec}>🎬 촬영 시작</button>
       </div>`}
-
-      <!-- 녹화 중: 중지 버튼 -->
       ${recording&&h`<div style=${{padding:"16px 20px",textAlign:"center"}}>
-        <p style=${{color:"#ff6666",fontSize:14,fontWeight:700,marginBottom:12}}>📹 촬영 중... ${sm?sm.icon:""} 분석을 위해 촬영하고 있어요</p>
-        <button style=${{padding:"14px 40px",borderRadius:50,background:"rgba(255,70,70,.8)",color:"#fff",fontSize:14,fontWeight:700}} onClick=${stopRec}>⏹️ 촬영 완료 (조기 종료)</button>
-      </div>`}
-
-      <!-- 분석 중 -->
-      ${analyzing&&h`<div style=${{padding:"50px 20px",textAlign:"center"}}>
-        <div class="spinner"/>
-        <p style=${{color:"#4ECDC4",marginTop:20,fontSize:16,fontWeight:700}}>AI 분석 중...</p>
-        <p style=${{color:"#888",fontSize:12,marginTop:8}}>${frames.length||1}장의 프레임을 분석하고 있어요</p>
-        <p style=${{color:"#666",fontSize:11,marginTop:4}}>잠시만 기다려주세요 (10~20초)</p>
-      </div>`}
-
-      ${error&&h`<div style=${{margin:"14px 18px",padding:14,background:"rgba(255,80,80,.12)",borderRadius:12,color:"#ff7070",fontSize:12}}>⚠️ ${error}</div>`}
-
-      <!-- 결과 -->
-      ${result&&h`<div class="fade-in" style=${{padding:"20px 18px"}}>
-        <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
-          <span style=${{fontSize:22}}>${sm?sm.icon:""}</span>
-          <span style=${{color:"#f0f0f5",fontSize:17,fontWeight:800}}>분석 결과</span>
-        </div>
-        <div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${result}</div>
-        <div style=${{marginTop:24,display:"flex",gap:10}}>
-          <button style=${{flex:1,padding:14,borderRadius:12,background:"rgba(255,255,255,.06)",color:"#aaa",fontSize:13,fontWeight:700}} onClick=${goHome}>🏠 홈</button>
-          <button style=${{flex:1,padding:14,borderRadius:12,background:clr+"22",border:"1px solid "+clr+"44",color:clr,fontSize:13,fontWeight:700}} onClick=${function(){setResult("");setFrames([]);setError(null);setScr("record");setTimeout(function(){startCam(face);},100);}}>🔄 다시 촬영</button>
-        </div>
+        <p style=${{color:"#ff6666",fontSize:13,fontWeight:700,marginBottom:12}}>📹 촬영 중... 분석을 위해 촬영하고 있어요</p>
+        <button style=${{padding:"12px 36px",borderRadius:50,background:"rgba(255,70,70,.7)",color:"#fff",fontSize:13,fontWeight:700}} onClick=${stopRecEarly}>⏹️ 촬영 완료</button>
       </div>`}
     </div>
   </div>`;
