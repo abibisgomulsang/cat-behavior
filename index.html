@@ -36,6 +36,16 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 .step-dot{width:8px;height:8px;border-radius:50%;background:#333;flex-shrink:0}
 .step-item.active .step-dot{background:#4ECDC4;animation:gentlePulse 1s ease-in-out infinite}
 .step-item.done .step-dot{background:#4ECDC4}
+@keyframes playZigzag{0%{transform:translate(0,0)}25%{transform:translate(40px,-20px)}50%{transform:translate(-20px,-40px)}75%{transform:translate(30px,-10px)}100%{transform:translate(0,0)}}
+@keyframes playUpdown{0%{transform:translateY(0)}30%{transform:translateY(-35px)}50%{transform:translateY(-5px)}70%{transform:translateY(-30px)}100%{transform:translateY(0)}}
+@keyframes playHide{0%{opacity:1;transform:scale(1)}30%{opacity:0;transform:scale(.3)}60%{opacity:0;transform:scale(.3)}80%{opacity:1;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
+@keyframes playRoll{0%{transform:translateX(-30px) rotate(0)}50%{transform:translateX(30px) rotate(360deg)}100%{transform:translateX(-30px) rotate(720deg)}}
+@keyframes playChase{0%{transform:translate(0,0)}25%{transform:translate(35px,-15px)}50%{transform:translate(40px,15px)}75%{transform:translate(-10px,20px)}100%{transform:translate(0,0)}}
+@keyframes playCat{0%{transform:translateX(-20px)}50%{transform:translateX(20px)}100%{transform:translateX(-20px)}}
+.play-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}
+.play-anim-box{width:100%;height:100px;background:rgba(0,0,0,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin:10px 0}
+.play-toy{font-size:28px;position:absolute}
+.play-cat{font-size:22px;position:absolute;bottom:12px;animation:playCat 2s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -59,7 +69,7 @@ var MODES=[
   {id:"toy",icon:"🧸",label:"장난감 분석",desc:"20초 촬영 → AI 장난감 분석",color:"#FF6B6B",sec:20,type:"video",
     loadMsg:"장난감을 분석하고 있어요",
     steps:["이미지 인식 중","재질/형태 분석 중","고양이 반응 예측 중","놀이법 생성 중"],
-    prompt:"당신은 고양이 행동학 박사이자 장난감 전문가입니다.\n\n아래 이미지들은 고양이 장난감을 20초 동안 촬영한 영상에서 추출한 프레임입니다.\n여러 각도에서 관찰한 내용을 종합하여 분석해주세요.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 관찰 내용\n- 이미지에서 실제로 보이는 장난감의 모양, 색상, 크기, 상태를 구체적으로 기술\n\n🧸 재질 분석\n- 재질 추정 (플라스틱/천/깃털/고무/나무/실/복합 등)\n- 내구성 평가\n- 질감이 고양이에게 주는 자극\n\n😺 고양이가 좋아할 부분\n- 사냥 본능 자극 요소\n- 촉각/후각 자극\n- 어떤 성격의 고양이에게 적합한지\n\n😾 고양이가 좋아하지 않을 부분\n- 흥미를 잃을 수 있는 요소\n- 거부감/크기/무게 문제\n\n💡 효과적인 사용법\n- 구체적인 놀이 방법 3가지\n- 사냥 시퀀스 활용법\n- 하루 놀이 시간/횟수 추천\n\n⚠️ 안전 주의사항\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."},
+    prompt:"당신은 고양이 행동학 박사이자 장난감 전문가입니다.\n\n아래 이미지들은 고양이 장난감을 20초 동안 촬영한 영상에서 추출한 프레임입니다.\n여러 각도에서 관찰한 내용을 종합하여 분석해주세요.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 관찰 내용\n- 이미지에서 실제로 보이는 장난감의 모양, 색상, 크기, 상태를 구체적으로 기술\n\n🧸 재질 분석\n- 재질 추정 (플라스틱/천/깃털/고무/나무/실/복합 등)\n- 내구성 평가\n- 질감이 고양이에게 주는 자극\n\n😺 고양이가 좋아할 부분\n- 사냥 본능 자극 요소\n- 촉각/후각 자극\n- 어떤 성격의 고양이에게 적합한지\n\n😾 고양이가 좋아하지 않을 부분\n- 흥미를 잃을 수 있는 요소\n- 거부감/크기/무게 문제\n\n💡 효과적인 놀이 방법 3가지\n아래 형식으로 반드시 3개를 작성하세요:\n\n[놀이법1] 제목: (놀이 이름)\n동작: (지그재그/위아래/숨기기/굴리기/추격 중 하나)\n설명: (구체적 방법 2~3문장)\n시간: (1회 몇 분, 하루 몇 회)\n\n[놀이법2] 제목: (놀이 이름)\n동작: (지그재그/위아래/숨기기/굴리기/추격 중 하나)\n설명: (구체적 방법 2~3문장)\n시간: (1회 몇 분, 하루 몇 회)\n\n[놀이법3] 제목: (놀이 이름)\n동작: (지그재그/위아래/숨기기/굴리기/추격 중 하나)\n설명: (구체적 방법 2~3문장)\n시간: (1회 몇 분, 하루 몇 회)\n\n⚠️ 안전 주의사항\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."},
   {id:"behavior",icon:"🐱",label:"고양이 번역",desc:"1분 촬영 → AI 행동 번역",color:"#4ECDC4",sec:60,type:"video",
     loadMsg:"우리 아이의 마음을 읽고 있어요",
     steps:["신체 언어 관찰 중","꼬리/귀/눈 분석 중","감정 상태 판단 중","통역 생성 중"],
@@ -74,6 +84,70 @@ var MODES=[
     prompt:"당신은 수의영양학 전문가입니다.\n\n아래 이미지는 고양이 사료/간식/영양제의 영양성분표입니다.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📷 인식된 내용\n- 제품명, 성분, 수치 기술\n\n✅ 고양이에게 좋은 성분\n- 동물성 단백질, 타우린, 오메가3 등\n\n❌ 해로운/주의할 성분\n- 양파/마늘/포도/자일리톨 등 위험 성분\n- 인공첨가물, 과다 나트륨/인\n- 곡물 함량\n\n📊 영양 균형 평가\n- 단백질/지방/탄수화물 비율\n- AAFCO 기준\n\n🐱 급여 추천\n- 적합한 고양이 (연령/체중)\n- 급여량/주의사항\n\n⭐ 종합 평점: ★1-5 (근거)\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."}
 ];
 var TIPS=["고양이는 하루 15시간 수면 😴","꼬리를 세우면 반가운 인사 🐱","느린 눈 깜빡임은 사랑해 😻","사냥 본능으로 움직이는 장난감 좋아해 🎯","골골송은 편안함의 신호 🎵","사료에 양파/마늘은 절대 금지 🚫","타우린은 고양이 필수 아미노산 💊"];
+
+/* ===== 놀이법 파서 + 애니메이션 컴포넌트 ===== */
+var ANIM_MAP={
+  "지그재그":{anim:"playZigzag 2.5s ease-in-out infinite",toy:"🪶",label:"지그재그로 움직여주세요"},
+  "위아래":{anim:"playUpdown 2s ease-in-out infinite",toy:"🎣",label:"위아래로 흔들어주세요"},
+  "숨기기":{anim:"playHide 3s ease-in-out infinite",toy:"🐭",label:"숨겼다 나타내세요"},
+  "굴리기":{anim:"playRoll 2s ease-in-out infinite",toy:"⚽",label:"굴려주세요"},
+  "추격":{anim:"playChase 3s ease-in-out infinite",toy:"🔴",label:"도망가게 움직여주세요"}
+};
+function parsePlayMethods(text){
+  var methods=[];
+  for(var i=1;i<=3;i++){
+    var tag="[놀이법"+i+"]";
+    var idx=text.indexOf(tag);
+    if(idx===-1)continue;
+    var chunk=text.substring(idx+tag.length);
+    var nextTag=chunk.indexOf("[놀이법");
+    if(nextTag===-1){var safeEnd=chunk.indexOf("⚠️");if(safeEnd>0)chunk=chunk.substring(0,safeEnd);} 
+    else{chunk=chunk.substring(0,nextTag);}
+    var title="",action="",desc="",time="";
+    chunk.split("\n").forEach(function(line){
+      line=line.trim();
+      if(line.startsWith("제목:"))title=line.replace("제목:","").trim();
+      else if(line.startsWith("동작:"))action=line.replace("동작:","").trim();
+      else if(line.startsWith("설명:"))desc=line.replace("설명:","").trim();
+      else if(line.startsWith("시간:"))time=line.replace("시간:","").trim();
+    });
+    if(title)methods.push({title:title,action:action,desc:desc,time:time});
+  }
+  return methods;
+}
+function getAnimForAction(action){
+  var keys=Object.keys(ANIM_MAP);
+  for(var i=0;i<keys.length;i++){if(action.indexOf(keys[i])>=0)return ANIM_MAP[keys[i]];}
+  return ANIM_MAP["지그재그"]; // 기본값
+}
+function removePlaySection(text){
+  var idx=text.indexOf("[놀이법1]");
+  if(idx===-1)return text;
+  var before=text.substring(0,idx);
+  // 안전 주의사항 이후는 유지
+  var safeIdx=text.indexOf("⚠️",idx);
+  var after=safeIdx>=0?text.substring(safeIdx):"";
+  return (before+after).trim();
+}
+function PlayCard(props){
+  var m=props.method,i=props.index;
+  var anim=getAnimForAction(m.action);
+  var colors=["#FF6B6B","#4ECDC4","#FF8C42"];
+  var c=colors[i%3];
+  return h`<div class="play-card" style=${{borderLeft:"3px solid "+c}}>
+    <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+      <span style=${{background:c+"22",color:c,padding:"2px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>놀이법 ${i+1}</span>
+      <span style=${{color:"#eee",fontSize:14,fontWeight:700}}>${m.title}</span>
+    </div>
+    <div class="play-anim-box">
+      <div class="play-toy" style=${{animation:anim.anim}}>${anim.toy}</div>
+      <div class="play-cat">🐱</div>
+      <div style=${{position:"absolute",bottom:4,right:8,color:"rgba(255,255,255,.3)",fontSize:10}}>${anim.label}</div>
+    </div>
+    <div style=${{color:"#ccd",fontSize:13,lineHeight:1.7}}>${m.desc}</div>
+    ${m.time&&h`<div style=${{marginTop:6,color:c,fontSize:12,fontWeight:600}}>⏰ ${m.time}</div>`}
+  </div>`;
+}
 
 function App(){
   var _scr=useState("home"),scr=_scr[0],setScr=_scr[1];
@@ -275,12 +349,25 @@ function App(){
   var circ=2*Math.PI*54;
 
   // 결과 화면
+  var playMethods=mode==="toy"?parsePlayMethods(result):[];
+  var cleanResult=mode==="toy"&&playMethods.length>0?removePlaySection(result):result;
+
   if(phase==="result"&&result)return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"}}>
     <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:clr}}><button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${goHome}>← 홈</button><span style=${{color:"#fff",fontSize:15,fontWeight:700}}>${sm.icon} ${sm.label} 결과</span><span style=${{width:56}}/></div>
     <div style=${{flex:1,overflowY:"auto",padding:"20px 18px",background:"linear-gradient(180deg,#13131f,#161630)"}} class="fade-in">
       <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><span style=${{fontSize:22}}>${sm.icon}</span><span style=${{color:"#f0f0f5",fontSize:17,fontWeight:800}}>분석 결과</span></div>
       ${error&&h`<div style=${{padding:14,background:"rgba(255,80,80,.12)",borderRadius:12,color:"#ff7070",fontSize:12,marginBottom:14}}>⚠️ ${error}</div>`}
-      <div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${result}</div>
+      <div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${cleanResult}</div>
+
+      <!-- 장난감 모드: 놀이법 애니메이션 카드 -->
+      ${playMethods.length>0&&h`<div style=${{marginTop:20}}>
+        <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+          <span style=${{fontSize:18}}>🎮</span>
+          <span style=${{color:"#FFD700",fontSize:16,fontWeight:800}}>놀이 방법 가이드</span>
+        </div>
+        ${playMethods.map(function(m,i){return h`<${PlayCard} key=${i} method=${m} index=${i}/>`;})}
+      </div>`}
+
       <div style=${{marginTop:30,display:"flex",gap:10}}>
         <button style=${{flex:1,padding:14,borderRadius:12,background:"rgba(255,255,255,.06)",color:"#aaa",fontSize:13,fontWeight:700}} onClick=${goHome}>🏠 홈</button>
         <button style=${{flex:1,padding:14,borderRadius:12,background:clr+"22",border:"1px solid "+clr+"44",color:clr,fontSize:13,fontWeight:700}} onClick=${function(){setResult("");setPhase("idle");setError(null);collectedRef.current=[];setScr("record");setTimeout(function(){startCam(face);},100);}}>🔄 다시 촬영</button>
