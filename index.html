@@ -36,16 +36,68 @@ button{border:none;background:none;cursor:pointer;font-family:'Noto Sans KR',san
 .step-dot{width:8px;height:8px;border-radius:50%;background:#333;flex-shrink:0}
 .step-item.active .step-dot{background:#4ECDC4;animation:gentlePulse 1s ease-in-out infinite}
 .step-item.done .step-dot{background:#4ECDC4}
-@keyframes playZigzag{0%{transform:translate(0,0)}25%{transform:translate(40px,-20px)}50%{transform:translate(-20px,-40px)}75%{transform:translate(30px,-10px)}100%{transform:translate(0,0)}}
-@keyframes playUpdown{0%{transform:translateY(0)}30%{transform:translateY(-35px)}50%{transform:translateY(-5px)}70%{transform:translateY(-30px)}100%{transform:translateY(0)}}
-@keyframes playHide{0%{opacity:1;transform:scale(1)}30%{opacity:0;transform:scale(.3)}60%{opacity:0;transform:scale(.3)}80%{opacity:1;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
-@keyframes playRoll{0%{transform:translateX(-30px) rotate(0)}50%{transform:translateX(30px) rotate(360deg)}100%{transform:translateX(-30px) rotate(720deg)}}
-@keyframes playChase{0%{transform:translate(0,0)}25%{transform:translate(35px,-15px)}50%{transform:translate(40px,15px)}75%{transform:translate(-10px,20px)}100%{transform:translate(0,0)}}
-@keyframes playCat{0%{transform:translateX(-20px)}50%{transform:translateX(20px)}100%{transform:translateX(-20px)}}
-.play-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:12px}
-.play-anim-box{width:100%;height:100px;background:rgba(0,0,0,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin:10px 0}
-.play-toy{font-size:28px;position:absolute}
-.play-cat{font-size:22px;position:absolute;bottom:12px;animation:playCat 2s ease-in-out infinite}
+
+/* ===== 놀이법 애니메이션 ===== */
+.play-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;margin-bottom:14px}
+.play-scene{width:100%;height:140px;border-radius:12px;position:relative;overflow:hidden;margin:10px 0}
+
+/* 장면1: 사냥/지그재그 - 갈색 바닥 + 깃털 불규칙 이동 + 고양이 추격 */
+.scene-hunt{background:linear-gradient(180deg,#1a1520 0%,#2a1f15 70%,#3d2f1e 100%)}
+@keyframes huntToy{0%{left:15%;top:25%}20%{left:65%;top:15%}40%{left:30%;top:45%}60%{left:70%;top:30%}80%{left:20%;top:20%}100%{left:15%;top:25%}}
+@keyframes huntCat{0%{left:20%;top:60%}20%{left:60%;top:55%}40%{left:35%;top:65%}60%{left:65%;top:58%}80%{left:25%;top:62%}100%{left:20%;top:60%}}
+@keyframes huntPaw{0%,80%{opacity:0;transform:scale(.5)}85%{opacity:1;transform:scale(1.2)}100%{opacity:0;transform:scale(.5)}}
+@keyframes huntTrail{0%{opacity:.6}100%{opacity:0}}
+.scene-hunt .toy{position:absolute;font-size:24px;animation:huntToy 4s ease-in-out infinite}
+.scene-hunt .cat{position:absolute;font-size:28px;animation:huntCat 4s ease-in-out infinite .3s}
+.scene-hunt .paw{position:absolute;font-size:16px;right:30%;top:35%;animation:huntPaw 4s ease-in-out infinite 2.5s}
+.scene-hunt .trail{position:absolute;width:4px;height:4px;border-radius:50%;background:#FF6B6B}
+.scene-hunt .t1{left:40%;top:30%;animation:huntTrail 2s infinite .5s}
+.scene-hunt .t2{left:55%;top:25%;animation:huntTrail 2s infinite 1s}
+.scene-hunt .t3{left:25%;top:40%;animation:huntTrail 2s infinite 1.5s}
+.scene-hunt .arrow{position:absolute;color:rgba(255,107,107,.3);font-size:10px;top:10px;right:10px}
+
+/* 장면2: 낚시/위아래 - 하늘색 배경 + 낚싯대 위아래 + 고양이 점프 */
+.scene-fish{background:linear-gradient(180deg,#151525 0%,#1a2030 60%,#252520 100%)}
+@keyframes fishRod{0%{transform:rotate(-15deg)}50%{transform:rotate(15deg)}100%{transform:rotate(-15deg)}}
+@keyframes fishToy{0%{top:35%;transform:rotate(0)}30%{top:15%;transform:rotate(20deg)}60%{top:40%;transform:rotate(-10deg)}100%{top:35%;transform:rotate(0)}}
+@keyframes fishCat{0%{bottom:8px;transform:scaleY(1)}40%{bottom:8px;transform:scaleY(.85)}50%{bottom:45px;transform:scaleY(1.1)}70%{bottom:8px;transform:scaleY(.9)}100%{bottom:8px;transform:scaleY(1)}}
+@keyframes fishHand{0%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}100%{transform:translateY(0) rotate(-5deg)}}
+.scene-fish .rod{position:absolute;left:25%;top:5px;font-size:12px;transform-origin:bottom center;animation:fishHand 2s ease-in-out infinite;color:#999}
+.scene-fish .toy{position:absolute;left:55%;font-size:22px;animation:fishToy 2s ease-in-out infinite}
+.scene-fish .cat{position:absolute;left:50%;font-size:28px;transform:translateX(-50%);animation:fishCat 2s ease-in-out infinite}
+.scene-fish .line{position:absolute;left:32%;top:12px;width:1px;height:40px;background:rgba(255,255,255,.15);transform-origin:top;animation:fishRod 2s ease-in-out infinite}
+
+/* 장면3: 숨바꼭질 - 이불/상자 뒤에 숨기 */
+.scene-hide{background:linear-gradient(180deg,#1a1525 0%,#201a28 60%,#2a2520 100%)}
+@keyframes hideToy{0%{left:60%;opacity:1;transform:scale(1)}25%{left:48%;opacity:1;transform:scale(.9)}35%{left:42%;opacity:0;transform:scale(.4)}65%{left:42%;opacity:0;transform:scale(.4)}75%{left:48%;opacity:.5;transform:scale(.7)}85%{left:55%;opacity:1;transform:scale(1.1)}100%{left:60%;opacity:1;transform:scale(1)}}
+@keyframes hideCat{0%{transform:translateX(0) scale(1)}30%{transform:translateX(15px) scale(1.05)}60%{transform:translateX(-5px) scale(.95)}75%{transform:translateX(20px) scale(1.15)}100%{transform:translateX(0) scale(1)}}
+@keyframes hideEyes{0%,30%{opacity:0}35%,65%{opacity:1}70%,100%{opacity:0}}
+@keyframes hideQ{0%,70%{opacity:0;transform:translateY(0)}75%{opacity:1;transform:translateY(-5px)}90%{opacity:1;transform:translateY(-8px)}100%{opacity:0;transform:translateY(-12px)}}
+.scene-hide .box{position:absolute;left:30%;bottom:15px;font-size:36px}
+.scene-hide .toy{position:absolute;top:35%;font-size:22px;animation:hideToy 4s ease-in-out infinite}
+.scene-hide .cat{position:absolute;right:15%;bottom:12px;font-size:28px;animation:hideCat 4s ease-in-out infinite}
+.scene-hide .eyes{position:absolute;left:38%;top:40%;font-size:14px;animation:hideEyes 4s ease-in-out infinite}
+.scene-hide .qmark{position:absolute;right:18%;bottom:50px;font-size:16px;color:#FFD700;animation:hideQ 4s ease-in-out infinite}
+
+/* 장면4: 굴리기 - 바닥 굴러가는 공 + 쫓아가는 고양이 */
+.scene-roll{background:linear-gradient(180deg,#151520 0%,#1a1a28 60%,#252018 100%)}
+@keyframes rollBall{0%{left:10%;transform:rotate(0)}50%{left:75%;transform:rotate(720deg)}100%{left:10%;transform:rotate(1440deg)}}
+@keyframes rollCat{0%{left:5%}45%{left:60%}55%{left:65%;transform:scaleX(1)}60%{left:63%;transform:scaleX(-1)}100%{left:5%;transform:scaleX(-1)}}
+@keyframes rollDust{0%{opacity:0;transform:scale(0)}50%{opacity:.4;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+.scene-roll .ball{position:absolute;top:40%;font-size:24px;animation:rollBall 3s ease-in-out infinite}
+.scene-roll .cat{position:absolute;bottom:12px;font-size:26px;animation:rollCat 3s ease-in-out infinite .2s}
+.scene-roll .dust1{position:absolute;bottom:20px;left:20%;font-size:8px;color:#666;animation:rollDust 1.5s infinite .3s}
+.scene-roll .dust2{position:absolute;bottom:25px;left:35%;font-size:6px;color:#555;animation:rollDust 1.5s infinite .8s}
+.scene-roll .floor{position:absolute;bottom:0;left:0;right:0;height:2px;background:rgba(255,255,255,.08)}
+
+/* 장면5: 추격/레이저 - 벽+바닥에 빨간 점 이동 */
+.scene-chase{background:linear-gradient(180deg,#151520 0%,#181828 50%,#1a1a20 100%)}
+@keyframes chaseDot{0%{left:20%;top:60%}20%{left:60%;top:30%}40%{left:75%;top:65%}60%{left:30%;top:25%}80%{left:55%;top:55%}100%{left:20%;top:60%}}
+@keyframes chaseCat{0%{left:25%;top:65%}20%{left:55%;top:40%}40%{left:70%;top:68%}60%{left:35%;top:35%}80%{left:50%;top:58%}100%{left:25%;top:65%}}
+@keyframes chaseGlow{0%,100%{box-shadow:0 0 8px 4px rgba(255,0,0,.3)}50%{box-shadow:0 0 15px 8px rgba(255,0,0,.5)}}
+.scene-chase .dot{position:absolute;width:10px;height:10px;border-radius:50%;background:#ff3333;animation:chaseDot 4s ease-in-out infinite,chaseGlow 1s ease-in-out infinite}
+.scene-chase .cat{position:absolute;font-size:24px;animation:chaseCat 4s ease-in-out infinite .2s}
+.scene-chase .beam{position:absolute;top:5px;right:15px;font-size:14px;opacity:.3}
 </style>
 </head>
 <body>
@@ -86,13 +138,21 @@ var MODES=[
 var TIPS=["고양이는 하루 15시간 수면 😴","꼬리를 세우면 반가운 인사 🐱","느린 눈 깜빡임은 사랑해 😻","사냥 본능으로 움직이는 장난감 좋아해 🎯","골골송은 편안함의 신호 🎵","사료에 양파/마늘은 절대 금지 🚫","타우린은 고양이 필수 아미노산 💊"];
 
 /* ===== 놀이법 파서 + 애니메이션 컴포넌트 ===== */
-var ANIM_MAP={
-  "지그재그":{anim:"playZigzag 2.5s ease-in-out infinite",toy:"🪶",label:"지그재그로 움직여주세요"},
-  "위아래":{anim:"playUpdown 2s ease-in-out infinite",toy:"🎣",label:"위아래로 흔들어주세요"},
-  "숨기기":{anim:"playHide 3s ease-in-out infinite",toy:"🐭",label:"숨겼다 나타내세요"},
-  "굴리기":{anim:"playRoll 2s ease-in-out infinite",toy:"⚽",label:"굴려주세요"},
-  "추격":{anim:"playChase 3s ease-in-out infinite",toy:"🔴",label:"도망가게 움직여주세요"}
+var SCENE_MAP={
+  "지그재그":"hunt","위아래":"fish","숨기기":"hide","굴리기":"roll","추격":"chase"
 };
+var SCENE_INFO={
+  hunt:{label:"🪶 사냥 놀이",tip:"바닥에서 불규칙하게 움직여 사냥 본능을 자극하세요"},
+  fish:{label:"🎣 낚시 놀이",tip:"위아래로 흔들어 점프를 유도하세요"},
+  hide:{label:"🫣 숨바꼭질",tip:"상자나 이불 뒤에 숨겼다 나타내세요"},
+  roll:{label:"⚽ 굴리기",tip:"바닥을 굴려 추격 본능을 자극하세요"},
+  chase:{label:"🔴 추격 놀이",tip:"빠르게 이동시켜 쫓아오게 하세요"}
+};
+function getScene(action){
+  var keys=Object.keys(SCENE_MAP);
+  for(var i=0;i<keys.length;i++){if(action.indexOf(keys[i])>=0)return SCENE_MAP[keys[i]];}
+  return"hunt";
+}
 function parsePlayMethods(text){
   var methods=[];
   for(var i=1;i<=3;i++){
@@ -101,7 +161,7 @@ function parsePlayMethods(text){
     if(idx===-1)continue;
     var chunk=text.substring(idx+tag.length);
     var nextTag=chunk.indexOf("[놀이법");
-    if(nextTag===-1){var safeEnd=chunk.indexOf("⚠️");if(safeEnd>0)chunk=chunk.substring(0,safeEnd);} 
+    if(nextTag===-1){var safeEnd=chunk.indexOf("⚠️");if(safeEnd>0)chunk=chunk.substring(0,safeEnd);}
     else{chunk=chunk.substring(0,nextTag);}
     var title="",action="",desc="",time="";
     chunk.split("\n").forEach(function(line){
@@ -115,37 +175,57 @@ function parsePlayMethods(text){
   }
   return methods;
 }
-function getAnimForAction(action){
-  var keys=Object.keys(ANIM_MAP);
-  for(var i=0;i<keys.length;i++){if(action.indexOf(keys[i])>=0)return ANIM_MAP[keys[i]];}
-  return ANIM_MAP["지그재그"]; // 기본값
-}
 function removePlaySection(text){
   var idx=text.indexOf("[놀이법1]");
   if(idx===-1)return text;
   var before=text.substring(0,idx);
-  // 안전 주의사항 이후는 유지
   var safeIdx=text.indexOf("⚠️",idx);
   var after=safeIdx>=0?text.substring(safeIdx):"";
-  return (before+after).trim();
+  return(before+after).trim();
 }
+
+/* 장면별 렌더러 */
+function SceneHunt(){return h`<div class="play-scene scene-hunt">
+  <div class="trail t1">•</div><div class="trail t2">•</div><div class="trail t3">•</div>
+  <div class="toy">🪶</div><div class="cat">🐱</div><div class="paw">🐾</div>
+  <div class="arrow" style=${{position:"absolute",bottom:8,left:10,color:"rgba(255,255,255,.2)",fontSize:10}}>↗ ↙ ↘ 불규칙 이동</div>
+</div>`;}
+function SceneFish(){return h`<div class="play-scene scene-fish">
+  <div class="rod">✋</div><div class="line"></div><div class="toy">🪶</div><div class="cat" style=${{bottom:"8px"}}>🐱</div>
+  <div style=${{position:"absolute",bottom:8,left:10,color:"rgba(255,255,255,.2)",fontSize:10}}>↕ 위아래 흔들기</div>
+</div>`;}
+function SceneHide(){return h`<div class="play-scene scene-hide">
+  <div class="box">📦</div><div class="toy">🐭</div><div class="eyes">👀</div><div class="cat">🐱</div><div class="qmark">❓</div>
+  <div style=${{position:"absolute",bottom:8,left:10,color:"rgba(255,255,255,.2)",fontSize:10}}>숨겼다 나타내기</div>
+</div>`;}
+function SceneRoll(){return h`<div class="play-scene scene-roll">
+  <div class="floor"></div><div class="ball">🔵</div><div class="cat">🐱</div>
+  <div class="dust1">💨</div><div class="dust2">💨</div>
+  <div style=${{position:"absolute",bottom:8,left:10,color:"rgba(255,255,255,.2)",fontSize:10}}>→ ← 굴려서 추격</div>
+</div>`;}
+function SceneChase(){return h`<div class="play-scene scene-chase">
+  <div class="beam">🔦</div><div class="dot"></div><div class="cat">🐱</div>
+  <div style=${{position:"absolute",bottom:8,left:10,color:"rgba(255,255,255,.2)",fontSize:10}}>↗ ↙ 빠르게 이동</div>
+</div>`;}
+
+var SCENE_RENDER={hunt:SceneHunt,fish:SceneFish,hide:SceneHide,roll:SceneRoll,chase:SceneChase};
+
 function PlayCard(props){
   var m=props.method,i=props.index;
-  var anim=getAnimForAction(m.action);
+  var sceneKey=getScene(m.action);
+  var info=SCENE_INFO[sceneKey];
+  var SceneComp=SCENE_RENDER[sceneKey];
   var colors=["#FF6B6B","#4ECDC4","#FF8C42"];
   var c=colors[i%3];
   return h`<div class="play-card" style=${{borderLeft:"3px solid "+c}}>
-    <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+    <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
       <span style=${{background:c+"22",color:c,padding:"2px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>놀이법 ${i+1}</span>
       <span style=${{color:"#eee",fontSize:14,fontWeight:700}}>${m.title}</span>
     </div>
-    <div class="play-anim-box">
-      <div class="play-toy" style=${{animation:anim.anim}}>${anim.toy}</div>
-      <div class="play-cat">🐱</div>
-      <div style=${{position:"absolute",bottom:4,right:8,color:"rgba(255,255,255,.3)",fontSize:10}}>${anim.label}</div>
-    </div>
-    <div style=${{color:"#ccd",fontSize:13,lineHeight:1.7}}>${m.desc}</div>
-    ${m.time&&h`<div style=${{marginTop:6,color:c,fontSize:12,fontWeight:600}}>⏰ ${m.time}</div>`}
+    <${SceneComp}/>
+    <div style=${{color:"#ccd",fontSize:13,lineHeight:1.7,marginTop:6}}>${m.desc}</div>
+    ${m.time&&h`<div style=${{marginTop:6,display:"flex",alignItems:"center",gap:6}}><span style=${{color:c,fontSize:12,fontWeight:600}}>⏰ ${m.time}</span></div>`}
+    <div style=${{marginTop:6,color:"#888",fontSize:11,fontStyle:"italic"}}>💡 ${info.tip}</div>
   </div>`;
 }
 
