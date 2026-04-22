@@ -129,7 +129,7 @@ var MODES=[
   {id:"behavior",icon:"🩹",label:"놀이 문제 진단",desc:"30초 촬영 → 보호자님의 고민 + 놀이 분석",color:"#4ECDC4",sec:30,type:"video",
     loadMsg:"보호자님의 고민을 살펴보고 있어요",
     steps:["고민 내용 이해 중","놀이 영상 관찰 중","아이의 반응 분석 중","맞춤 해결책 만드는 중"],
-    prompt:"당신은 CAAB 인증 고양이 행동학 전문가이자 다정한 상담사입니다.\n보호자님과 1:1 상담하듯 따뜻하고 친근한 어투로 답변하세요. 단, 전문성은 잃지 마세요.\n\n아래 이미지들은 집사가 고양이와 30초 동안 놀아주는 영상에서 추출한 프레임입니다.\n보호자님의 고민(있는 경우)과 영상을 모두 고려해서 분석해주세요.\n\n## 답변 규칙\n- 어투: \"보호자님~\", \"~해보시는 게 어떨까요?\", \"아이가 ~하고 있네요\" 같은 부드러운 상담 어투\n- 절대 가짜 수치 사용 금지 (예: \"80% 충족\" 같은 만든 숫자 X)\n- 대신 ⭐ 등급으로 평가: ⭐⭐⭐ 높음 / ⭐⭐ 중간 / ⭐ 낮음\n- 추천은 구체적 제품(장난감 종류)과 동작을 묶어서 제시\n\n## 답변 형식 (반드시 이 순서로)\n\n👀 지금 보호자님께서는…\n(영상 속 보호자님의 놀이 방식을 1~2문장으로 따뜻하게 묘사)\n\n🐱 우리 아이의 반응\n(고양이의 자세·시선·움직임에서 보이는 신호 2~3가지)\n- 흥미도: ⭐⭐⭐⭐⭐ 중 별 개수 + 한 줄 근거\n- 사냥본능 자극: ⭐⭐⭐ 높음/중간/낮음 + 근거\n\n🤔 이런 점이 아쉬워요\n(현재 놀이의 문제점 1~2가지를 부드럽게. \"이런 경우 아이들이 좋아하지 않아요\" 식)\n\n💡 이렇게 해보시는 게 어떨까요?\n반드시 아래 형식으로 3개 작성:\n\n[놀이법1] 제목: (구체적 놀이 이름)\n동작: (지그재그/위아래/숨기기/굴리기/추격 중 하나)\n추천 장난감: (구체 종류 — 예: \"낚싯대형 깃털 장난감\", \"굴러다니는 방울공\")\n사냥본능 자극: ⭐⭐⭐ (높음/중간/낮음)\n설명: (보호자님 말투로 다정하게 2~3문장. \"이렇게 ~해주시면 아이가 ~할 거예요\")\n시간: (1회 몇 분, 하루 몇 회)\n\n[놀이법2] 제목: ...\n동작: ...\n추천 장난감: ...\n사냥본능 자극: ⭐⭐ ...\n설명: ...\n시간: ...\n\n[놀이법3] 제목: ...\n동작: ...\n추천 장난감: ...\n사냥본능 자극: ⭐⭐⭐ ...\n설명: ...\n시간: ...\n\n⚠️ 주의해주세요\n(놀이 시 조심할 점 1~2가지를 따뜻하게)"},
+    prompt:"당신은 CAAB 인증 고양이 행동학 전문가이자 다정한 상담사입니다.\n보호자님과 1:1 상담하듯 따뜻하고 친근한 어투로 답변하세요. 단, 전문성은 잃지 마세요.\n\n═══════════════════════════════════════════════\n🚨 절대 규칙 (1순위, 반드시 지키세요)\n═══════════════════════════════════════════════\n\n1) 영상에 없는 내용은 절대 만들어내지 마세요. 추측·상상·일반론 금지.\n2) 아래 중 하나라도 해당되면 분석을 거부하고 정해진 형식만 출력하세요:\n   - 영상에 고양이가 명확히 보이지 않음 (꼬리 끝/털만 보이는 정도 포함)\n   - 영상이 너무 어두워서 알아볼 수 없음\n   - 카메라가 가려져 있거나 엎어져 있음 (어두운 화면, 천장, 바닥만 보임 등)\n   - 사람이나 사물만 보이고 고양이가 없음\n   - 영상이 너무 흔들리거나 흐려서 판독 불가\n3) 분석 거부 시 ↓ 아래 형식만 출력하고 즉시 종료하세요. 다른 내용 절대 추가 금지.\n   별점도, 놀이법도, 추천도 출력하지 마세요.\n\n[분석 거부 형식 — 정확히 이 형식만]\n📷 분석 불가\n\n**보이는 것**\n(실제로 보이는 것만 1~2문장으로. 예: \"화면이 거의 어둡고 마룻바닥 일부만 보여요\", \"가구만 보이고 고양이는 없어요\")\n\n**불가 사유**\n(왜 분석 못하는지 1문장. 예: \"고양이가 영상에 보이지 않아요\", \"카메라가 가려져 있어요\")\n\n**보호자님께**\n보호자님~ 카메라가 우리 아이를 잘 볼 수 있게 다시 촬영해 주시겠어요? 밝은 곳에서 고양이가 노는 모습을 30초간 담아주시면 정확하게 봐드릴 수 있어요.\n\n═══════════════════════════════════════════════\n\n위 1)~3)에 해당하지 않는 정상 영상일 때만 아래 분석을 진행하세요.\n\n## 답변 작성 전 자체 점검 (속으로 하고 출력 X)\n- 4프레임에 고양이가 명확히 보이는가? (예/아니오)\n- 사람이 놀아주는 모습이 실제로 보이는가? (예/아니오)\n- 둘 중 하나라도 \"아니오\"면 → 위 \"📷 분석 불가\" 형식으로 출력 후 종료\n\n## 답변 규칙\n- 어투: \"보호자님~\", \"~해보시는 게 어떨까요?\", \"아이가 ~하고 있네요\" 같은 부드러운 상담 어투\n- 절대 가짜 수치 사용 금지 (예: \"80% 충족\" 같은 만든 숫자 X)\n- 대신 ⭐ 등급으로 평가: ⭐⭐⭐ 높음 / ⭐⭐ 중간 / ⭐ 낮음\n- 추천은 구체적 제품(장난감 종류)과 동작을 묶어서 제시\n- 모든 평가는 영상에서 실제로 본 근거를 함께 적기\n\n## 답변 형식 (반드시 이 순서로)\n\n👀 지금 보호자님께서는…\n(영상 속 보호자님의 놀이 방식을 1~2문장으로. 본 그대로만)\n\n🐱 우리 아이의 반응\n(영상에서 실제로 보이는 신호 2~3가지를 근거와 함께)\n- 흥미도: ⭐⭐⭐⭐⭐ 중 별 개수 + 영상 속 근거 한 줄\n- 사냥본능 자극: ⭐⭐⭐ 높음/중간/낮음 + 영상 속 근거 한 줄\n\n🤔 이런 점이 아쉬워요\n(현재 놀이의 문제점 1~2가지를 부드럽게. \"이런 경우 아이들이 좋아하지 않아요\" 식)\n\n💡 이렇게 해보시는 게 어떨까요?\n반드시 아래 형식으로 3개 작성:\n\n[놀이법1] 제목: (구체적 놀이 이름)\n동작: (지그재그/위아래/숨기기/굴리기/추격 중 하나)\n추천 장난감: (구체 종류 — 예: \"낚싯대형 깃털 장난감\", \"굴러다니는 방울공\")\n사냥본능 자극: ⭐⭐⭐ (높음/중간/낮음)\n설명: (보호자님 말투로 다정하게 2~3문장. \"이렇게 ~해주시면 아이가 ~할 거예요\")\n시간: (1회 몇 분, 하루 몇 회)\n\n[놀이법2] 제목: ...\n동작: ...\n추천 장난감: ...\n사냥본능 자극: ⭐⭐ ...\n설명: ...\n시간: ...\n\n[놀이법3] 제목: ...\n동작: ...\n추천 장난감: ...\n사냥본능 자극: ⭐⭐⭐ ...\n설명: ...\n시간: ...\n\n⚠️ 주의해주세요\n(놀이 시 조심할 점 1~2가지를 따뜻하게)"},
   {id:"problem",icon:"🩺",label:"문제행동 분석",desc:"1분 촬영 → 문제행동 진단",color:"#FF8C42",sec:60,type:"video",
     loadMsg:"행동 패턴을 분석하고 있어요",
     steps:["행동 관찰 중","정상/비정상 판별 중","원인 분석 중","교정 계획 생성 중"],
@@ -445,8 +445,9 @@ function App(){
   var circ=2*Math.PI*54;
 
   // 결과 화면
-  var playMethods=(mode==="toy"||mode==="behavior")?parsePlayMethods(result):[];
-  var cleanResult=(mode==="toy"||mode==="behavior")&&playMethods.length>0?removePlaySection(result):result;
+  var blocked=!!(result&&result.indexOf("📷 분석 불가")>=0);
+  var playMethods=(!blocked&&(mode==="toy"||mode==="behavior"))?parsePlayMethods(result):[];
+  var cleanResult=(!blocked&&(mode==="toy"||mode==="behavior")&&playMethods.length>0)?removePlaySection(result):result;
 
   // ===== 분석 실패 전용 화면 (에러만 있고 결과 없음) =====
   if(phase==="result"&&error&&!result)return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#1a0a0a,#2a1515 45%,#1a0a0a)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"30px 24px"}} class="fade-in">
@@ -471,9 +472,28 @@ function App(){
   if(phase==="result"&&(result||error))return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"}}>
     <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:clr}}><button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${goHome}>← 홈</button><span style=${{color:"#fff",fontSize:15,fontWeight:700}}>${sm.icon} ${sm.label} 결과</span><span style=${{width:56}}/></div>
     <div style=${{flex:1,overflowY:"auto",padding:"20px 18px",background:"linear-gradient(180deg,#13131f,#161630)"}} class="fade-in">
-      <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><span style=${{fontSize:22}}>${sm.icon}</span><span style=${{color:"#f0f0f5",fontSize:17,fontWeight:800}}>분석 결과</span></div>
+      <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+        <span style=${{fontSize:22}}>${blocked?"📷":sm.icon}</span>
+        <span style=${{color:blocked?"#ffd8a0":"#f0f0f5",fontSize:17,fontWeight:800}}>${blocked?"다시 촬영이 필요해요":"분석 결과"}</span>
+      </div>
       ${error&&h`<div style=${{padding:14,background:"rgba(255,80,80,.12)",borderRadius:12,color:"#ff7070",fontSize:12,marginBottom:14}}>⚠️ ${error}</div>`}
-      <div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${cleanResult}</div>
+      ${blocked?h`
+        <div style=${{padding:18,background:"rgba(255,200,100,.08)",border:"1px solid rgba(255,200,100,.3)",borderRadius:14,marginBottom:14}}>
+          <div style=${{color:"#ffd8a0",fontSize:13,lineHeight:1.7,marginBottom:12,fontWeight:600}}>
+            우리 아이를 정확히 봐드리고 싶어서, 분석을 잠시 멈췄어요.
+          </div>
+          <div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${cleanResult}</div>
+        </div>
+        <div style=${{padding:14,background:"rgba(78,205,196,.06)",border:"1px solid rgba(78,205,196,.2)",borderRadius:12,marginBottom:14}}>
+          <div style=${{color:"#4ECDC4",fontSize:12.5,fontWeight:700,marginBottom:8}}>📸 더 정확한 분석을 위한 촬영 팁</div>
+          <ul style=${{color:"#aab",fontSize:12,lineHeight:1.8,margin:0,paddingLeft:18}}>
+            <li>밝은 곳에서 촬영해주세요 (자연광이 가장 좋아요)</li>
+            <li>고양이 전체 모습이 화면에 들어오게 해주세요</li>
+            <li>카메라를 안정적으로 잡고, 너무 흔들리지 않게요</li>
+            <li>장난감으로 놀아주는 모습이 잘 보이도록 거리 조절</li>
+          </ul>
+        </div>
+      `:h`<div style=${{color:"#ccd",fontSize:13.5,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${cleanResult}</div>`}
 
       <!-- 장난감 모드: 놀이법 애니메이션 카드 -->
       ${playMethods.length>0&&h`<div style=${{marginTop:20}}>
