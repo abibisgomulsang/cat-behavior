@@ -137,7 +137,11 @@ var MODES=[
   {id:"food",icon:"🥩",label:"성분표 분석",desc:"사료/간식/츄르 사진 → 성분 안전 분석",color:"#a29bfe",sec:0,type:"photo",
     loadMsg:"성분을 꼼꼼히 분석하고 있어요",
     steps:["성분표 인식 중","위험 성분 검사 중","영양 균형 평가 중","안전 등급 산출 중"],
-    prompt:"당신은 수의영양학 박사이자 고양이 식품 안전 전문가입니다.\n\n아래 이미지는 고양이 사료/간식/츄르/영양제의 성분표 또는 영양성분표 사진입니다.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📋 인식된 성분 목록\n- 사진에서 읽힌 모든 성분명 나열\n\n🚨 위험 성분 (즉시 확인 필요)\n- 양파/마늘/파 (혈액독성)\n- 포도/건포도 (신장독성)\n- 자일리톨 (저혈당)\n- 프로필렌글리콜 (적혈구 손상)\n- 카페인/초콜릿\n- 알코올\n→ 발견 시 ⛔ 표시 + 위험도 설명\n\n⚠️ 주의 성분\n- 과다 나트륨 (신장 부담)\n- BHA/BHT/에톡시퀸 (방부제)\n- 카라기난 (염증)\n- 과다 인 (신장 질환)\n- 곡물/전분 과다 (당뇨 위험)\n→ 각 성분별 위험 이유 설명\n\n✅ 좋은 성분\n- 고함량 동물성 단백질\n- 타우린 (필수 아미노산)\n- 오메가3 (EPA/DHA)\n- 자연 유래 항산화제\n- 프로바이오틱스\n\n📊 영양 균형\n- 단백질/지방/탄수화물 비율 평가\n- AAFCO 기준 충족 여부\n- 수분 함량 (건식/습식 판단)\n\n🐱 이런 고양이에게 적합해요\n- 추천 연령대\n- 체중/건강 상태 기준\n- 피해야 할 경우 (신장병/당뇨/비만 등)\n\n⭐ 종합 안전 등급\n- 🟢 안전 / 🟡 주의 / 🔴 위험 중 하나\n- 등급 근거 한 줄 요약\n- 별점: ★1-5\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."}
+    prompt:"당신은 수의영양학 박사이자 고양이 식품 안전 전문가입니다.\n\n아래 이미지는 고양이 사료/간식/츄르/영양제의 성분표 또는 영양성분표 사진입니다.\n\n반드시 아래 항목을 한국어로 상세히 답변하세요:\n\n📋 인식된 성분 목록\n- 사진에서 읽힌 모든 성분명 나열\n\n🚨 위험 성분 (즉시 확인 필요)\n- 양파/마늘/파 (혈액독성)\n- 포도/건포도 (신장독성)\n- 자일리톨 (저혈당)\n- 프로필렌글리콜 (적혈구 손상)\n- 카페인/초콜릿\n- 알코올\n→ 발견 시 ⛔ 표시 + 위험도 설명\n\n⚠️ 주의 성분\n- 과다 나트륨 (신장 부담)\n- BHA/BHT/에톡시퀸 (방부제)\n- 카라기난 (염증)\n- 과다 인 (신장 질환)\n- 곡물/전분 과다 (당뇨 위험)\n→ 각 성분별 위험 이유 설명\n\n✅ 좋은 성분\n- 고함량 동물성 단백질\n- 타우린 (필수 아미노산)\n- 오메가3 (EPA/DHA)\n- 자연 유래 항산화제\n- 프로바이오틱스\n\n📊 영양 균형\n- 단백질/지방/탄수화물 비율 평가\n- AAFCO 기준 충족 여부\n- 수분 함량 (건식/습식 판단)\n\n🐱 이런 고양이에게 적합해요\n- 추천 연령대\n- 체중/건강 상태 기준\n- 피해야 할 경우 (신장병/당뇨/비만 등)\n\n⭐ 종합 안전 등급\n- 🟢 안전 / 🟡 주의 / 🔴 위험 중 하나\n- 등급 근거 한 줄 요약\n- 별점: ★1-5\n\n이모지와 줄바꿈으로 보기 좋게 답변하세요."},
+  {id:"quiz_video",icon:"🎬",label:"영상 진단",desc:"30초 촬영 → AI 영상 분석",color:"#4ECDC4",sec:30,type:"video",hidden:true,
+    loadMsg:"영상을 자세히 보고 있어요",
+    steps:["우리 아이 모습 인식 중","행동 신호 분석 중","3문항 응답과 비교 중","맞춤 솔루션 만드는 중"],
+    prompt:""}
 ];
 var TIPS=["고양이는 하루 15시간 수면 😴","꼬리를 세우면 반가운 인사 🐱","느린 눈 깜빡임은 사랑해 😻","사냥 본능으로 움직이는 장난감 좋아해 🎯","골골송은 편안함의 신호 🎵","사료에 양파/마늘은 절대 금지 🚫","타우린은 고양이 필수 아미노산 💊"];
 
@@ -631,7 +635,14 @@ function calcAccuracy(opts){
   if(opts.neuter)a+=3;
   if(opts.breed)a+=3;
   if(opts.weight)a+=2;
-  return Math.min(a,75);
+  return Math.min(a,95);
+}
+
+/* ===== 3문항 진단 결과를 컨텍스트로 한 영상 분석 프롬프트 ===== */
+function buildQuizVideoPrompt(qprob,qans,diag){
+  var ansText=qprob.qs.map(function(q,i){return "  Q"+(i+1)+". "+q.q+" → "+(qans[i]?qans[i].label:"답변 안 함");}).join("\n");
+  var causeText=diag.top.map(function(t){var c=CAUSES.find(function(x){return x.code===t.code;});return c.label+" "+t.pct+"%";}).join(" / ");
+  return "당신은 CAAB 인증 고양이 행동학 전문가이자 다정한 상담사입니다.\n보호자님과 1:1 상담하듯 따뜻하고 친근한 어투로 답변하세요. 단, 전문성은 잃지 마세요.\n\n═══════════════════════════════════════════════\n🚨 절대 규칙 (반드시 지키세요)\n═══════════════════════════════════════════════\n\n1) 영상에 없는 내용은 절대 만들어내지 마세요. 추측·상상·일반론 금지.\n2) 아래 중 하나라도 해당되면 분석을 거부하고 정해진 형식만 출력하세요:\n   - 영상에 고양이가 명확히 보이지 않음\n   - 영상이 너무 어두워 알아볼 수 없음\n   - 카메라가 가려져 있거나 엎어져 있음\n   - 사람이나 사물만 보이고 고양이가 없음\n   - 영상이 너무 흔들리거나 흐려서 판독 불가\n3) 분석 거부 시 ↓ 아래 형식만 출력하고 즉시 종료. 다른 내용 절대 추가 금지.\n\n[분석 거부 형식]\n📷 분석 불가\n\n**보이는 것**\n(실제로 보이는 것만 1~2문장)\n\n**불가 사유**\n(왜 분석 못하는지 1문장)\n\n**보호자님께**\n보호자님~ 카메라가 우리 아이를 잘 볼 수 있게 다시 촬영해 주시겠어요? 밝은 곳에서 30초만 담아주시면 정확하게 봐드릴 수 있어요.\n\n═══════════════════════════════════════════════\n\n## 보호자님이 입력한 정보\n- 주 고민: "+qprob.label+" ("+qprob.desc+")\n- 3문항 응답:\n"+ansText+"\n- 매칭 페르소나: "+diag.persona.emoji+" "+diag.persona.name+" — "+diag.persona.desc+"\n- 텍스트 진단 가능 원인 Top 3: "+causeText+"\n\n## 분석 임무\n위 텍스트 진단 결과가 영상과 일치하는지 검증하고, 영상에서 본 추가 신호를 토대로 보강·교정하여 솔루션을 제시하세요.\n\n## 답변 형식 (반드시 이 순서로)\n\n👀 영상에서 보이는 모습\n(영상 4프레임에서 실제로 본 것을 2~3문장으로. \"새로운 환경에서 꼬리를 낮게 들고…\" 같이 구체적으로)\n\n🎯 진단 보강\n(텍스트 진단의 페르소나 \""+diag.persona.name+"\"·원인 Top 3과 영상이 일치하는지, 추가로 본 신호 1~2가지)\n- 신호: ⭐⭐⭐ 강함 / ⭐⭐ 보통 / ⭐ 약함 으로 표시\n\n💡 오늘 당장 해볼 솔루션 3가지\n반드시 아래 형식으로 3개:\n\n[놀이법1] 제목: (구체적 이름)\n동작: (지그재그/위아래/숨기기/굴리기/추격 중 하나)\n설명: (보호자님 말투로 다정하게 2~3문장)\n시간: (1회 몇 분, 하루 몇 회)\n\n[놀이법2] 제목: ...\n동작: ...\n설명: ...\n시간: ...\n\n[놀이법3] 제목: ...\n동작: ...\n설명: ...\n시간: ...\n\n⚠️ 주의해주세요\n(영상에서 의료 의심 신호가 보이면 수의사 상담 권유. 없으면 놀이 시 조심할 점 1가지)";
 }
 
 /* ===== 놀이법 파서 + 애니메이션 컴포넌트 ===== */
@@ -834,6 +845,9 @@ function App(){
     if(sm.id==="behavior"&&question&&question.trim()){
       promptText="📌 보호자님의 고민:\n\""+question.trim()+"\"\n\n위 고민을 꼭 고려해서 답변해주세요.\n\n"+promptText;
     }
+    if(sm.id==="quiz_video"&&qprob&&diag){
+      promptText=buildQuizVideoPrompt(qprob,qans,diag);
+    }
     parts.push({text:promptText});
     api({contents:[{parts:parts}],generationConfig:{maxOutputTokens:4000,thinkingConfig:{thinkingBudget:0}}}).then(function(d){
       stopStepAnim();
@@ -846,6 +860,14 @@ function App(){
       if(!t)t="결과 없음";
       setResult(t);
       setHist(function(p){return [{id:Date.now(),mode:sm.label,icon:sm.icon,result:t,time:new Date().toLocaleString("ko-KR")}].concat(p).slice(0,30);});
+      // quiz_video → video_result 화면으로 라우팅 (정확도 +15%)
+      if(sm.id==="quiz_video"&&diag){
+        var newAcc=Math.min(diag.accuracy+15,95);
+        setDiag(Object.assign({},diag,{accuracy:newAcc,videoResult:t}));
+        setPhase("done");
+        setTimeout(function(){setPhase("idle");setScr("video_result");},1500);
+        return;
+      }
       // "완료!" 표시 → 1.5초 후 결과
       setPhase("done");
       setTimeout(function(){setPhase("result");},1500);
@@ -888,7 +910,9 @@ function App(){
     var medical=detectMedicalFlag(qprob.id,tags,sc.scores);
     var acc=calcAccuracy({problem:qprob.id,answers:nextAns,video:false,age:ageHint});
     setDiag({tags:tags,scores:sc.scores,pct:sc.pct,top:top,persona:persona,medical:medical,accuracy:acc});
-    setScr("freeresult");
+    // 의료 플래그 high → 영상 단계 건너뛰고 바로 결과(수의사 권고 우선)
+    if(medical&&medical.level==="high"){setScr("freeresult");return;}
+    setScr("video_intro");
   }
   function applyAgeHint(age){
     setAgeHint(age);
@@ -953,6 +977,62 @@ function App(){
           ${curQ.opts.map(function(o,i){return h`<button key=${i} class="fade-in" style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"16px 18px",textAlign:"left",color:"#eee",fontSize:14.5,fontWeight:600,transition:"all .15s"}} onClick=${function(){onQuizAnswer(o);}}>${o.label}</button>`;})}
         </div>
         <div style=${{marginTop:20,padding:"10px 12px",background:"rgba(78,205,196,.06)",borderRadius:10,color:"#7eddd4",fontSize:11,lineHeight:1.6}}>💚 답하기 어려우시면 "잘 모르겠어요"를 골라주세요. 그래도 분석해드려요.</div>
+      </div>
+    </div>`;
+  }
+
+  // ===== VIDEO INTRO (3문항 후 영상 권장) =====
+  if(scr==="video_intro"&&qprob&&diag){
+    return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",display:"flex",flexDirection:"column"}}>
+      <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:qprob.color}}>
+        <button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){setQstep(qprob.qs.length-1);setScr("quiz");}}>← 진단</button>
+        <span style=${{color:"#fff",fontSize:14,fontWeight:700}}>${qprob.icon} 영상 분석 단계</span>
+        <span style=${{width:56}}/>
+      </div>
+      <div class="fade-in" style=${{flex:1,padding:"24px 22px",display:"flex",flexDirection:"column"}}>
+        <!-- 진단 요약 미니 카드 -->
+        <div style=${{padding:14,background:"linear-gradient(135deg,"+qprob.color+"22,"+qprob.color+"08)",border:"1px solid "+qprob.color+"44",borderRadius:14,marginBottom:18}}>
+          <div style=${{color:"#aab",fontSize:11,marginBottom:4}}>1차 진단 결과</div>
+          <div style=${{display:"flex",alignItems:"center",gap:10}}>
+            <span style=${{fontSize:30}}>${diag.persona.emoji}</span>
+            <div><div style=${{color:"#f0f0f5",fontSize:17,fontWeight:800}}>${diag.persona.name}</div><div style=${{color:"#ccd",fontSize:12}}>현재 정확도 ${diag.accuracy}%</div></div>
+          </div>
+        </div>
+
+        <div style=${{textAlign:"center",marginBottom:18}}>
+          <div style=${{fontSize:48,marginBottom:10}}>📹</div>
+          <h2 style=${{color:"#f0f0f5",fontSize:20,fontWeight:800,lineHeight:1.4,marginBottom:8}}>이제 영상으로<br/>정확도를 올려볼까요?</h2>
+          <p style=${{color:"#aab",fontSize:13,lineHeight:1.7}}>30초만 우리 아이를 촬영해 주시면<br/>AI가 직접 행동을 보고 보강해 드려요.</p>
+        </div>
+
+        <!-- 비포/애프터 게이지 -->
+        <div style=${{padding:14,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,marginBottom:14}}>
+          <div style=${{display:"flex",justifyContent:"space-between",fontSize:11.5,marginBottom:6}}>
+            <span style=${{color:"#888"}}>지금</span>
+            <span style=${{color:"#aab",fontWeight:700}}>${diag.accuracy}%</span>
+          </div>
+          <div style=${{height:8,background:"rgba(255,255,255,.06)",borderRadius:4,overflow:"hidden",marginBottom:10}}>
+            <div style=${{height:"100%",width:diag.accuracy+"%",background:"#888",transition:"width .5s ease"}}/>
+          </div>
+          <div style=${{display:"flex",justifyContent:"space-between",fontSize:11.5,marginBottom:6}}>
+            <span style=${{color:"#4ECDC4",fontWeight:700}}>📹 영상 첨부 시</span>
+            <span style=${{color:"#4ECDC4",fontWeight:800}}>${Math.min(diag.accuracy+15,95)}%</span>
+          </div>
+          <div style=${{height:10,background:"rgba(255,255,255,.06)",borderRadius:5,overflow:"hidden"}}>
+            <div style=${{height:"100%",width:Math.min(diag.accuracy+15,95)+"%",background:"linear-gradient(90deg,#4ECDC4,#7eddd4)",transition:"width .5s ease"}}/>
+          </div>
+        </div>
+
+        <!-- 안내 -->
+        <div style=${{padding:"10px 12px",background:"rgba(78,205,196,.06)",border:"1px solid rgba(78,205,196,.18)",borderRadius:10,color:"#7eddd4",fontSize:11.5,lineHeight:1.7,marginBottom:18}}>
+          🛡️ 영상은 분석에만 쓰이고 서버에 저장되지 않아요.<br/>
+          📌 우리 아이가 평소처럼 노는 모습을 30초만 담아주세요.
+        </div>
+
+        <button style=${{width:"100%",padding:"16px 20px",borderRadius:14,background:qprob.color,color:"#fff",fontSize:16,fontWeight:900,boxShadow:"0 4px 24px "+qprob.color+"66",marginBottom:10}} onClick=${function(){enterMode("quiz_video");}}>📹 30초 영상 분석 시작</button>
+        <button style=${{width:"100%",padding:"13px 16px",borderRadius:12,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",color:"#aab",fontSize:12.5,fontWeight:600}} onClick=${function(){setScr("freeresult");}}>영상 없이 텍스트 결과만 보기</button>
+
+        <div style=${{marginTop:"auto",paddingTop:20,textAlign:"center",color:"#666",fontSize:10.5}}>AI 진단은 참고용이며 수의사 상담을 대체하지 않습니다</div>
       </div>
     </div>`;
   }
@@ -1048,13 +1128,113 @@ function App(){
     </div>`;
   }
 
+  // ===== VIDEO RESULT (영상 분석 + 솔루션 + 유료 CTA) =====
+  if(scr==="video_result"&&diag&&qprob){
+    var vt=diag.videoResult||result||"";
+    var vBlocked=vt.indexOf("📷 분석 불가")>=0;
+    var vPlayMethods=!vBlocked?parsePlayMethods(vt):[];
+    var vCleanResult=!vBlocked&&vPlayMethods.length>0?removePlaySection(vt):vt;
+    var vMed=diag.medical;
+    return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#0d0d18,#13131f)",display:"flex",flexDirection:"column"}}>
+      <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:qprob.color}}>
+        <button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${goHome}>← 홈</button>
+        <span style=${{color:"#fff",fontSize:14,fontWeight:800}}>🎬 영상 분석 결과</span>
+        <span style=${{width:56}}/>
+      </div>
+      <div class="fade-in" style=${{flex:1,padding:"22px 18px",overflowY:"auto"}}>
+
+        ${vBlocked?h`<div style=${{padding:18,background:"rgba(255,200,100,.08)",border:"1px solid rgba(255,200,100,.3)",borderRadius:14,marginBottom:14}}>
+          <div style=${{color:"#ffd8a0",fontSize:14,fontWeight:800,marginBottom:8}}>📷 다시 촬영이 필요해요</div>
+          <div style=${{color:"#ccd",fontSize:13,lineHeight:1.8,whiteSpace:"pre-wrap"}}>${vCleanResult}</div>
+          <button style=${{marginTop:12,width:"100%",padding:13,borderRadius:10,background:qprob.color,color:"#fff",fontSize:13,fontWeight:700}} onClick=${function(){setResult("");setError(null);setPhase("idle");collectedRef.current=[];setScr("video_intro");}}>🔄 다시 촬영하기</button>
+        </div>`:null}
+
+        ${vMed?h`<div style=${{padding:14,background:vMed.level==="high"?"rgba(255,80,80,.12)":"rgba(255,200,100,.10)",border:"1px solid "+(vMed.level==="high"?"rgba(255,80,80,.35)":"rgba(255,200,100,.35)"),borderRadius:14,marginBottom:14}}>
+          <div style=${{color:vMed.level==="high"?"#ff8888":"#ffd8a0",fontSize:13.5,fontWeight:800,marginBottom:6}}>${MEDICAL_FLAG_MSG[vMed.level].title}</div>
+          <div style=${{color:"#eee",fontSize:12.5,lineHeight:1.7}}>${MEDICAL_FLAG_MSG[vMed.level].body}</div>
+        </div>`:null}
+
+        ${!vBlocked?h`<div>
+          <!-- 페르소나 + 정확도 헤더 -->
+          <div style=${{padding:16,background:"linear-gradient(135deg,"+qprob.color+"22,"+qprob.color+"08)",border:"1px solid "+qprob.color+"44",borderRadius:14,marginBottom:14}}>
+            <div style=${{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+              <span style=${{fontSize:32}}>${diag.persona.emoji}</span>
+              <div><div style=${{color:"#f0f0f5",fontSize:18,fontWeight:900}}>${diag.persona.name}</div><div style=${{color:"#ccd",fontSize:11.5}}>영상 분석 완료 — 정확도 ${diag.accuracy}%</div></div>
+            </div>
+            <div style=${{height:6,background:"rgba(255,255,255,.06)",borderRadius:3,overflow:"hidden"}}>
+              <div style=${{height:"100%",width:diag.accuracy+"%",background:"linear-gradient(90deg,#4ECDC4,#7eddd4)",transition:"width .5s ease"}}/>
+            </div>
+          </div>
+
+          <!-- 원인 Top 3 (영상 보정) -->
+          <div style=${{marginBottom:16}}>
+            <div style=${{color:"#f0f0f5",fontSize:14.5,fontWeight:800,marginBottom:10}}>🔍 가능 원인 Top 3</div>
+            ${diag.top.map(function(t){var c=CAUSES.find(function(x){return x.code===t.code;});return h`<div key=${t.code} style=${{marginBottom:8}}>
+              <div style=${{display:"flex",justifyContent:"space-between",fontSize:12.5,marginBottom:4}}>
+                <span style=${{color:"#ddd",fontWeight:600}}>${c.label}</span>
+                <span style=${{color:c.color,fontWeight:800}}>${t.pct}%</span>
+              </div>
+              <div style=${{height:7,background:"rgba(255,255,255,.06)",borderRadius:4,overflow:"hidden"}}>
+                <div style=${{height:"100%",width:t.pct+"%",background:c.color,transition:"width .5s ease"}}/>
+              </div>
+            </div>`;})}
+          </div>
+
+          <!-- 영상 분석 본문 -->
+          <div style=${{padding:"14px 16px",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",borderRadius:14,marginBottom:14}}>
+            <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+              <span style=${{fontSize:18}}>🎬</span>
+              <span style=${{color:"#4ECDC4",fontSize:13,fontWeight:800}}>AI가 본 우리 아이</span>
+            </div>
+            <div style=${{color:"#ccd",fontSize:13,lineHeight:1.85,whiteSpace:"pre-wrap"}}>${vCleanResult}</div>
+          </div>
+
+          <!-- 솔루션 (놀이법 카드) -->
+          ${vPlayMethods.length>0?h`<div style=${{marginBottom:18}}>
+            <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+              <span style=${{fontSize:18}}>💡</span>
+              <span style=${{color:"#FFD700",fontSize:14.5,fontWeight:800}}>오늘 해볼 솔루션 ${vPlayMethods.length}가지</span>
+            </div>
+            ${vPlayMethods.map(function(m,i){return h`<${PlayCard} key=${i} method=${m} index=${i}/>`;})}
+          </div>`:null}
+
+          <!-- 유료 CTA -->
+          <div style=${{padding:14,background:"linear-gradient(135deg,"+qprob.color+"15,"+qprob.color+"05)",border:"1px solid "+qprob.color+"33",borderRadius:14,marginBottom:14}}>
+            <div style=${{color:"#f0f0f5",fontSize:14,fontWeight:800,marginBottom:4}}>🎁 더 깊이 알고 싶으세요?</div>
+            <div style=${{color:"#aab",fontSize:11.5,lineHeight:1.6,marginBottom:12}}>영상 분석은 시작일 뿐. 우리 아이만의 완성형 플랜을 받아보세요.</div>
+            <div style=${{padding:"6px 10px",background:"rgba(255,215,0,.10)",border:"1px dashed rgba(255,215,0,.3)",borderRadius:8,color:"#FFD700",fontSize:10.5,marginBottom:10,textAlign:"center"}}>🧪 테스트 모드 — 결제 없이 진입</div>
+            <button style=${{width:"100%",padding:"14px 16px",borderRadius:12,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"#eee",fontSize:13,fontWeight:700,marginBottom:8,textAlign:"left"}} onClick=${function(){setScr("premium");}}>
+              <div style=${{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <span>📝 정밀 리포트</span><span style=${{color:"#FFD700",fontSize:13}}>2,900원</span>
+              </div>
+              <div style=${{color:"#888",fontSize:11,marginTop:3,fontWeight:400}}>원인 Top 5 + 장난감 3종 + 사냥놀이 처방 3종 + PDF</div>
+            </button>
+            <button style=${{width:"100%",padding:"14px 16px",borderRadius:12,background:"linear-gradient(135deg,"+qprob.color+"33,"+qprob.color+"15)",border:"1px solid "+qprob.color+"66",color:"#fff",fontSize:13,fontWeight:700,textAlign:"left"}} onClick=${function(){setChecks([false,false,false,false,false,false,false]);setDayIdx(0);setScr("weekplan");}}>
+              <div style=${{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <span>📅 7일 사냥놀이 플랜</span><span style=${{color:"#FFD700",fontSize:13}}>9,900원</span>
+              </div>
+              <div style=${{color:"rgba(255,255,255,.7)",fontSize:11,marginTop:3,fontWeight:400}}>매일 미션 3개 + 영상 가이드 + 일일 체크인</div>
+            </button>
+            <div style=${{textAlign:"center",color:"#666",fontSize:10,marginTop:8}}>🛡️ 24시간 100% 환불 보장</div>
+          </div>
+        </div>`:null}
+
+        <div style=${{display:"flex",gap:10,marginTop:10}}>
+          <button style=${{flex:1,padding:13,borderRadius:12,background:"rgba(255,255,255,.05)",color:"#aab",fontSize:12.5,fontWeight:600}} onClick=${goHome}>🏠 처음으로</button>
+          <button style=${{flex:1,padding:13,borderRadius:12,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",color:"#aab",fontSize:12.5,fontWeight:600}} onClick=${function(){setResult("");setError(null);setPhase("idle");collectedRef.current=[];setScr("video_intro");}}>🔄 다시 촬영</button>
+        </div>
+        <div style=${{marginTop:14,padding:8,textAlign:"center",color:"#666",fontSize:10.5,lineHeight:1.6}}>AI 진단은 참고용이며 수의사 상담을 대체하지 않습니다</div>
+      </div>
+    </div>`;
+  }
+
   // ===== PREMIUM (정밀 리포트) =====
   if(scr==="premium"&&diag&&qprob){
     var pc=PERSONA_CONTENT[diag.persona.id]||PERSONA_CONTENT.hunter;
     var top5=topCauses(diag.pct,5);
     return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#0d0d18,#13131f)",display:"flex",flexDirection:"column"}}>
       <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"linear-gradient(135deg,#FFD700,#FFA500)"}}>
-        <button style=${{background:"rgba(0,0,0,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){setScr("freeresult");}}>← 결과</button>
+        <button style=${{background:"rgba(0,0,0,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){setScr(diag&&diag.videoResult?"video_result":"freeresult");}}>← 결과</button>
         <span style=${{color:"#fff",fontSize:14,fontWeight:800}}>📝 정밀 리포트</span>
         <span style=${{width:56}}/>
       </div>
@@ -1139,7 +1319,7 @@ function App(){
     ];
     return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#0d0d18,#13131f)",display:"flex",flexDirection:"column"}}>
       <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"linear-gradient(135deg,"+qprob.color+","+qprob.color+"aa)"}}>
-        <button style=${{background:"rgba(0,0,0,.2)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){setScr("freeresult");}}>← 결과</button>
+        <button style=${{background:"rgba(0,0,0,.2)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){setScr(diag&&diag.videoResult?"video_result":"freeresult");}}>← 결과</button>
         <span style=${{color:"#fff",fontSize:14,fontWeight:800}}>📅 7일 ${diag.persona.name} 플랜</span>
         <span style=${{width:56}}/>
       </div>
@@ -1230,7 +1410,7 @@ function App(){
       <span style=${{color:"#f0f0f5",fontSize:14,fontWeight:800}}>📷 사진·영상으로 분석</span>
     </div>
     <div style=${{width:"100%",display:"flex",flexDirection:"column",gap:8}}>
-      ${MODES.map(function(m){return h`<button key=${m.id} class="fade-in" style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderLeft:"4px solid "+m.color,borderRadius:12,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",textAlign:"left"}} onClick=${function(){enterMode(m.id);}}>
+      ${MODES.filter(function(m){return !m.hidden;}).map(function(m){return h`<button key=${m.id} class="fade-in" style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderLeft:"4px solid "+m.color,borderRadius:12,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",textAlign:"left"}} onClick=${function(){enterMode(m.id);}}>
         <div style=${{display:"flex",alignItems:"center",gap:12}}><span style=${{fontSize:28}}>${m.icon}</span><div><div style=${{fontSize:14,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:10.5,color:"#888",marginTop:2}}>${m.desc}</div></div></div>
         <span style=${{fontSize:18,color:"#555"}}>›</span></button>`;})}
     </div>
