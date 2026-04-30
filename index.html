@@ -141,6 +141,499 @@ var MODES=[
 ];
 var TIPS=["고양이는 하루 15시간 수면 😴","꼬리를 세우면 반가운 인사 🐱","느린 눈 깜빡임은 사랑해 😻","사냥 본능으로 움직이는 장난감 좋아해 🎯","골골송은 편안함의 신호 🎵","사료에 양파/마늘은 절대 금지 🚫","타우린은 고양이 필수 아미노산 💊"];
 
+/* ===== 문제행동 카드 9종 (영상/사진 없이 3문항으로 진단) ===== */
+var PROBLEMS=[
+  {id:"crying",icon:"🐾",label:"자꾸 울어요",desc:"새벽 / 혼자 / 밥 앞에서",color:"#FF6B6B",risk:"low",
+    qs:[
+      {q:"언제 주로 울어요?",opts:[
+        {label:"새벽이나 밤",tags:["night_active","attention_seeking"]},
+        {label:"혼자 있을 때",tags:["separation_anxiety","attention_seeking"]},
+        {label:"밥 앞에서만",tags:["learned_pattern","food_demand"]},
+        {label:"항상",tags:["chronic_stress","medical_flag_check"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"평소 성격은?",opts:[
+        {label:"활발해요",tags:["high_energy"]},
+        {label:"차분해요",tags:["calm"]},
+        {label:"예민해요",tags:["sensitive","stress_prone"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"함께 사는 식구는?",opts:[
+        {label:"한 마리만",tags:["solo_household"]},
+        {label:"다묘",tags:["multi_cat"]},
+        {label:"다른 동물도",tags:["multi_species"]},
+        {label:"사람만",tags:["solo_household"]}
+      ]}
+    ]},
+  {id:"biting",icon:"🩹",label:"손을 물어요",desc:"놀다가 / 쓰다듬으면 / 갑자기",color:"#FF8C42",risk:"low",
+    qs:[
+      {q:"언제 주로 물어요?",opts:[
+        {label:"놀다가",tags:["prey_drive","play_aggression","high_energy"]},
+        {label:"쓰다듬을 때",tags:["petting_intolerance","sensitive"]},
+        {label:"갑자기, 이유 없이",tags:["sudden_aggression","medical_flag_check"]},
+        {label:"새벽이나 밤",tags:["night_active","energy_excess"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"평소 성격은?",opts:[
+        {label:"활발해요",tags:["high_energy","young_adult_likely"]},
+        {label:"차분해요",tags:["calm"]},
+        {label:"예민해요",tags:["sensitive","stress_prone"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"함께 사는 식구는?",opts:[
+        {label:"한 마리만",tags:["solo_household"]},
+        {label:"다묘",tags:["multi_cat"]},
+        {label:"다른 동물도",tags:["multi_species"]},
+        {label:"사람만",tags:["solo_household"]}
+      ]}
+    ]},
+  {id:"hiding",icon:"🚪",label:"자꾸 숨어요",desc:"손님 / 청소기 / 평소에",color:"#a29bfe",risk:"medium",
+    qs:[
+      {q:"언제 숨나요?",opts:[
+        {label:"손님이 오면",tags:["sensitive","fear_human"]},
+        {label:"새 가구·이사 후",tags:["env_change","chronic_stress"]},
+        {label:"청소기·시끄러운 소리",tags:["noise_sensitive"]},
+        {label:"평소에도 자주",tags:["chronic_stress","medical_flag_check"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"숨었을 때는?",opts:[
+        {label:"부르면 나와요",tags:["mild_fear"]},
+        {label:"몇 시간씩 안 나와요",tags:["chronic_stress","medical_flag_check"]},
+        {label:"먹지도 않아요",tags:["medical_flag_eat","chronic_stress"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"함께 사는 식구는?",opts:[
+        {label:"한 마리만",tags:["solo_household"]},
+        {label:"다묘",tags:["multi_cat","social_stress"]},
+        {label:"다른 동물도",tags:["multi_species"]},
+        {label:"사람만",tags:["solo_household"]}
+      ]}
+    ]},
+  {id:"inactive",icon:"💤",label:"안 놀아요",desc:"장난감 무관심 / 잠만 자요",color:"#6c8aff",risk:"medium",
+    qs:[
+      {q:"어떤 모습이에요?",opts:[
+        {label:"장난감을 봐도 무관심",tags:["low_energy","play_motivation_low"]},
+        {label:"잠만 자요",tags:["low_energy","obesity_likely"]},
+        {label:"먹는 것도 줄었어요",tags:["medical_flag_eat","low_energy"]},
+        {label:"갑자기 안 놀아요",tags:["sudden_change","medical_flag_check"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"체형은?",opts:[
+        {label:"통통한 편",tags:["obesity_likely"]},
+        {label:"보통",tags:["normal_weight"]},
+        {label:"마른 편",tags:["medical_flag_check"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"나이대는?",opts:[
+        {label:"1살 미만",tags:["kitten"]},
+        {label:"1~7살 성묘",tags:["adult"]},
+        {label:"8살 이상 노묘",tags:["senior","medical_flag_check"]},
+        {label:"잘 모르겠어요",tags:["adult"]}
+      ]}
+    ]},
+  {id:"grooming",icon:"🌀",label:"자꾸 핥아요",desc:"같은 자리 / 털이 빠질 정도",color:"#ff5555",risk:"high",
+    qs:[
+      {q:"어떻게 핥아요?",opts:[
+        {label:"같은 부위만 집중",tags:["compulsive_flag","medical_flag_skin"]},
+        {label:"털이 빠질 정도로",tags:["medical_flag_skin","compulsive_flag"]},
+        {label:"빨갛게 헐 때까지",tags:["medical_flag_skin","compulsive_flag"]},
+        {label:"평소보다 자주",tags:["compulsive_flag","chronic_stress"]},
+        {label:"잘 모르겠어요",tags:["medical_flag_check"]}
+      ]},
+      {q:"언제부터?",opts:[
+        {label:"환경 변화 후",tags:["env_change","chronic_stress"]},
+        {label:"이유 없이 갑자기",tags:["medical_flag_skin","sudden_change"]},
+        {label:"오래됐어요",tags:["compulsive_flag"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"평소 성격은?",opts:[
+        {label:"예민해요",tags:["sensitive","stress_prone"]},
+        {label:"차분해요",tags:["calm"]},
+        {label:"활발해요",tags:["high_energy"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]}
+    ]},
+  {id:"toileting",icon:"💩",label:"화장실 밖에 싸요",desc:"이불 / 카펫 / 빈도 증가",color:"#ff5555",risk:"high",
+    qs:[
+      {q:"어디에 실수해요?",opts:[
+        {label:"이불·옷가지",tags:["medical_flag_urinary","stress_marking"]},
+        {label:"카펫·러그",tags:["litter_aversion","medical_flag_urinary"]},
+        {label:"화장실 근처",tags:["litter_aversion"]},
+        {label:"여기저기",tags:["medical_flag_urinary","chronic_stress"]},
+        {label:"잘 모르겠어요",tags:["medical_flag_check"]}
+      ]},
+      {q:"언제부터?",opts:[
+        {label:"갑자기 시작됐어요",tags:["medical_flag_urinary","sudden_change"]},
+        {label:"환경 변화 후",tags:["env_change","chronic_stress"]},
+        {label:"오래됐어요",tags:["litter_aversion"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"화장실 환경은?",opts:[
+        {label:"마리 수보다 적어요",tags:["resource_shortage"]},
+        {label:"한 곳에만 있어요",tags:["resource_shortage"]},
+        {label:"충분해요(N+1)",tags:["adequate_litter"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]}
+    ]},
+  {id:"spraying",icon:"🪟",label:"스프레이해요",desc:"벽 / 가구 / 침구",color:"#FF6B6B",risk:"medium",
+    qs:[
+      {q:"어디에?",opts:[
+        {label:"창문·문 근처",tags:["territorial","outside_cat_visible"]},
+        {label:"새 물건·가구",tags:["env_change","territorial"]},
+        {label:"여기저기 벽",tags:["territorial","chronic_stress"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"중성화는?",opts:[
+        {label:"중성화 완료",tags:["neutered"]},
+        {label:"안 했어요",tags:["intact","hormonal"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"함께 사는 식구는?",opts:[
+        {label:"한 마리만",tags:["solo_household"]},
+        {label:"다묘",tags:["multi_cat","social_stress"]},
+        {label:"다른 동물도",tags:["multi_species"]},
+        {label:"사람만",tags:["solo_household"]}
+      ]}
+    ]},
+  {id:"eating",icon:"🍴",label:"안 먹어요",desc:"갑자기 / 특정 사료만",color:"#ff5555",risk:"high",
+    qs:[
+      {q:"얼마나 안 먹나요?",opts:[
+        {label:"24시간 넘게 전혀",tags:["medical_flag_eat","emergency"]},
+        {label:"하루 한 끼 정도",tags:["medical_flag_eat"]},
+        {label:"양만 줄었어요",tags:["medical_flag_check","sensitive"]},
+        {label:"특정 사료만 거부",tags:["food_pickiness"]},
+        {label:"잘 모르겠어요",tags:["medical_flag_check"]}
+      ]},
+      {q:"다른 변화는?",opts:[
+        {label:"잠만 자요",tags:["low_energy","medical_flag_eat"]},
+        {label:"토해요",tags:["medical_flag_eat","emergency"]},
+        {label:"숨어요",tags:["chronic_stress","medical_flag_eat"]},
+        {label:"평소처럼 활발",tags:["food_pickiness"]},
+        {label:"잘 모르겠어요",tags:["medical_flag_check"]}
+      ]},
+      {q:"환경 변화 있었어요?",opts:[
+        {label:"이사·새 식구",tags:["env_change","chronic_stress"]},
+        {label:"사료를 바꿨어요",tags:["food_change"]},
+        {label:"없어요",tags:["medical_flag_eat"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]}
+    ]},
+  {id:"aggression",icon:"😾",label:"다른 묘랑 싸워요",desc:"합사 후 / 갑자기",color:"#FF8C42",risk:"medium",
+    qs:[
+      {q:"언제부터?",opts:[
+        {label:"새 고양이 합사 후",tags:["multi_cat","territorial","social_stress"]},
+        {label:"갑자기 사이가 나빠짐",tags:["sudden_change","redirected_aggression","medical_flag_check"]},
+        {label:"원래부터",tags:["multi_cat","territorial"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"자원 환경은?",opts:[
+        {label:"화장실/밥그릇 부족",tags:["resource_shortage","social_stress"]},
+        {label:"숨을 곳이 없어요",tags:["resource_shortage","chronic_stress"]},
+        {label:"충분해요",tags:["adequate_resources"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]},
+      {q:"중성화 상태는?",opts:[
+        {label:"모두 중성화",tags:["neutered"]},
+        {label:"한 마리 안 했어요",tags:["intact","hormonal"]},
+        {label:"전부 안 했어요",tags:["intact","hormonal"]},
+        {label:"잘 모르겠어요",tags:["unclear"]}
+      ]}
+    ]}
+];
+
+/* ===== 5대 원인 카테고리 ===== */
+var CAUSES=[
+  {code:"C1",label:"에너지·운동 부족",color:"#FF6B6B",desc:"사냥본능과 에너지 분출이 부족해요",hint:"하루 2회, 5~10분 사냥놀이로 본능을 채워주세요"},
+  {code:"C2",label:"환경 스트레스",color:"#4ECDC4",desc:"환경 변화·소음·좁은 공간이 부담이에요",hint:"안전한 휴식 공간(상자·캣타워)을 마련해주세요"},
+  {code:"C3",label:"사회적 갈등",color:"#FF8C42",desc:"식구·다묘 관계에서 자원 경쟁이 있어요",hint:"화장실·밥·숨을 곳을 마리당 N+1로 분리해주세요"},
+  {code:"C4",label:"의료적 가능성",color:"#ff5555",desc:"통증·피부·비뇨기 등 건강 신호가 의심돼요",hint:"수의사 상담을 우선 권해드려요"},
+  {code:"C5",label:"학습된 패턴",color:"#a29bfe",desc:"보호자 반응이 행동을 강화하고 있어요",hint:"행동 직후 반응을 끊고 다른 시간에 보상해주세요"}
+];
+
+/* ===== 행동 태그 → 5대 원인 가중치 ===== */
+var CAUSE_WEIGHTS={
+  prey_drive:{C1:5},
+  energy_excess:{C1:4,C2:1},
+  high_energy:{C1:3},
+  young_adult_likely:{C1:2},
+  night_active:{C1:3,C2:1,C5:2},
+  attention_seeking:{C1:1,C3:1,C5:4},
+  separation_anxiety:{C2:3,C3:2,C5:1},
+  learned_pattern:{C5:5},
+  food_demand:{C5:4},
+  chronic_stress:{C2:5,C3:1,C4:1},
+  calm:{},
+  sensitive:{C2:3,C3:1,C5:1},
+  stress_prone:{C2:3},
+  solo_household:{C1:1,C5:1},
+  multi_cat:{C2:2,C3:4},
+  multi_species:{C2:1,C3:2},
+  fear_human:{C2:3},
+  env_change:{C2:4},
+  noise_sensitive:{C2:3},
+  mild_fear:{C2:1},
+  play_aggression:{C1:4,C5:1},
+  petting_intolerance:{C2:1,C3:1},
+  sudden_aggression:{C2:1,C4:4},
+  sudden_change:{C4:3},
+  redirected_aggression:{C2:2,C3:2},
+  territorial:{C2:2,C3:4},
+  social_stress:{C2:2,C3:3},
+  resource_shortage:{C2:2,C3:3},
+  adequate_litter:{},
+  adequate_resources:{},
+  litter_aversion:{C2:3,C5:1},
+  stress_marking:{C2:3,C3:2},
+  outside_cat_visible:{C2:3,C3:1},
+  hormonal:{C2:1,C3:2},
+  neutered:{},
+  intact:{C2:1,C3:2},
+  obesity_likely:{C1:2,C4:2},
+  low_energy:{C2:1,C4:3},
+  play_motivation_low:{C1:1,C4:2},
+  destruction:{C1:3,C5:1},
+  food_pickiness:{C5:2},
+  food_change:{C2:1},
+  kitten:{C1:2},
+  adult:{},
+  senior:{C4:2},
+  normal_weight:{},
+  compulsive_flag:{C2:2,C4:5,C5:1},
+  medical_flag_check:{C4:4},
+  medical_flag_skin:{C4:6},
+  medical_flag_urinary:{C4:6},
+  medical_flag_eat:{C4:7},
+  emergency:{C4:9},
+  vocal_breed_check:{},
+  unclear:{}
+};
+
+/* ===== 8종 페르소나 (응답 태그 시그니처로 매칭) ===== */
+var PERSONAS=[
+  {id:"hunter",emoji:"🏹",name:"사냥꾼형",desc:"활발하고 사냥본능이 강한 아이",sig:["high_energy","prey_drive","play_aggression","young_adult_likely"]},
+  {id:"loner",emoji:"🌙",name:"외톨이형",desc:"안전한 공간이 필요한 예민한 아이",sig:["sensitive","fear_human","solo_household","mild_fear"]},
+  {id:"boss",emoji:"👑",name:"보스형",desc:"영역 정리가 필요한 아이",sig:["territorial","multi_cat","social_stress","intact","stress_marking"]},
+  {id:"baby",emoji:"🍼",name:"어린아이형",desc:"에너지가 넘치는 아이",sig:["kitten","high_energy","destruction","play_aggression"]},
+  {id:"nervous",emoji:"🌪️",name:"예민덩이형",desc:"작은 변화에도 크게 반응하는 아이",sig:["compulsive_flag","sensitive","stress_prone","env_change","noise_sensitive"]},
+  {id:"lazy",emoji:"😴",name:"게으름뱅이형",desc:"동기 부여가 필요한 아이",sig:["low_energy","obesity_likely","play_motivation_low","calm"]},
+  {id:"grumpy",emoji:"🙅",name:"까칠덩이형",desc:"거리 존중이 필요한 아이",sig:["petting_intolerance","sensitive","sudden_aggression"]},
+  {id:"clinger",emoji:"🥺",name:"따라쟁이형",desc:"애정 표현이 풍부한 아이",sig:["attention_seeking","separation_anxiety","food_demand","learned_pattern"]}
+];
+
+/* ===== 페르소나별 프리미엄 콘텐츠 (장난감 3종 / 놀이 3종 / 7일 플랜) ===== */
+var PERSONA_CONTENT={
+  hunter:{
+    strengths:["사냥본능이 풍부해요","에너지가 넘쳐요","호기심이 많아요"],
+    challenges:["흥분 조절이 약해요","손·발을 사냥감으로 착각해요"],
+    toys:[
+      {name:"낚싯대형 깃털",why:"공중 사냥 본능을 강하게 자극",price:"5,000~15,000원"},
+      {name:"전동 쥐·물고기",why:"불규칙 움직임으로 추격 본능 유발",price:"10,000~25,000원"},
+      {name:"퍼즐 피더",why:"사냥-획득-보상 패턴 만족",price:"15,000~30,000원"}
+    ],
+    plays:[
+      {title:"지그재그 추격",action:"지그재그",desc:"낚싯대를 바닥에서 좌우로 불규칙하게 이동, 잡으면 잠깐 멈춰주세요",time:"5~10분, 하루 2회"},
+      {title:"숨겼다 보여주기",action:"숨기기",desc:"상자나 소파 뒤로 장난감을 숨겼다 살짝 노출시키며 추격 유도",time:"5분, 하루 1~2회"},
+      {title:"굴리기 사냥",action:"굴리기",desc:"공을 굴려 빠르게 추격하게 한 뒤 사료 한 알로 보상",time:"5분, 하루 2회"}
+    ],
+    week:{
+      m:["5분 낚싯대 지그재그","5분 퍼즐 피더로 식사","좌우 불규칙 5분 추격","숨기기 놀이 5분","공 굴리기 5분","낚싯대+숨기기 콤보 5분","좋아한 놀이 1개 10분"],
+      n:["퍼즐 피더로 점심","공 굴리기 3분","낚싯대 위아래 5분","수직공간 점프 유도 3분","숨기기 5분","퍼즐 피더 점심","쉼"],
+      e:["10분 사냥놀이→식사","10분 추격 후 슬로우 다운","10분 낚싯대→츄르 보상","10분 추격→그루밍","10분 사냥놀이→식사","10분 콤보 사냥","10분 마무리 사냥놀이"],
+      hint:["흥분도 체크","에너지 분출 정도 체크","손 무는 빈도 변화","수직 공간 활용도","숨기기 반응","콤보 만족도","손 무는 빈도 비교"]
+    }
+  },
+  loner:{
+    strengths:["관찰력이 좋아요","조용한 환경에서 안정돼요"],
+    challenges:["새로운 자극에 약해요","숨는 시간이 길어요"],
+    toys:[
+      {name:"숨숨하우스·터널",why:"안전기지 확보로 안정감 제공",price:"15,000~40,000원"},
+      {name:"부드러운 인형",why:"위협감 없이 만질 수 있는 자극",price:"5,000~15,000원"},
+      {name:"끈 없는 자율 장난감",why:"보호자 없이도 가지고 놀 수 있음",price:"5,000~12,000원"}
+    ],
+    plays:[
+      {title:"멀리서 살살",action:"숨기기",desc:"숨숨하우스 입구에서 살짝씩 장난감을 노출, 강요 X",time:"3~5분, 하루 2회"},
+      {title:"같은 방, 다른 거리",action:"굴리기",desc:"멀리서 공을 살살 굴려 보내고 다가오면 멈춰주세요",time:"5분, 하루 1회"},
+      {title:"천천히 위아래",action:"위아래",desc:"낚싯대를 천천히, 작게 흔들어 부담 주지 않게",time:"5분, 하루 1회"}
+    ],
+    week:{
+      m:["하우스 곁에 인형 놓기","입구에서 깃털 살살","공 살짝 굴리기","낚싯대 천천히","좋아한 놀이 반복","간식 트레일 5개","좋아한 놀이 5분"],
+      n:["조용한 그루밍","사료 트레일","쉼","간식 위치 바꿔보기","쉼","쉼","손바닥 간식"],
+      e:["방 정리·소음 OFF","멀리서 5분 놀이","멀리서 5분 놀이","천천히 위아래 5분","숨기기 5분","숨기기+멀리굴리기","처음 활동량 vs 지금"],
+      hint:["숨는 시간 측정","나오는 거리 측정","꼬리 위치 확인","눈맞춤 빈도","호기심 신호","접근 거리","변화 비교"]
+    }
+  },
+  boss:{
+    strengths:["자기주장이 분명해요","리더십이 있어요"],
+    challenges:["영역 다툼이 잦아요","자원 경쟁에 예민해요"],
+    toys:[
+      {name:"독립 캣타워",why:"자기 영역 확보·수직공간 분리",price:"40,000~100,000원"},
+      {name:"개별 퍼즐 피더",why:"자원 경쟁 없이 식사",price:"15,000~30,000원"},
+      {name:"페로몬 디퓨저(Feliway)",why:"긴장 완화 보조",price:"30,000~50,000원"}
+    ],
+    plays:[
+      {title:"개별 사냥놀이",action:"지그재그",desc:"다른 묘 없는 방에서 1:1로 5분, 절대 합치지 않기",time:"5분, 하루 2회"},
+      {title:"수직 점프 유도",action:"위아래",desc:"캣타워 위로 깃털을 올려 점프 유도",time:"5분, 하루 1회"},
+      {title:"각자의 추격",action:"추격",desc:"방 두 개에 각자 공을 굴려주기",time:"5분, 하루 1회"}
+    ],
+    week:{
+      m:["밥·물·화장실 N+1 점검","개별 5분 사냥","개별 5분 사냥","수직 점프 5분","개별 사냥","페로몬 디퓨저 점검","좋아한 놀이"],
+      n:["개별 퍼즐 피더","개별 식사 분리","쉼","개별 츄르","개별 식사","개별 식사","개별 식사"],
+      e:["다묘 동선 분리","페로몬 점검","개별 5분 사냥","개별 사냥","페로몬 1주차 점검","변화 기록","갈등 빈도 비교"],
+      hint:["갈등 횟수 기록","으르렁 빈도","꼬리 부풀림","마운팅 빈도","영역 마킹 변화","스프레이 빈도","주간 변화"]
+    }
+  },
+  baby:{
+    strengths:["호기심 폭발","빠른 학습"],
+    challenges:["과잉 활동","물건 파괴"],
+    toys:[
+      {name:"터널·바스락 매트",why:"폭발적 에너지 분출처",price:"10,000~25,000원"},
+      {name:"강아지풀 낚싯대",why:"안전한 사냥감",price:"3,000~10,000원"},
+      {name:"공 세트(다양 사이즈)",why:"하루 종일 놀 수 있는 자율 장난감",price:"5,000~15,000원"}
+    ],
+    plays:[
+      {title:"폭발 분출",action:"지그재그",desc:"5분 강하게 → 1분 휴식 → 다시 5분",time:"5분×2세트, 하루 2~3회"},
+      {title:"터널 추격",action:"숨기기",desc:"터널 양쪽에서 장난감 왔다갔다",time:"5분, 하루 2회"},
+      {title:"공 굴리기 마라톤",action:"굴리기",desc:"여러 공을 동시에 굴려주기",time:"5분, 하루 2회"}
+    ],
+    week:{
+      m:["5분 폭발 분출","터널 추격 5분","공 마라톤 5분","낚싯대 5분","터널+공 콤보","낚싯대 5분","좋아한 놀이 10분"],
+      n:["퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더"],
+      e:["10분 사냥놀이→식사","10분 추격","10분 콤보","10분 사냥놀이→식사","10분 사냥놀이","10분 마무리","10분 마무리 후 비교"],
+      hint:["파괴 행동 줄어듦","수면 시간 변화","활동량 분포","손 무는 빈도","에너지 사이클","휴식 시간","주간 변화"]
+    }
+  },
+  nervous:{
+    strengths:["관찰력 뛰어남","유대감 깊어요"],
+    challenges:["환경 변화 민감","강박 행동 위험"],
+    toys:[
+      {name:"안전한 숨숨공간",why:"스트레스 회복처",price:"15,000~40,000원"},
+      {name:"부드러운 깃털",why:"낮은 자극으로 시작",price:"3,000~10,000원"},
+      {name:"페로몬 디퓨저",why:"긴장 완화",price:"30,000~50,000원"}
+    ],
+    plays:[
+      {title:"천천히 살살",action:"위아래",desc:"낚싯대를 천천히, 길게 늘어뜨려 부담 X",time:"3~5분, 하루 2회"},
+      {title:"안전기지 사냥",action:"숨기기",desc:"숨숨하우스 곁에서 짧게",time:"5분, 하루 1회"},
+      {title:"가까운 굴리기",action:"굴리기",desc:"가까이 살살 굴리고 가져오면 츄르",time:"5분, 하루 1회"}
+    ],
+    week:{
+      m:["환경 점검(소음·향)","숨숨공간 추가","천천히 살살 5분","페로몬 점검","루틴 시간 고정","루틴 유지","좋아한 놀이"],
+      n:["조용한 그루밍","쉼","쉼","쉼","쉼","쉼","쉼"],
+      e:["3분 살살 놀이","5분 살살","천천히 위아래","숨기기 5분","살살 5분","변화 기록","강박 빈도 비교"],
+      hint:["강박 행동 빈도","숨는 시간","꼬리 위치","호흡 안정","루틴 효과","환경 점수","주간 변화"]
+    }
+  },
+  lazy:{
+    strengths:["편안한 분위기","적응력 좋음"],
+    challenges:["운동 부족","비만 가능성"],
+    toys:[
+      {name:"퍼즐 피더",why:"움직여야 식사 가능 → 자연 운동",price:"15,000~30,000원"},
+      {name:"가벼운 공",why:"적은 힘으로도 굴러감",price:"3,000~8,000원"},
+      {name:"캣닢 인형",why:"동기 부여",price:"5,000~15,000원"}
+    ],
+    plays:[
+      {title:"식사 전 짧게",action:"굴리기",desc:"식사 직전 3분 추격→밥. 가장 동기 높을 때",time:"3분, 하루 2회 (식사 직전)"},
+      {title:"퍼즐 피더 식사",action:"숨기기",desc:"사료를 퍼즐에 넣어 움직여야 먹게",time:"식사 시간"},
+      {title:"캣닢 자극",action:"지그재그",desc:"캣닢 묻힌 인형으로 동기 부여",time:"3분, 하루 1회"}
+    ],
+    week:{
+      m:["식전 3분 굴리기","퍼즐 피더 점검","식전 3분","캣닢 인형","식전 3분","식전 3분","활동량 비교"],
+      n:["퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더"],
+      e:["식전 5분 추격","식전 5분","식전 5분","식전 5분","식전 5분","식전 5분","주간 비교"],
+      hint:["체중 측정 1회","활동 시간","식사 속도","움직임 분포","수면 시간","활동 시간","Day1 vs Day7"]
+    }
+  },
+  grumpy:{
+    strengths:["거리감 분명","독립적"],
+    challenges:["스킨십 거부","갑작스런 무는 행동"],
+    toys:[
+      {name:"낚싯대(긴 버전)",why:"안전 거리 유지하며 사냥",price:"5,000~15,000원"},
+      {name:"자율 장난감",why:"손이 닿지 않아도 OK",price:"5,000~12,000원"},
+      {name:"퍼즐 피더",why:"보상 학습으로 호감 형성",price:"15,000~30,000원"}
+    ],
+    plays:[
+      {title:"긴 낚싯대 사냥",action:"지그재그",desc:"긴 낚싯대로 안전 거리 유지하며 5분",time:"5분, 하루 2회"},
+      {title:"손 대신 장난감",action:"굴리기",desc:"쓰다듬는 대신 장난감으로 교감",time:"5분, 하루 1회"},
+      {title:"보상 학습",action:"숨기기",desc:"좋은 행동→츄르 즉시 보상",time:"3분, 하루 2회"}
+    ],
+    week:{
+      m:["긴 낚싯대 5분","손 대신 장난감","긴 낚싯대 5분","보상 학습","긴 낚싯대","손 대신 장난감","좋아한 놀이"],
+      n:["퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더"],
+      e:["거리 존중 5분","쓰다듬기 0회","장난감으로 교감","보상 학습","장난감 5분","장난감 5분","무는 빈도 비교"],
+      hint:["무는 빈도 기록","꼬리 흔들림","눈동공 크기","접근 의사 신호","보상 후 반응","행동 변화","주간 변화"]
+    }
+  },
+  clinger:{
+    strengths:["애정이 풍부","사람 친화적"],
+    challenges:["분리 불안","과한 요구 행동"],
+    toys:[
+      {name:"자율 퍼즐 피더",why:"혼자 있을 때 자가 만족",price:"15,000~30,000원"},
+      {name:"창문 캣타워",why:"보호자 없을 때 시각 자극",price:"30,000~80,000원"},
+      {name:"라디오·인형",why:"고요함 완화",price:"5,000~15,000원"}
+    ],
+    plays:[
+      {title:"독립 사냥놀이",action:"숨기기",desc:"보호자 안 보이는 데서 자율 장난감",time:"식사 사이"},
+      {title:"외출 전 사냥",action:"지그재그",desc:"외출 30분 전 5분 사냥→식사",time:"5분, 외출 전"},
+      {title:"보상 후 무시",action:"학습",desc:"우는 행동에 반응 X, 조용해진 후 보상",time:"꾸준히"}
+    ],
+    week:{
+      m:["외출 전 5분 사냥","외출 전 사냥","자율 장난감 점검","외출 전 사냥","자율 장난감","외출 전 사냥","좋아한 놀이"],
+      n:["퍼즐 피더 자율","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더","퍼즐 피더"],
+      e:["우는 행동 무시 연습","조용해진 후 보상","우는 행동 무시","조용해진 후 보상","독립 시간 늘리기","독립 시간 늘리기","울음 빈도 비교"],
+      hint:["우는 빈도 기록","독립 시간 측정","요구 행동 변화","자율 놀이 시간","우는 빈도","독립 시간","주간 변화"]
+    }
+  }
+};
+
+/* ===== 의료 플래그 검출 ===== */
+function detectMedicalFlag(problemId,tags,causeScores){
+  var hard=["medical_flag_skin","medical_flag_urinary","medical_flag_eat","emergency"];
+  for(var i=0;i<hard.length;i++){if(tags.indexOf(hard[i])>=0)return {level:"high",code:hard[i]};}
+  if((causeScores.C4||0)>=8)return {level:"high",code:"high_C4"};
+  if(problemId==="grooming"&&tags.indexOf("compulsive_flag")>=0)return {level:"high",code:"compulsive"};
+  if(problemId==="eating")return {level:"high",code:"eating_check"};
+  if(tags.indexOf("medical_flag_check")>=0)return {level:"medium",code:"general_check"};
+  if((causeScores.C4||0)>=5)return {level:"medium",code:"mid_C4"};
+  return null;
+}
+
+var MEDICAL_FLAG_MSG={
+  high:{title:"⚠️ 수의사 상담을 먼저 권해드려요",body:"보이는 신호 중 건강 문제 가능성이 있어요. 행동교정 전에 병원에서 검사를 받아보시는 게 안전해요.",cta:"병원 방문 후 다시 진단받기"},
+  medium:{title:"🟡 검사 한 번 받아보시는 게 좋아요",body:"확신할 수는 없지만 의심 신호가 보여요. 가까운 시일 내에 검진을 권해드려요.",cta:"검진 후에도 행동 분석 받기"}
+};
+
+/* ===== 점수화 + 페르소나 매칭 + 정확도 ===== */
+function scoreCauses(tags){
+  var s={C1:0,C2:0,C3:0,C4:0,C5:0};
+  tags.forEach(function(t){var w=CAUSE_WEIGHTS[t]||{};Object.keys(w).forEach(function(k){s[k]+=w[k];});});
+  var total=s.C1+s.C2+s.C3+s.C4+s.C5;
+  if(total<=0)return {scores:s,pct:{C1:0,C2:0,C3:0,C4:0,C5:0},total:0};
+  var pct={};Object.keys(s).forEach(function(k){pct[k]=Math.round(s[k]/total*100);});
+  return {scores:s,pct:pct,total:total};
+}
+function topCauses(pct,n){
+  return Object.keys(pct).map(function(k){return {code:k,pct:pct[k]};}).filter(function(x){return x.pct>0;}).sort(function(a,b){return b.pct-a.pct;}).slice(0,n);
+}
+function matchPersona(tags){
+  var best=null,bestScore=-1;
+  PERSONAS.forEach(function(p){
+    var hit=0;p.sig.forEach(function(s){if(tags.indexOf(s)>=0)hit++;});
+    if(hit>bestScore){bestScore=hit;best=p;}
+  });
+  return best||PERSONAS[0];
+}
+function calcAccuracy(opts){
+  var a=50;
+  if(opts.problem)a+=10;
+  if(opts.answers){a+=opts.answers.filter(function(x){return x;}).length*5;}
+  if(opts.video)a+=15;
+  if(opts.age)a+=5;
+  if(opts.household)a+=5;
+  if(opts.neuter)a+=3;
+  if(opts.breed)a+=3;
+  if(opts.weight)a+=2;
+  return Math.min(a,75);
+}
+
 /* ===== 놀이법 파서 + 애니메이션 컴포넌트 ===== */
 var SCENE_MAP={
   "지그재그":"hunt","위아래":"fish","숨기기":"hide","굴리기":"roll","추격":"chase"
@@ -252,6 +745,14 @@ function App(){
   var _hist=useState([]),hist=_hist[0],setHist=_hist[1];
   var _hv=useState(null),hv=_hv[0],setHv=_hv[1];
   var _question=useState(""),question=_question[0],setQuestion=_question[1];
+  // ===== 행동 진단(퀴즈) 상태 =====
+  var _qprob=useState(null),qprob=_qprob[0],setQprob=_qprob[1];           // 선택한 PROBLEMS 객체
+  var _qstep=useState(0),qstep=_qstep[0],setQstep=_qstep[1];               // 0~2
+  var _qans=useState([null,null,null]),qans=_qans[0],setQans=_qans[1];     // 선택한 옵션 배열
+  var _diag=useState(null),diag=_diag[0],setDiag=_diag[1];                 // 진단 결과
+  var _ageHint=useState(null),ageHint=_ageHint[0],setAgeHint=_ageHint[1];  // 추가 정보
+  var _checks=useState([false,false,false,false,false,false,false]),checks=_checks[0],setChecks=_checks[1]; // 7일 체크인
+  var _dayIdx=useState(0),dayIdx=_dayIdx[0],setDayIdx=_dayIdx[1]; // 현재 보고 있는 일자
   var vRef=useRef(),cRef=useRef(),stRef=useRef();
   var timerRef=useRef(),frameRef=useRef(),stepTimerRef=useRef();
   var collectedRef=useRef([]);
@@ -369,8 +870,41 @@ function App(){
     };r.readAsDataURL(f);
   }
 
-  function goHome(){cleanup();setScr("home");setMode(null);setRecording(false);setRemain(0);setResult("");setError(null);setPhoto(null);setCamOk(false);setPhase("idle");setStepIdx(0);setHv(null);setQuestion("");collectedRef.current=[];}
-  function enterMode(id){setMode(id);var m=MODES.find(function(x){return x.id===id;});setResult("");setError(null);setPhase("idle");setPhoto(null);setQuestion("");if(m.type==="photo"){setScr("photo");}else{setScr("record");setTimeout(function(){startCam(face);},100);}}
+  function goHome(){cleanup();setScr("home");setMode(null);setRecording(false);setRemain(0);setResult("");setError(null);setPhoto(null);setCamOk(false);setPhase("idle");setStepIdx(0);setHv(null);setQuestion("");setQprob(null);setQstep(0);setQans([null,null,null]);setDiag(null);setAgeHint(null);setChecks([false,false,false,false,false,false,false]);setDayIdx(0);collectedRef.current=[];}
+  function enterMode(id){
+    var p=PROBLEMS.find(function(x){return x.id===id;});
+    if(p){setQprob(p);setQstep(0);setQans([null,null,null]);setDiag(null);setAgeHint(null);setMode(id);setScr("quiz");return;}
+    setMode(id);var m=MODES.find(function(x){return x.id===id;});setResult("");setError(null);setPhase("idle");setPhoto(null);setQuestion("");if(m.type==="photo"){setScr("photo");}else{setScr("record");setTimeout(function(){startCam(face);},100);}
+  }
+  // ===== 퀴즈 응답 처리 =====
+  function onQuizAnswer(opt){
+    var nextAns=qans.slice();nextAns[qstep]=opt;setQans(nextAns);
+    if(qstep<2){setQstep(qstep+1);return;}
+    // 마지막 문항 → 진단 계산
+    var tags=[];nextAns.forEach(function(a){if(a&&a.tags)a.tags.forEach(function(t){if(tags.indexOf(t)<0)tags.push(t);});});
+    var sc=scoreCauses(tags);
+    var top=topCauses(sc.pct,3);
+    var persona=matchPersona(tags);
+    var medical=detectMedicalFlag(qprob.id,tags,sc.scores);
+    var acc=calcAccuracy({problem:qprob.id,answers:nextAns,video:false,age:ageHint});
+    setDiag({tags:tags,scores:sc.scores,pct:sc.pct,top:top,persona:persona,medical:medical,accuracy:acc});
+    setScr("freeresult");
+  }
+  function applyAgeHint(age){
+    setAgeHint(age);
+    if(!diag)return;
+    // 나이대 가중치 보정: 노묘는 C4↑, 어린묘는 C1↑
+    var bonus={C1:0,C2:0,C3:0,C4:0,C5:0};
+    if(age==="senior")bonus.C4=4;
+    else if(age==="kitten")bonus.C1=4;
+    var s2={C1:diag.scores.C1+bonus.C1,C2:diag.scores.C2+bonus.C2,C3:diag.scores.C3+bonus.C3,C4:diag.scores.C4+bonus.C4,C5:diag.scores.C5};
+    var total=s2.C1+s2.C2+s2.C3+s2.C4+s2.C5;
+    var pct={};Object.keys(s2).forEach(function(k){pct[k]=total>0?Math.round(s2[k]/total*100):0;});
+    var top=topCauses(pct,3);
+    var medical2=detectMedicalFlag(qprob.id,diag.tags.concat([age==="senior"?"senior":age==="kitten"?"kitten":"adult"]),s2);
+    var acc=calcAccuracy({problem:qprob.id,answers:qans,video:false,age:age});
+    setDiag(Object.assign({},diag,{scores:s2,pct:pct,top:top,medical:medical2||diag.medical,accuracy:acc}));
+  }
   function flipCam(){var f2=face==="environment"?"user":"environment";setFace(f2);startCam(f2);}
 
   var sm=MODES.find(function(x){return x.id===mode;});var clr=sm?sm.color:"#4ECDC4";
@@ -399,18 +933,306 @@ function App(){
   // ===== HISTORY LIST =====
   if(scr==="history")return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"#111119",display:"flex",flexDirection:"column"}}><div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"#333"}}><button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${goHome}>← 홈</button><span style=${{color:"#fff",fontSize:15,fontWeight:700}}>📋 기록</span><span style=${{width:56}}/></div><div style=${{flex:1,overflowY:"auto",padding:16}}>${hist.length===0?h`<div style=${{textAlign:"center",paddingTop:60,color:"#888"}}>아직 기록이 없어요</div>`:hist.map(function(x){return h`<button key=${x.id} style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:14,textAlign:"left",display:"block",marginBottom:10}} onClick=${function(){setHv(x);}}><div style=${{color:"#eee",fontSize:13,fontWeight:700}}>${x.icon} ${x.mode}</div><div style=${{color:"#888",fontSize:10,marginTop:4}}>${x.time}</div><div style=${{color:"#999",fontSize:11,marginTop:4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>${x.result.slice(0,60)}</div></button>`;})}</div></div>`;
 
+  // ===== QUIZ (3문항 진단) =====
+  if(scr==="quiz"&&qprob){
+    var curQ=qprob.qs[qstep];
+    var pgPct=Math.round(((qstep)/qprob.qs.length)*100);
+    return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",display:"flex",flexDirection:"column"}}>
+      <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 14px",background:qprob.color}}>
+        <button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){if(qstep===0){goHome();}else{setQstep(qstep-1);}}}>← ${qstep===0?"홈":"이전"}</button>
+        <span style=${{color:"#fff",fontSize:14,fontWeight:700}}>${qprob.icon} ${qprob.label}</span>
+        <span style=${{color:"#fff",fontSize:12,opacity:.85}}>${qstep+1}/${qprob.qs.length}</span>
+      </div>
+      <div style=${{height:4,background:"rgba(255,255,255,.06)"}}>
+        <div style=${{height:"100%",width:pgPct+"%",background:qprob.color,transition:"width .3s ease"}}/>
+      </div>
+      <div class="fade-in" style=${{flex:1,padding:"28px 22px"}}>
+        <div style=${{color:"#8a8aac",fontSize:12,marginBottom:8}}>질문 ${qstep+1}</div>
+        <h2 style=${{color:"#f0f0f5",fontSize:22,fontWeight:800,lineHeight:1.4,marginBottom:24}}>${curQ.q}</h2>
+        <div style=${{display:"flex",flexDirection:"column",gap:10}}>
+          ${curQ.opts.map(function(o,i){return h`<button key=${i} class="fade-in" style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"16px 18px",textAlign:"left",color:"#eee",fontSize:14.5,fontWeight:600,transition:"all .15s"}} onClick=${function(){onQuizAnswer(o);}}>${o.label}</button>`;})}
+        </div>
+        <div style=${{marginTop:20,padding:"10px 12px",background:"rgba(78,205,196,.06)",borderRadius:10,color:"#7eddd4",fontSize:11,lineHeight:1.6}}>💚 답하기 어려우시면 "잘 모르겠어요"를 골라주세요. 그래도 분석해드려요.</div>
+      </div>
+    </div>`;
+  }
+
+  // ===== FREE RESULT (무료 결과 + 정확도 게이지 + 유료 CTA) =====
+  if(scr==="freeresult"&&diag&&qprob){
+    var med=diag.medical;
+    var blocked=med&&med.level==="high";
+    return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",display:"flex",flexDirection:"column"}}>
+      <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:qprob.color}}>
+        <button style=${{background:"rgba(255,255,255,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${goHome}>← 홈</button>
+        <span style=${{color:"#fff",fontSize:14,fontWeight:700}}>${qprob.icon} 진단 결과</span>
+        <span style=${{width:56}}/>
+      </div>
+      <div class="fade-in" style=${{flex:1,padding:"22px 18px"}}>
+        ${med?h`<div style=${{padding:16,background:med.level==="high"?"rgba(255,80,80,.12)":"rgba(255,200,100,.10)",border:"1px solid "+(med.level==="high"?"rgba(255,80,80,.35)":"rgba(255,200,100,.35)"),borderRadius:14,marginBottom:18}}>
+          <div style=${{color:med.level==="high"?"#ff8888":"#ffd8a0",fontSize:14,fontWeight:800,marginBottom:6}}>${MEDICAL_FLAG_MSG[med.level].title}</div>
+          <div style=${{color:"#eee",fontSize:13,lineHeight:1.7}}>${MEDICAL_FLAG_MSG[med.level].body}</div>
+          <div style=${{marginTop:10,padding:"8px 10px",background:"rgba(0,0,0,.25)",borderRadius:8,color:"#aab",fontSize:11.5,lineHeight:1.6}}>📌 AI 진단은 참고용이며, 수의사 상담을 대체하지 않아요.</div>
+        </div>`:null}
+
+        <!-- 페르소나 카드 -->
+        <div style=${{padding:18,background:"linear-gradient(135deg,"+qprob.color+"22,"+qprob.color+"08)",border:"1px solid "+qprob.color+"44",borderRadius:16,marginBottom:16}}>
+          <div style=${{color:"#aab",fontSize:11.5,marginBottom:6}}>우리 아이는</div>
+          <div style=${{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+            <span style=${{fontSize:36}}>${diag.persona.emoji}</span>
+            <span style=${{color:"#f0f0f5",fontSize:22,fontWeight:900}}>${diag.persona.name}</span>
+          </div>
+          <div style=${{color:"#ccd",fontSize:13,lineHeight:1.6}}>${diag.persona.desc}</div>
+        </div>
+
+        <!-- 가능 원인 Top 3 -->
+        <div style=${{marginBottom:18}}>
+          <div style=${{color:"#f0f0f5",fontSize:14.5,fontWeight:800,marginBottom:10}}>🔍 가능 원인 Top 3</div>
+          ${diag.top.map(function(t){var c=CAUSES.find(function(x){return x.code===t.code;});return h`<div key=${t.code} style=${{marginBottom:10}}>
+            <div style=${{display:"flex",justifyContent:"space-between",fontSize:12.5,marginBottom:4}}>
+              <span style=${{color:"#ddd",fontWeight:600}}>${c.label}</span>
+              <span style=${{color:c.color,fontWeight:800}}>${t.pct}%</span>
+            </div>
+            <div style=${{height:8,background:"rgba(255,255,255,.06)",borderRadius:4,overflow:"hidden"}}>
+              <div style=${{height:"100%",width:t.pct+"%",background:c.color,transition:"width .5s ease"}}/>
+            </div>
+          </div>`;})}
+        </div>
+
+        <!-- 오늘 1가지 미션 -->
+        ${!blocked&&diag.top[0]?(function(){var c=CAUSES.find(function(x){return x.code===diag.top[0].code;});return h`<div style=${{padding:14,background:"rgba(255,215,0,.06)",border:"1px solid rgba(255,215,0,.25)",borderRadius:14,marginBottom:18}}>
+          <div style=${{color:"#FFD700",fontSize:13,fontWeight:800,marginBottom:6}}>✨ 오늘 당장 해볼 1가지</div>
+          <div style=${{color:"#eee",fontSize:13.5,lineHeight:1.7}}>${c.hint}</div>
+        </div>`;})():null}
+
+        <!-- 정확도 게이지 -->
+        <div style=${{padding:14,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,marginBottom:18}}>
+          <div style=${{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:8}}>
+            <span style=${{color:"#aab",fontWeight:600}}>📊 진단 정확도</span>
+            <span style=${{color:"#4ECDC4",fontWeight:800,fontSize:14}}>${diag.accuracy}%</span>
+          </div>
+          <div style=${{height:10,background:"rgba(255,255,255,.06)",borderRadius:5,overflow:"hidden",marginBottom:10}}>
+            <div style=${{height:"100%",width:diag.accuracy+"%",background:"linear-gradient(90deg,#4ECDC4,#7eddd4)",transition:"width .5s ease"}}/>
+          </div>
+          ${!ageHint?h`<div>
+            <div style=${{color:"#aab",fontSize:11.5,marginBottom:8}}>💡 나이대만 알려주시면 +5%</div>
+            <div style=${{display:"flex",gap:6}}>
+              ${["kitten","adult","senior"].map(function(a){var label={kitten:"1살 미만",adult:"1~7살",senior:"8살+"}[a];return h`<button key=${a} style=${{flex:1,padding:"9px 6px",borderRadius:10,background:"rgba(78,205,196,.10)",border:"1px solid rgba(78,205,196,.3)",color:"#7eddd4",fontSize:11.5,fontWeight:700}} onClick=${function(){applyAgeHint(a);}}>${label}</button>`;})}
+              <button style=${{padding:"9px 10px",borderRadius:10,background:"rgba(255,255,255,.04)",color:"#888",fontSize:11.5}} onClick=${function(){setAgeHint("skipped");}}>스킵</button>
+            </div>
+          </div>`:h`<div style=${{color:"#7eddd4",fontSize:11.5}}>✅ 정보가 반영됐어요</div>`}
+        </div>
+
+        <!-- 유료 CTA (의료 플래그 high 시 비활성화) -->
+        ${blocked?h`<div style=${{padding:14,background:"rgba(255,255,255,.04)",border:"1px dashed rgba(255,255,255,.15)",borderRadius:14,color:"#888",fontSize:12.5,lineHeight:1.7,textAlign:"center"}}>병원 방문 후 다시 진단받아주세요.<br/>지금은 유료 플랜 결제가 비활성화되어 있어요.</div>`
+        :h`<div>
+          <div style=${{color:"#f0f0f5",fontSize:14.5,fontWeight:800,marginBottom:10}}>🎁 더 깊이 알아보기</div>
+          <div style=${{padding:"8px 10px",background:"rgba(255,215,0,.08)",border:"1px dashed rgba(255,215,0,.3)",borderRadius:10,color:"#FFD700",fontSize:11,marginBottom:10,textAlign:"center"}}>🧪 테스트 모드 — 결제 없이 바로 진입</div>
+          <button style=${{width:"100%",padding:"15px 16px",borderRadius:14,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"#eee",fontSize:13.5,fontWeight:700,marginBottom:10,textAlign:"left"}} onClick=${function(){setScr("premium");}}>
+            <div style=${{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span>📝 정밀 리포트</span><span style=${{color:"#FFD700",fontSize:14}}>2,900원</span>
+            </div>
+            <div style=${{color:"#888",fontSize:11.5,marginTop:4,fontWeight:400}}>원인 Top 5 + 맞춤 미션 5개 + 사냥놀이 처방 3종 + PDF</div>
+          </button>
+          <button style=${{width:"100%",padding:"15px 16px",borderRadius:14,background:"linear-gradient(135deg,"+qprob.color+"22,"+qprob.color+"11)",border:"1px solid "+qprob.color+"55",color:"#fff",fontSize:13.5,fontWeight:700,marginBottom:10,textAlign:"left"}} onClick=${function(){setChecks([false,false,false,false,false,false,false]);setDayIdx(0);setScr("weekplan");}}>
+            <div style=${{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span>📅 7일 사냥놀이 플랜</span><span style=${{color:"#FFD700",fontSize:14}}>9,900원</span>
+            </div>
+            <div style=${{color:"rgba(255,255,255,.6)",fontSize:11.5,marginTop:4,fontWeight:400}}>매일 미션 3개 + 영상 가이드 + 일일 체크인</div>
+          </button>
+          <div style=${{textAlign:"center",color:"#666",fontSize:10.5,marginTop:8}}>🛡️ 24시간 100% 환불 보장</div>
+        </div>`}
+
+        <button style=${{width:"100%",marginTop:20,padding:14,borderRadius:12,background:"rgba(255,255,255,.05)",color:"#aab",fontSize:13,fontWeight:600}} onClick=${goHome}>🏠 처음으로</button>
+        <div style=${{marginTop:14,padding:10,textAlign:"center",color:"#666",fontSize:10.5,lineHeight:1.6}}>AI 진단은 참고용이며 수의사 상담을 대체하지 않습니다</div>
+      </div>
+    </div>`;
+  }
+
+  // ===== PREMIUM (정밀 리포트) =====
+  if(scr==="premium"&&diag&&qprob){
+    var pc=PERSONA_CONTENT[diag.persona.id]||PERSONA_CONTENT.hunter;
+    var top5=topCauses(diag.pct,5);
+    return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#0d0d18,#13131f)",display:"flex",flexDirection:"column"}}>
+      <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"linear-gradient(135deg,#FFD700,#FFA500)"}}>
+        <button style=${{background:"rgba(0,0,0,.18)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){setScr("freeresult");}}>← 결과</button>
+        <span style=${{color:"#fff",fontSize:14,fontWeight:800}}>📝 정밀 리포트</span>
+        <span style=${{width:56}}/>
+      </div>
+      <div class="fade-in" style=${{flex:1,padding:"22px 18px",overflowY:"auto"}}>
+        <div style=${{padding:"6px 10px",background:"rgba(255,215,0,.10)",border:"1px dashed rgba(255,215,0,.35)",borderRadius:8,color:"#FFD700",fontSize:11,marginBottom:14,textAlign:"center"}}>🧪 테스트 모드 — 실제 서비스에서는 결제 후 진입</div>
+
+        <!-- 페르소나 풀버전 카드 -->
+        <div style=${{padding:18,background:"linear-gradient(135deg,"+qprob.color+"22,"+qprob.color+"08)",border:"1px solid "+qprob.color+"44",borderRadius:16,marginBottom:18}}>
+          <div style=${{color:"#aab",fontSize:11.5,marginBottom:6}}>우리 아이 페르소나</div>
+          <div style=${{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+            <span style=${{fontSize:42}}>${diag.persona.emoji}</span>
+            <div><div style=${{color:"#f0f0f5",fontSize:22,fontWeight:900}}>${diag.persona.name}</div><div style=${{color:"#ccd",fontSize:12.5,marginTop:2}}>${diag.persona.desc}</div></div>
+          </div>
+          <div style=${{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:12}}>
+            <div><div style=${{color:"#7eddd4",fontSize:11,fontWeight:700,marginBottom:4}}>💪 강점</div>${pc.strengths.map(function(s,i){return h`<div key=${i} style=${{color:"#ddd",fontSize:11.5,lineHeight:1.6}}>• ${s}</div>`;})}</div>
+            <div><div style=${{color:"#ff9090",fontSize:11,fontWeight:700,marginBottom:4}}>⚡ 도전</div>${pc.challenges.map(function(s,i){return h`<div key=${i} style=${{color:"#ddd",fontSize:11.5,lineHeight:1.6}}>• ${s}</div>`;})}</div>
+          </div>
+        </div>
+
+        <!-- 원인 Top 5 + 상세 -->
+        <div style=${{marginBottom:18}}>
+          <div style=${{color:"#f0f0f5",fontSize:15,fontWeight:800,marginBottom:10}}>🔍 가능 원인 Top 5 (상세)</div>
+          ${top5.map(function(t){var c=CAUSES.find(function(x){return x.code===t.code;});return h`<div key=${t.code} style=${{padding:"12px 14px",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",borderLeft:"3px solid "+c.color,borderRadius:10,marginBottom:8}}>
+            <div style=${{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:4}}>
+              <span style=${{color:"#eee",fontWeight:700}}>${c.label}</span>
+              <span style=${{color:c.color,fontWeight:800}}>${t.pct}%</span>
+            </div>
+            <div style=${{color:"#aab",fontSize:11.5,lineHeight:1.6,marginBottom:4}}>${c.desc}</div>
+            <div style=${{color:c.color,fontSize:11.5,lineHeight:1.6}}>💡 ${c.hint}</div>
+          </div>`;})}
+        </div>
+
+        <!-- 추천 장난감 3종 -->
+        <div style=${{marginBottom:18}}>
+          <div style=${{color:"#f0f0f5",fontSize:15,fontWeight:800,marginBottom:10}}>🧸 추천 장난감 3종</div>
+          ${pc.toys.map(function(t,i){return h`<div key=${i} style=${{padding:"12px 14px",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",borderRadius:10,marginBottom:8}}>
+            <div style=${{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+              <span style=${{color:"#eee",fontSize:13.5,fontWeight:700}}>${i+1}. ${t.name}</span>
+              <span style=${{color:"#FFD700",fontSize:11.5,fontWeight:700}}>${t.price}</span>
+            </div>
+            <div style=${{color:"#aab",fontSize:11.5,lineHeight:1.6}}>${t.why}</div>
+          </div>`;})}
+        </div>
+
+        <!-- 사냥놀이 처방 3종 (애니메이션 포함) -->
+        <div style=${{marginBottom:18}}>
+          <div style=${{color:"#f0f0f5",fontSize:15,fontWeight:800,marginBottom:10}}>🎯 맞춤 사냥놀이 처방 3종</div>
+          ${pc.plays.map(function(p,i){var sceneKey=getScene(p.action);var SceneComp=SCENE_RENDER[sceneKey]||SCENE_RENDER.hunt;var info=SCENE_INFO[sceneKey];var cl=["#FF6B6B","#4ECDC4","#FF8C42"][i%3];return h`<div key=${i} class="play-card" style=${{borderLeft:"3px solid "+cl}}>
+            <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+              <span style=${{background:cl+"22",color:cl,padding:"2px 10px",borderRadius:20,fontSize:11,fontWeight:700}}>처방 ${i+1}</span>
+              <span style=${{color:"#eee",fontSize:14,fontWeight:700}}>${p.title}</span>
+            </div>
+            <${SceneComp}/>
+            <div style=${{color:"#ccd",fontSize:13,lineHeight:1.7,marginTop:6}}>${p.desc}</div>
+            <div style=${{marginTop:6,color:cl,fontSize:12,fontWeight:600}}>⏰ ${p.time}</div>
+            <div style=${{marginTop:6,color:"#888",fontSize:11,fontStyle:"italic"}}>💡 ${info?info.tip:""}</div>
+          </div>`;})}
+        </div>
+
+        <!-- 7일 플랜 업셀 -->
+        <button style=${{width:"100%",padding:"15px 16px",borderRadius:14,background:"linear-gradient(135deg,"+qprob.color+"33,"+qprob.color+"15)",border:"1px solid "+qprob.color+"66",color:"#fff",fontSize:14,fontWeight:800,marginBottom:14,textAlign:"left"}} onClick=${function(){setChecks([false,false,false,false,false,false,false]);setDayIdx(0);setScr("weekplan");}}>
+          <div style=${{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span>📅 7일 플랜으로 업그레이드</span><span style=${{color:"#FFD700",fontSize:13}}>+7,000원</span>
+          </div>
+          <div style=${{color:"rgba(255,255,255,.7)",fontSize:11.5,marginTop:4,fontWeight:400}}>리포트만으론 행동이 안 바뀌어요. 매일 1미션 시작하기.</div>
+        </button>
+
+        <button style=${{width:"100%",padding:14,borderRadius:12,background:"rgba(255,255,255,.05)",color:"#aab",fontSize:13,fontWeight:600,marginBottom:10}} onClick=${goHome}>🏠 처음으로</button>
+        <div style=${{padding:10,textAlign:"center",color:"#666",fontSize:10.5,lineHeight:1.6}}>AI 진단은 참고용이며 수의사 상담을 대체하지 않습니다</div>
+      </div>
+    </div>`;
+  }
+
+  // ===== WEEK PLAN (7일 플랜) =====
+  if(scr==="weekplan"&&diag&&qprob){
+    var pc2=PERSONA_CONTENT[diag.persona.id]||PERSONA_CONTENT.hunter;
+    var done=checks.filter(function(x){return x;}).length;
+    var missions=[
+      {key:"m",icon:"🌅",label:"아침",text:pc2.week.m[dayIdx]},
+      {key:"n",icon:"☀️",label:"점심",text:pc2.week.n[dayIdx]},
+      {key:"e",icon:"🌙",label:"저녁",text:pc2.week.e[dayIdx]}
+    ];
+    return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#0d0d18,#13131f)",display:"flex",flexDirection:"column"}}>
+      <div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px",background:"linear-gradient(135deg,"+qprob.color+","+qprob.color+"aa)"}}>
+        <button style=${{background:"rgba(0,0,0,.2)",color:"#fff",padding:"7px 14px",borderRadius:8,fontSize:12.5}} onClick=${function(){setScr("freeresult");}}>← 결과</button>
+        <span style=${{color:"#fff",fontSize:14,fontWeight:800}}>📅 7일 ${diag.persona.name} 플랜</span>
+        <span style=${{width:56}}/>
+      </div>
+      <div class="fade-in" style=${{flex:1,padding:"20px 18px",overflowY:"auto"}}>
+        <div style=${{padding:"6px 10px",background:"rgba(255,215,0,.10)",border:"1px dashed rgba(255,215,0,.35)",borderRadius:8,color:"#FFD700",fontSize:11,marginBottom:14,textAlign:"center"}}>🧪 테스트 모드 — 진행 상태는 페이지 이탈 시 초기화</div>
+
+        <!-- 진행도 게이지 -->
+        <div style=${{padding:14,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,marginBottom:14}}>
+          <div style=${{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:8}}>
+            <span style=${{color:"#aab",fontWeight:600}}>전체 진행도</span>
+            <span style=${{color:qprob.color,fontWeight:800,fontSize:14}}>${done}/7일</span>
+          </div>
+          <div style=${{height:10,background:"rgba(255,255,255,.06)",borderRadius:5,overflow:"hidden"}}>
+            <div style=${{height:"100%",width:(done/7*100)+"%",background:"linear-gradient(90deg,"+qprob.color+","+qprob.color+"cc)",transition:"width .5s ease"}}/>
+          </div>
+        </div>
+
+        <!-- 일자 선택 탭 -->
+        <div style=${{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:6,marginBottom:18}}>
+          ${[0,1,2,3,4,5,6].map(function(i){var sel=i===dayIdx,ok=checks[i];return h`<button key=${i} style=${{padding:"8px 0",borderRadius:10,background:sel?qprob.color:"rgba(255,255,255,.05)",border:"1px solid "+(sel?qprob.color:"rgba(255,255,255,.08)"),color:sel?"#fff":(ok?"#7eddd4":"#aab"),fontSize:11.5,fontWeight:700}} onClick=${function(){setDayIdx(i);}}>${ok?"✓":""}D${i+1}</button>`;})}
+        </div>
+
+        <!-- 오늘 (선택일) 미션 -->
+        <div style=${{marginBottom:14}}>
+          <div style=${{color:"#f0f0f5",fontSize:16,fontWeight:800,marginBottom:10}}>Day ${dayIdx+1} ${checks[dayIdx]?"✅ 완료":""}</div>
+          ${missions.map(function(m,i){return h`<div key=${i} style=${{padding:"14px 16px",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",borderRadius:12,marginBottom:8}}>
+            <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+              <span style=${{fontSize:18}}>${m.icon}</span>
+              <span style=${{color:qprob.color,fontSize:12,fontWeight:800}}>${m.label} 미션</span>
+            </div>
+            <div style=${{color:"#eee",fontSize:13.5,lineHeight:1.7}}>${m.text}</div>
+          </div>`;})}
+        </div>
+
+        <!-- 일일 인사이트 / 체크인 -->
+        <div style=${{padding:14,background:"rgba(78,205,196,.06)",border:"1px solid rgba(78,205,196,.2)",borderRadius:12,marginBottom:14}}>
+          <div style=${{color:"#4ECDC4",fontSize:12,fontWeight:800,marginBottom:6}}>📊 오늘의 관찰 포인트</div>
+          <div style=${{color:"#ccd",fontSize:12.5,lineHeight:1.7}}>${pc2.week.hint[dayIdx]}</div>
+        </div>
+
+        <!-- 오늘 우리 아이 어땠어요? -->
+        <div style=${{padding:14,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,marginBottom:14}}>
+          <div style=${{color:"#aab",fontSize:12,fontWeight:700,marginBottom:10}}>오늘 우리 아이는 어땠어요?</div>
+          <div style=${{display:"flex",gap:8}}>
+            ${[{e:"😻",t:"좋았어요"},{e:"🙂",t:"그저 그래"},{e:"😿",t:"안 좋았어"}].map(function(o,i){return h`<button key=${i} style=${{flex:1,padding:"10px 4px",borderRadius:10,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",color:"#ddd",fontSize:11.5,fontWeight:600}} onClick=${function(){var nc=checks.slice();nc[dayIdx]=true;setChecks(nc);if(dayIdx<6)setTimeout(function(){setDayIdx(dayIdx+1);},400);}}><div style=${{fontSize:22,marginBottom:2}}>${o.e}</div>${o.t}</button>`;})}
+          </div>
+        </div>
+
+        <button style=${{width:"100%",padding:14,borderRadius:12,background:checks[dayIdx]?"rgba(255,255,255,.05)":qprob.color,color:checks[dayIdx]?"#aab":"#fff",fontSize:13.5,fontWeight:800,marginBottom:10}} onClick=${function(){var nc=checks.slice();nc[dayIdx]=!nc[dayIdx];setChecks(nc);}}>${checks[dayIdx]?"↩ 미완료로 되돌리기":"✓ Day "+(dayIdx+1)+" 완료 표시"}</button>
+
+        ${done>=7?h`<div style=${{padding:18,background:"linear-gradient(135deg,#FFD70022,#FFA50011)",border:"1px solid #FFD70055",borderRadius:14,textAlign:"center",marginBottom:14}}>
+          <div style=${{fontSize:36,marginBottom:6}}>🎉</div>
+          <div style=${{color:"#FFD700",fontSize:15,fontWeight:800,marginBottom:4}}>7일 플랜 완주!</div>
+          <div style=${{color:"#ccd",fontSize:12.5,lineHeight:1.7}}>월 구독으로 다음 단계 처방 받아보세요</div>
+        </div>`:null}
+
+        <button style=${{width:"100%",padding:14,borderRadius:12,background:"rgba(255,255,255,.05)",color:"#aab",fontSize:13,fontWeight:600,marginBottom:10}} onClick=${goHome}>🏠 처음으로</button>
+        <div style=${{padding:10,textAlign:"center",color:"#666",fontSize:10.5,lineHeight:1.6}}>AI 진단은 참고용이며 수의사 상담을 대체하지 않습니다</div>
+      </div>
+    </div>`;
+  }
+
   // ===== HOME =====
   if(scr==="home")return h`<div style=${{maxWidth:520,margin:"0 auto",minHeight:"100dvh",background:"linear-gradient(170deg,#13131f,#161630 40%,#0d1b3a)",padding:"0 20px 28px",display:"flex",flexDirection:"column",alignItems:"center"}}>
-    <div style=${{textAlign:"center",paddingTop:44,marginBottom:16}}>
-      <div style=${{width:90,height:90,borderRadius:45,background:"linear-gradient(135deg,#FF6B6B,#FF8C42,#4ECDC4)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px",boxShadow:"0 6px 28px rgba(255,107,107,.25)",animation:"pulse 3s ease-in-out infinite"}}><span style=${{fontSize:50}}>🐱</span></div>
-      <h1 style=${{fontSize:25,fontWeight:900,color:"#f0f0f5"}}>냥냥 행동분석</h1>
-      <p style=${{fontSize:12,color:"#8888aa",marginTop:4}}>AI 고양이 행동교정 전문가</p>
+    <div style=${{textAlign:"center",paddingTop:36,marginBottom:14}}>
+      <div style=${{width:78,height:78,borderRadius:40,background:"linear-gradient(135deg,#FF6B6B,#FF8C42,#4ECDC4)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 10px",boxShadow:"0 6px 28px rgba(255,107,107,.25)",animation:"pulse 3s ease-in-out infinite"}}><span style=${{fontSize:42}}>🐱</span></div>
+      <h1 style=${{fontSize:23,fontWeight:900,color:"#f0f0f5"}}>우리 아이, 왜 그럴까요?</h1>
+      <p style=${{fontSize:12,color:"#8888aa",marginTop:6,lineHeight:1.6}}>이름도, 나이도 묻지 않아요.<br/>30초면 충분해요.</p>
     </div>
     <div style=${{background:"rgba(255,255,255,.06)",borderRadius:12,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,width:"100%",marginBottom:20,border:"1px solid rgba(255,255,255,.05)"}}><span>💡</span><span style=${{color:"#ccd",fontSize:12}}>${tip}</span></div>
-    <div style=${{width:"100%",display:"flex",flexDirection:"column",gap:10}}>
-      ${MODES.map(function(m){return h`<button key=${m.id} class="fade-in" style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderLeft:"4px solid "+m.color,borderRadius:14,padding:"15px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",textAlign:"left"}} onClick=${function(){enterMode(m.id);}}>
-        <div style=${{display:"flex",alignItems:"center",gap:14}}><span style=${{fontSize:34}}>${m.icon}</span><div><div style=${{fontSize:15,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:11,color:"#888",marginTop:2}}>${m.desc}</div></div></div>
-        <span style=${{fontSize:20,color:"#555"}}>›</span></button>`;})}
+
+    <!-- 행동 고민 섹션 (신규) -->
+    <div style=${{width:"100%",marginBottom:8,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <span style=${{color:"#f0f0f5",fontSize:14,fontWeight:800}}>🐾 어떤 고민이세요?</span>
+      <span style=${{color:"#888",fontSize:11}}>3문항이면 끝</span>
+    </div>
+    <div style=${{width:"100%",display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:20}}>
+      ${PROBLEMS.map(function(p){return h`<button key=${p.id} class="fade-in" style=${{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.07)",borderTop:"3px solid "+p.color,borderRadius:12,padding:"14px 12px",textAlign:"left",minHeight:88}} onClick=${function(){enterMode(p.id);}}>
+        <div style=${{fontSize:24,marginBottom:6}}>${p.icon}</div>
+        <div style=${{color:p.color,fontSize:13,fontWeight:800,lineHeight:1.3}}>${p.label}</div>
+        <div style=${{color:"#888",fontSize:10.5,marginTop:3,lineHeight:1.4}}>${p.desc}</div>
+        ${p.risk==="high"?h`<div style=${{marginTop:6,fontSize:9.5,color:"#ff8888",fontWeight:700}}>⚠ 건강 신호 우선</div>`:null}
+      </button>`;})}
+    </div>
+
+    <!-- 사진/영상 분석 섹션 (기존) -->
+    <div style=${{width:"100%",marginBottom:8}}>
+      <span style=${{color:"#f0f0f5",fontSize:14,fontWeight:800}}>📷 사진·영상으로 분석</span>
+    </div>
+    <div style=${{width:"100%",display:"flex",flexDirection:"column",gap:8}}>
+      ${MODES.map(function(m){return h`<button key=${m.id} class="fade-in" style=${{width:"100%",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.06)",borderLeft:"4px solid "+m.color,borderRadius:12,padding:"12px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",textAlign:"left"}} onClick=${function(){enterMode(m.id);}}>
+        <div style=${{display:"flex",alignItems:"center",gap:12}}><span style=${{fontSize:28}}>${m.icon}</span><div><div style=${{fontSize:14,fontWeight:700,color:m.color}}>${m.label}</div><div style=${{fontSize:10.5,color:"#888",marginTop:2}}>${m.desc}</div></div></div>
+        <span style=${{fontSize:18,color:"#555"}}>›</span></button>`;})}
     </div>
     <button style=${{marginTop:14,padding:"11px 22px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:12,color:"#aab",fontSize:12.5,width:"100%"}} onClick=${function(){setScr("history");}}>📋 분석 기록 (${hist.length})</button>
     <div style=${{marginTop:"auto",paddingTop:20}}><span style=${{fontSize:10,color:"#666"}}>AI 분석은 참고용이며 수의사 상담을 대체하지 않습니다</span></div>
